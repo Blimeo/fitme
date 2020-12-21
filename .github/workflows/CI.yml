@@ -20,7 +20,7 @@ jobs:
       run: cd frontend && yarn install
 
     - name: Run TypeScript Compiler
-      run: yarn tsc
+      run: cd frontend && yarn tsc
    
     - name: Run Linter
-      run: yarn lint
+      run: cd frontend && yarn lint

@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Node
+      uses: actions/setup-node@v1  
+      
+    - name: Yarn Install Frontend
+      run: cd frontend && yarn install
+
+    - name: Run TypeScript Compiler
+      run: yarn tsc
+   
+    - name: Run Linter
+      run: yarn lint

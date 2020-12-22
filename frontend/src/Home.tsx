@@ -1,11 +1,12 @@
+import { Typography } from '@material-ui/core';
 import React from 'react';
 import Header from './Header'
 
 function Home() {
     return (
         <div className="Home">
-            <Header></Header>
-            <h1>Welcome to Fitme!</h1>
+            <Header />
+            <Typography>Welcome to Fitme!</Typography>
         </div>
 
     );

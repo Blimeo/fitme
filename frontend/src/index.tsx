@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./css/index.css";
 import Home from "./Home";
+import Profile from "./Profile";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
@@ -14,6 +15,7 @@ ReactDOM.render(
           <Route path="/about" component={Home} />
           <Route path="/items" component={Home} />
           <Route path="/fits" component={Home} />
+          <Route path="/profile" component={Profile} />
         </Switch>
       </main>
     </BrowserRouter>

@@ -11,7 +11,7 @@ import {
   Theme,
 } from "@material-ui/core";
 import { BrowserRouter as Router, Link, Route } from "react-router-dom";
-import "./css/Header.css";
+import styles from "./css/Header.module.css";
 import LoginDialogue from './LoginDialogue'
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -33,16 +33,16 @@ function Nav() {
         <Toolbar>
           <Typography variant="h6">Fitme</Typography>
           <Tabs className={classes.expand}>
-            <Link to="/">
+            <Link className={styles.link} to="/">
               <Tab label="Home" />
             </Link>
-            <Link to="/about">
+            <Link className={styles.link} to="/about">
               <Tab label="About" />
             </Link>
-            <Link to="/items">
+            <Link className={styles.link} to="/items">
               <Tab label="Items" />
             </Link>
-            <Link to="/fits">
+            <Link className={styles.link} to="/fits">
               <Tab label="Fits" />
             </Link>
           </Tabs>

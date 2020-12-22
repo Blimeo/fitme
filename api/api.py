@@ -42,7 +42,6 @@ def login():
     req = request.get_json(force=True)
     email = req.get('email', None)
     password = req.get('password', None)
-    print(email, password)
 
     if users_collection.find_one({"email": email, "password": password}):
         access_token = create_access_token(identity=email)

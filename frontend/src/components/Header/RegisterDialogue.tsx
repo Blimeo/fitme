@@ -12,6 +12,7 @@ import styles from "./LoginDialogue.module.css";
 export default function FormDialog() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleClickOpen = () => {
@@ -20,39 +21,35 @@ export default function FormDialog() {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleLogin = (e: any) => {
+  const handleRegister = (e: any) => {
     e.preventDefault();
-    let opts = {
+    const opts = {
       'email': email,
+      'username': username,
       'password': password
     }
-    fetch('/login', {
+    fetch('/register', {
       method: 'POST',
       body: JSON.stringify(opts)
     }).then(r => r.json())
       .then(token => {
-        if (token.access_token){
-          alert(token.access_token)          
-        }
-        else {
-          alert("Please type in correct username/password")
-        }
+          alert(token.message)
       });
     setOpen(false);
   };
   return (
     <div>
       <Button className={styles.loginButton} onClick={handleClickOpen}>
-        Login
+      Register
       </Button>
       <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Log in</DialogTitle>
+        <DialogTitle id="form-dialog-title">Register</DialogTitle>
         <DialogContent>
-          <DialogContentText>Please log into your account.</DialogContentText>
+          <DialogContentText>Fill out the items below to register.</DialogContentText>
           <TextField
             autoFocus
             margin="dense"
@@ -61,6 +58,15 @@ export default function FormDialog() {
             type="email"
             onChange={(e) => setEmail(e.target.value)}
             value={email}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            id="name"
+            label="Username"
+            type="username"
+            onChange={(e) => setUsername(e.target.value)}
+            value={username}
             fullWidth
           />
           <TextField
@@ -77,8 +83,8 @@ export default function FormDialog() {
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleLogin} color="primary">
-            Login
+          <Button onClick={handleRegister} color="primary">
+            Register
           </Button>
         </DialogActions>
       </Dialog>

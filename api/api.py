@@ -14,35 +14,34 @@ app.config['JWT_REFRESH_LIFESPAN'] = {'days': 30}
 jwt = JWTManager(app)
 
 mongo_uri = os.getenv("MONGO_URI")
-client = pymongo.MongoClient(mongo_uri)
+connection_timeout = 2000 # ms
+client = pymongo.MongoClient(mongo_uri, serverSelectionTimeoutMS=connection_timeout)
 db = client.get_database('fitme_db')
 users_collection = db['users']
 
 
 @app.route("/register", methods=["POST"])
 def register():
-    email = request.form["email"]
-
+    req = request.get_json(force=True)
+    email = req.get('email', None)
+    username = req.get('username', None)
     if users_collection.find_one({"email": email}):
-        return jsonify(message="User already exists"), 409
+        return jsonify(message="A user with that email already exists."), 409
+    elif users_collection.find_one({'username': username}):
+        return jsonify(message="A user with that username already exists."), 409
     else:
-        first_name = request.form["first_name"]
-        last_name = request.form["last_name"]
-        password = request.form["password"]
-        user_info = dict(first_name=first_name,
-                         last_name=last_name, email=email, password=password)
+        password = req.get('password', None)
+        user_info = dict(email=email,
+                         username=username, password=password)
         users_collection.insert_one(user_info)
         return jsonify(message="User added successfully"), 201
 
 
 @app.route("/login", methods=["POST"])
 def login():
-    if request.is_json:
-        email = request.json["email"]
-        password = request.json["password"]
-    else:
-        email = request.form["email"]
-        password = request.form["password"]
+    req = request.get_json(force=True)
+    email = req.get('email', None)
+    password = req.get('password', None)
 
     if users_collection.find_one({"email": email, "password": password}):
         access_token = create_access_token(identity=email)

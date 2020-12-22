@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -27,7 +27,7 @@ export default function FormDialog() {
       'password': password
     }
     fetch('/login', {
-      method: 'post',
+      method: 'POST',
       body: JSON.stringify(opts)
     }).then(r => r.json())
       .then(token => {
@@ -39,13 +39,6 @@ export default function FormDialog() {
         }
       });
     setOpen(false);
-  };
-  const handleEmailChange = (e: any) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: any) => {
-    setPassword(e.target.value);
   };
   return (
     <div>
@@ -66,7 +59,7 @@ export default function FormDialog() {
             id="name"
             label="Email Address"
             type="email"
-            onChange={handleEmailChange}
+            onChange={(e) => setEmail(e.target.value)}
             value={email}
             fullWidth
           />
@@ -75,7 +68,7 @@ export default function FormDialog() {
             id="password"
             label="Password"
             type="password"
-            onChange={handlePasswordChange}
+            onChange={(e) => setPassword(e.target.value)}
             value={password}
             fullWidth
           />

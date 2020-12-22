@@ -11,8 +11,8 @@ import {
   Theme,
 } from "@material-ui/core";
 import { BrowserRouter as Router, Link, Route } from "react-router-dom";
-import styles from "./css/Header.module.css";
-import LoginDialogue from './LoginDialogue'
+import styles from "./index.module.css";
+import LoginDialogue from "./LoginDialogue";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

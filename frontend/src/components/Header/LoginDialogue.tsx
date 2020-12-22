@@ -1,13 +1,13 @@
-import React, {useState} from 'react';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import React, { useState } from "react";
+import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 
-import styles from './css/LoginDialogue.module.css';
+import styles from "./LoginDialogue.module.css";
 
 export default function FormDialog() {
   const [open, setOpen] = useState(false);
@@ -17,7 +17,7 @@ export default function FormDialog() {
   };
   const handleLogin = () => {
     setOpen(false);
-  }
+  };
   const handleClose = () => {
     setOpen(false);
   };
@@ -27,12 +27,14 @@ export default function FormDialog() {
       <Button className={styles.loginButton} onClick={handleClickOpen}>
         Login
       </Button>
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="form-dialog-title"
+      >
         <DialogTitle id="form-dialog-title">Log in</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Please log into your account.
-          </DialogContentText>
+          <DialogContentText>Please log into your account.</DialogContentText>
           <TextField
             autoFocus
             margin="dense"

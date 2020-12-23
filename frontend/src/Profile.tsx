@@ -1,5 +1,5 @@
 import { Typography } from "@material-ui/core";
-import React, { useEffect, useRef} from "react";
+import React, { useEffect } from "react";
 
 function Profile() {
   useEffect(() => {
@@ -16,7 +16,7 @@ function Profile() {
       })
         .then((r) => r.json())
         .then((token) => {
-          alert(token.identity)
+          alert(token.identity);
         });
     }
   });

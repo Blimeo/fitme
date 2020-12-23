@@ -1,26 +1,75 @@
 import React from "react";
 import {
   AppBar,
-  Tabs,
-  Tab,
   Toolbar,
-  Typography,
   makeStyles,
   createStyles,
+  Grid,
+  Button,
+  Avatar,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import styles from "./index.module.css";
 import LoginDialogue from "./LoginDialogue";
 import RegisterDialogue from "./RegisterDialogue";
 import LogoutButton from "./LogoutButton";
+import Logo from "../../assets/img/fitme-logo.png";
+import styles from "./index.module.css";
 
 const useStyles = makeStyles(() =>
   createStyles({
     root: {
       flexGrow: 1,
     },
-    expand: {
+    grow: {
       flexGrow: 1,
+    },
+    container: {
+      width: 1170,
+      margin: "auto",
+    },
+    buttonFontSize: {
+      fontSize: "11px",
+      color: "#a1a1a1",
+      textDecoration: "none",
+    },
+    AppBar: {
+      backgroundColor: "#fff",
+      backgroundSize: "cover",
+    },
+    mainLogo: {
+      color: "#a1a1a1",
+      justifyContent: "left",
+      "&:hover": {
+        background: "transparent",
+      },
+    },
+    avatar: {
+      height: "100%",
+      width: "100px",
+      borderRadius: 0,
+    },
+    loginButton: {
+      background: "#e91e63",
+      color: "#fff",
+      borderRadius: "25px",
+      padding: "0px 25px",
+      marginLeft: "5px",
+      "&:hover": {
+        background: "#ff3b7d",
+        boxShadow: "0px 2px 10px #888888",
+      },
+    },
+    logoutButton: {
+      background: "#fff",
+      color: "#000",
+      fontSize: "11px",
+      border: "3px solid black",
+      borderRadius: "25px",
+      padding: "0px 25px",
+      marginLeft: "5px",
+      "&:hover": {
+        background: "grey",
+      },
     },
   })
 );
@@ -35,37 +84,52 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6">Fitme</Typography>
-          <Tabs className={classes.expand}>
-            <Link className={styles.link} to="/">
-              <Tab label="Home" />
+      <AppBar position="static" color="default" className={classes.AppBar}>
+        <Grid item sm={12} xs={12} className={classes.container}>
+          <Toolbar>
+            <Grid className={classes.grow}>
+              <Button className={classes.mainLogo} href="/">
+                <Avatar src={Logo} className={classes.avatar} />
+              </Button>
+            </Grid>
+            <Link to="/about" className={styles.link}>
+              <Button color="inherit" className={classes.buttonFontSize}>
+                About
+              </Button>
             </Link>
-            <Link className={styles.link} to="/about">
-              <Tab label="About" />
+            <Link to="/items" className={styles.link}>
+              <Button color="inherit" className={classes.buttonFontSize}>
+                Items
+              </Button>
             </Link>
-            <Link className={styles.link} to="/items">
-              <Tab label="Items" />
+            <Link to="/fits" className={styles.link}>
+              <Button color="inherit" className={classes.buttonFontSize}>
+                Fits
+              </Button>
             </Link>
-            <Link className={styles.link} to="/fits">
-              <Tab label="Fits" />
-            </Link>
-            {loggedIn && (
-              <Link className={styles.link} to="/profile">
-                <Tab label="Profile" />
-              </Link>
+            {loggedIn ? (
+              <>
+                <Link to="/profile" className={styles.link}>
+                  <Button color="inherit" className={classes.buttonFontSize}>
+                    Profile
+                  </Button>
+                </Link>
+                <LogoutButton
+                  logged={setLoggedIn}
+                  className={classes.logoutButton}
+                />
+              </>
+            ) : (
+              <>
+                <LoginDialogue
+                  logged={setLoggedIn}
+                  buttonClassName={classes.loginButton}
+                />
+                <RegisterDialogue buttonClassName={classes.loginButton} />
+              </>
             )}
-          </Tabs>
-          {loggedIn ? (
-            <LogoutButton logged={setLoggedIn} />
-          ) : (
-            <div>
-              <RegisterDialogue />
-              <LoginDialogue logged={setLoggedIn} />
-            </div>
-          )}
-        </Toolbar>
+          </Toolbar>
+        </Grid>
       </AppBar>
     </div>
   );

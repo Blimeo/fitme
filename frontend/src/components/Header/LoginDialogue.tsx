@@ -6,6 +6,8 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import { Grid } from "@material-ui/core";
+import styles from "./forms.module.css";
 
 type Props = {
   readonly logged: React.Dispatch<React.SetStateAction<boolean>>;
@@ -57,29 +59,39 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
         <DialogTitle id="form-dialog-title">Log in</DialogTitle>
         <DialogContent>
           <DialogContentText>Please log into your account.</DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-          />
-          <TextField
-            margin="dense"
-            id="password"
-            label="Password"
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-          />
+          <Grid container alignItems="center" justify="center">
+            <Grid item lg={12}>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="name"
+                label="Email Address"
+                type="email"
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
+                className={styles.InputField}
+                required
+              />
+            </Grid>
+            <Grid item lg={12}>
+              <TextField
+                margin="dense"
+                id="password"
+                label="Password"
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+                className={styles.InputField}
+                required
+              />
+            </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleLogin} color="primary">
+          <Button onClick={handleLogin} color="primary" type="submit">
             Login
           </Button>
         </DialogActions>

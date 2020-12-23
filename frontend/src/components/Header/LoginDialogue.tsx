@@ -6,13 +6,13 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import styles from "./LoginDialogue.module.css";
 
 type Props = {
   readonly logged: React.Dispatch<React.SetStateAction<boolean>>;
+  readonly buttonClassName: string;
 };
 
-export default function FormDialog({ logged }: Props) {
+export default function LoginDialog({ logged, buttonClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +23,7 @@ export default function FormDialog({ logged }: Props) {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleLogin = (e: any) => {
+  const handleLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     let opts = {
       email: email,
@@ -46,7 +46,7 @@ export default function FormDialog({ logged }: Props) {
   };
   return (
     <div>
-      <Button className={styles.loginButton} onClick={handleClickOpen}>
+      <Button className={buttonClassName} onClick={handleClickOpen}>
         Login
       </Button>
       <Dialog

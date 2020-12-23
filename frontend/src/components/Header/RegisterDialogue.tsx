@@ -7,9 +7,11 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-import styles from "./LoginDialogue.module.css";
+type Props = {
+  readonly buttonClassName: string;
+};
 
-export default function FormDialog() {
+export default function RegisterDialog({ buttonClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -40,15 +42,15 @@ export default function FormDialog() {
   };
   return (
     <div>
-      <Button className={styles.loginButton} onClick={handleClickOpen}>
-        Register
+      <Button className={buttonClassName} onClick={handleClickOpen}>
+        Sign Up
       </Button>
       <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Register</DialogTitle>
+        <DialogTitle id="form-dialog-title">Sign Up</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Fill out the items below to register.

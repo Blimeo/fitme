@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -9,7 +9,10 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 
 import styles from "./LoginDialogue.module.css";
 
-export default function FormDialog() {
+type props = {
+  logged: React.Dispatch<React.SetStateAction<boolean>>;
+};
+export default function FormDialog({ logged }: props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,19 +26,21 @@ export default function FormDialog() {
   const handleLogin = (e: any) => {
     e.preventDefault();
     let opts = {
-      'email': email,
-      'password': password
-    }
-    fetch('/login', {
-      method: 'POST',
-      body: JSON.stringify(opts)
-    }).then(r => r.json())
-      .then(token => {
-        if (token.access_token){
-          alert(token.access_token)          
-        }
-        else {
-          alert("Please type in correct username/password")
+      email: email,
+      password: password,
+    };
+    fetch("/login", {
+      method: "POST",
+      body: JSON.stringify(opts),
+    })
+      .then((r) => r.json())
+      .then((token) => {
+        if (token.access_token) {
+          localStorage.setItem("access_token", token.access_token);
+          logged(true);
+          // alert(localStorage.getItem("access_token"));
+        } else {
+          alert("Invalid username/password.");
         }
       });
     setOpen(false);

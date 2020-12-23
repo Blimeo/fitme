@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Tabs,
@@ -14,6 +14,7 @@ import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 import styles from "./index.module.css";
 import LoginDialogue from "./LoginDialogue";
 import RegisterDialogue from "./RegisterDialogue";
+import LogoutButton from "./LogoutButton";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -23,11 +24,39 @@ const useStyles = makeStyles((theme: Theme) =>
     expand: {
       flexGrow: 1,
     },
-  })
+  })  
 );
+
 
 function Nav() {
   const classes = useStyles();
+  const [loggedIn, setLoggedIn] = useState(false);
+  useEffect(() => {
+    const access_token = localStorage.getItem("access_token");
+    setLoggedIn(access_token !== null);
+  });
+  const renderProfileButton = () => {
+    if (loggedIn) {
+      return (
+        <Link className={styles.link} to="/profile">
+          <Tab label="Profile" />
+        </Link>
+      );
+    }
+    return null;
+  };
+  const renderTopRight = () => {
+    if (!loggedIn) {
+      return (
+        <div>
+          <RegisterDialogue />
+          <LoginDialogue logged={setLoggedIn}/>
+        </div>
+      );
+    } else {
+      return <LogoutButton logged={setLoggedIn}/>;
+    }
+  };
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -46,12 +75,9 @@ function Nav() {
             <Link className={styles.link} to="/fits">
               <Tab label="Fits" />
             </Link>
-            <Link className={styles.link} to="/profile">
-              <Tab label="Profile" />
-            </Link>
+            {renderProfileButton()}
           </Tabs>
-          <RegisterDialogue />
-          <LoginDialogue />
+          {renderTopRight()}
         </Toolbar>
       </AppBar>
     </div>

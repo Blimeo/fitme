@@ -3,19 +3,18 @@ import {
   AppBar,
   Tabs,
   Tab,
-  Button,
   Toolbar,
   Typography,
   makeStyles,
   createStyles,
-  Theme,
 } from "@material-ui/core";
-import { BrowserRouter as Router, Link, Route } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from "./index.module.css";
 import LoginDialogue from "./LoginDialogue";
 import RegisterDialogue from "./RegisterDialogue";
+import LogoutButton from "./LogoutButton";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {
       flexGrow: 1,
@@ -26,8 +25,14 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function Nav() {
+type Props = {
+  readonly loggedIn: boolean;
+  readonly setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+function Nav({ loggedIn, setLoggedIn }: Props) {
   const classes = useStyles();
+
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -46,12 +51,20 @@ function Nav() {
             <Link className={styles.link} to="/fits">
               <Tab label="Fits" />
             </Link>
-            <Link className={styles.link} to="/profile">
-              <Tab label="Profile" />
-            </Link>
+            {loggedIn && (
+              <Link className={styles.link} to="/profile">
+                <Tab label="Profile" />
+              </Link>
+            )}
           </Tabs>
-          <RegisterDialogue />
-          <LoginDialogue />
+          {loggedIn ? (
+            <LogoutButton logged={setLoggedIn} />
+          ) : (
+            <div>
+              <RegisterDialogue />
+              <LoginDialogue logged={setLoggedIn} />
+            </div>
+          )}
         </Toolbar>
       </AppBar>
     </div>

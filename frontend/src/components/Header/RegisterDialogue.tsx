@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -24,23 +24,24 @@ export default function FormDialog() {
   const handleRegister = (e: any) => {
     e.preventDefault();
     const opts = {
-      'email': email,
-      'username': username,
-      'password': password
-    }
-    fetch('/register', {
-      method: 'POST',
-      body: JSON.stringify(opts)
-    }).then(r => r.json())
-      .then(token => {
-          alert(token.message)
+      email: email,
+      username: username,
+      password: password,
+    };
+    fetch("/register", {
+      method: "POST",
+      body: JSON.stringify(opts),
+    })
+      .then((r) => r.json())
+      .then((token) => {
+        alert(token.message);
       });
     setOpen(false);
   };
   return (
     <div>
       <Button className={styles.loginButton} onClick={handleClickOpen}>
-      Register
+        Register
       </Button>
       <Dialog
         open={open}
@@ -49,7 +50,9 @@ export default function FormDialog() {
       >
         <DialogTitle id="form-dialog-title">Register</DialogTitle>
         <DialogContent>
-          <DialogContentText>Fill out the items below to register.</DialogContentText>
+          <DialogContentText>
+            Fill out the items below to register.
+          </DialogContentText>
           <TextField
             autoFocus
             margin="dense"
@@ -58,7 +61,6 @@ export default function FormDialog() {
             type="email"
             onChange={(e) => setEmail(e.target.value)}
             value={email}
-            fullWidth
           />
           <TextField
             margin="dense"
@@ -67,7 +69,6 @@ export default function FormDialog() {
             type="username"
             onChange={(e) => setUsername(e.target.value)}
             value={username}
-            fullWidth
           />
           <TextField
             margin="dense"
@@ -76,7 +77,6 @@ export default function FormDialog() {
             type="password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
-            fullWidth
           />
         </DialogContent>
         <DialogActions>

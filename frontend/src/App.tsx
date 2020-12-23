@@ -10,8 +10,8 @@ export default function App() {
   useEffect(() => {
     const access_token = localStorage.getItem("access_token");
     setLoggedIn(access_token !== null);
-    console.log('Logged in: ' + loggedIn);
-  });
+    console.log("Logged in: " + loggedIn);
+  }, [loggedIn]);
   return (
     <div>
       <BrowserRouter>
@@ -23,7 +23,7 @@ export default function App() {
             <Route path="/items" component={Home} />
             <Route path="/fits" component={Home} />
             <Route path="/profile">
-                {loggedIn ? <Profile /> : <Redirect to="/" />}
+              {loggedIn ? <Profile /> : <Redirect to="/" />}
             </Route>
           </Switch>
         </main>

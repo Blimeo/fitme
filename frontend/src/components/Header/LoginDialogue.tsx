@@ -6,12 +6,12 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-
 import styles from "./LoginDialogue.module.css";
 
 type props = {
   logged: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
 export default function FormDialog({ logged }: props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");

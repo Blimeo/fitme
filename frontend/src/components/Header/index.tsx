@@ -3,14 +3,13 @@ import {
   AppBar,
   Tabs,
   Tab,
-  Button,
   Toolbar,
   Typography,
   makeStyles,
   createStyles,
   Theme,
 } from "@material-ui/core";
-import { BrowserRouter as Router, Link, Route } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from "./index.module.css";
 import LoginDialogue from "./LoginDialogue";
 import RegisterDialogue from "./RegisterDialogue";
@@ -24,9 +23,8 @@ const useStyles = makeStyles((theme: Theme) =>
     expand: {
       flexGrow: 1,
     },
-  })  
+  })
 );
-
 
 function Nav() {
   const classes = useStyles();
@@ -34,7 +32,7 @@ function Nav() {
   useEffect(() => {
     const access_token = localStorage.getItem("access_token");
     setLoggedIn(access_token !== null);
-  });
+  }, []);
   const renderProfileButton = () => {
     if (loggedIn) {
       return (
@@ -50,11 +48,11 @@ function Nav() {
       return (
         <div>
           <RegisterDialogue />
-          <LoginDialogue logged={setLoggedIn}/>
+          <LoginDialogue logged={setLoggedIn} />
         </div>
       );
     } else {
-      return <LogoutButton logged={setLoggedIn}/>;
+      return <LogoutButton logged={setLoggedIn} />;
     }
   };
   return (

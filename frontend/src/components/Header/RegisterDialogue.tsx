@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -8,7 +8,6 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
 import styles from "./LoginDialogue.module.css";
-
 
 export default function FormDialog() {
   const [open, setOpen] = useState(false);
@@ -25,23 +24,24 @@ export default function FormDialog() {
   const handleRegister = (e: any) => {
     e.preventDefault();
     const opts = {
-      'email': email,
-      'username': username,
-      'password': password
-    }
-    fetch('/register', {
-      method: 'POST',
-      body: JSON.stringify(opts)
-    }).then(r => r.json())
-      .then(token => {
-          alert(token.message)
+      email: email,
+      username: username,
+      password: password,
+    };
+    fetch("/register", {
+      method: "POST",
+      body: JSON.stringify(opts),
+    })
+      .then((r) => r.json())
+      .then((token) => {
+        alert(token.message);
       });
     setOpen(false);
   };
   return (
     <div>
       <Button className={styles.loginButton} onClick={handleClickOpen}>
-      Register
+        Register
       </Button>
       <Dialog
         open={open}
@@ -50,7 +50,9 @@ export default function FormDialog() {
       >
         <DialogTitle id="form-dialog-title">Register</DialogTitle>
         <DialogContent>
-          <DialogContentText>Fill out the items below to register.</DialogContentText>
+          <DialogContentText>
+            Fill out the items below to register.
+          </DialogContentText>
           <TextField
             autoFocus
             margin="dense"

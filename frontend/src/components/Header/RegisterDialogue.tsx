@@ -61,7 +61,6 @@ export default function FormDialog() {
             type="email"
             onChange={(e) => setEmail(e.target.value)}
             value={email}
-            fullWidth
           />
           <TextField
             margin="dense"
@@ -70,7 +69,6 @@ export default function FormDialog() {
             type="username"
             onChange={(e) => setUsername(e.target.value)}
             value={username}
-            fullWidth
           />
           <TextField
             margin="dense"
@@ -79,7 +77,6 @@ export default function FormDialog() {
             type="password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
-            fullWidth
           />
         </DialogContent>
         <DialogActions>

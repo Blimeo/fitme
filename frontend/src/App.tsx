@@ -15,7 +15,7 @@ export default function App() {
   return (
     <div>
       <BrowserRouter>
-        <Header />
+        <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
         <main>
           <Switch>
             <Route path="/" component={Home} exact />

@@ -6,7 +6,6 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import styles from "./LoginDialogue.module.css";
 
 type Props = {
   readonly logged: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,7 +23,7 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleLogin = (e: any) => {
+  const handleLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     let opts = {
       email: email,

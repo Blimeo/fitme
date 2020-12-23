@@ -9,6 +9,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 
 import styles from "./LoginDialogue.module.css";
 
+
 export default function FormDialog() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");

@@ -2,7 +2,7 @@
 import os
 import pymongo
 from flask import Flask, jsonify, request, Response
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from dotenv import load_dotenv, find_dotenv
 
 
@@ -42,7 +42,6 @@ def login():
     req = request.get_json(force=True)
     email = req.get('email', None)
     password = req.get('password', None)
-
     if users_collection.find_one({"email": email, "password": password}):
         access_token = create_access_token(identity=email)
         return jsonify(message="Login Succeeded!", access_token=access_token), 201
@@ -50,10 +49,12 @@ def login():
         return jsonify(message="Bad Email or Password"), 401
 
 
-@app.route("/create", methods=["POST"])
+@app.route("/profile_data", methods=["POST"])
 @jwt_required
-def create():
-    return jsonify(message="yay"), 200
+def profile_data():
+    # req = request.get_json(force=True)
+    print(get_jwt_identity())
+    return jsonify(identity=get_jwt_identity()), 200
 
 
 if __name__ == "__main__":

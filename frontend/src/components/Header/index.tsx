@@ -136,7 +136,7 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
       authWalled: false,
     },
     {
-      label: "profile",
+      label: "Profile",
       href: "/profile",
       authWalled: true,
     },
@@ -175,6 +175,8 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
                       </Button>
                     </Link>
                   );
+                } else {
+                  return null;
                 }
               })}
               {loggedIn ? (
@@ -210,6 +212,8 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
             <MenuItem>{label}</MenuItem>
           </Link>
         );
+      } else {
+        return null;
       }
     });
   };

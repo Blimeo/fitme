@@ -10,9 +10,10 @@ import styles from "./LoginDialogue.module.css";
 
 type Props = {
   readonly logged: React.Dispatch<React.SetStateAction<boolean>>;
+  readonly buttonClassName: string;
 };
 
-export default function FormDialog({ logged }: Props) {
+export default function LoginDialog({ logged, buttonClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,7 +47,7 @@ export default function FormDialog({ logged }: Props) {
   };
   return (
     <div>
-      <Button className={styles.loginButton} onClick={handleClickOpen}>
+      <Button className={buttonClassName} onClick={handleClickOpen}>
         Login
       </Button>
       <Dialog

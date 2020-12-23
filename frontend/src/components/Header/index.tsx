@@ -7,7 +7,11 @@ import {
   Grid,
   Button,
   Avatar,
+  IconButton,
+  Drawer,
+  MenuItem,
 } from "@material-ui/core";
+import MenuIcon from "@material-ui/icons/Menu";
 import { Link } from "react-router-dom";
 import LoginDialogue from "./LoginDialogue";
 import RegisterDialogue from "./RegisterDialogue";
@@ -81,7 +85,36 @@ type Props = {
 
 function Nav({ loggedIn, setLoggedIn }: Props) {
   const [inMobileView, setInMobileView] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const classes = useStyles();
+
+  type Link = {
+    label: string;
+    href: string;
+    authWalled: boolean;
+  };
+  const LINKS: Link[] = [
+    {
+      label: "About",
+      href: "/about",
+      authWalled: false,
+    },
+    {
+      label: "Items",
+      href: "/items",
+      authWalled: false,
+    },
+    {
+      label: "Fits",
+      href: "/fits",
+      authWalled: false,
+    },
+    {
+      label: "profile",
+      href: "/profile",
+      authWalled: true,
+    },
+  ];
 
   useEffect(() => {
     const setResponsiveness = () => {
@@ -104,28 +137,22 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
                   <Avatar src={Logo} className={classes.avatar} />
                 </Button>
               </Grid>
-              <Link to="/about" className={styles.link}>
-                <Button color="inherit" className={classes.buttonFontSize}>
-                  About
-                </Button>
-              </Link>
-              <Link to="/items" className={styles.link}>
-                <Button color="inherit" className={classes.buttonFontSize}>
-                  Items
-                </Button>
-              </Link>
-              <Link to="/fits" className={styles.link}>
-                <Button color="inherit" className={classes.buttonFontSize}>
-                  Fits
-                </Button>
-              </Link>
+              {LINKS.map(({ label, href, authWalled }) => {
+                if (!authWalled || (authWalled && loggedIn)) {
+                  return (
+                    <Link to={href} className={styles.link}>
+                      <Button
+                        color="inherit"
+                        className={classes.buttonFontSize}
+                      >
+                        {label}
+                      </Button>
+                    </Link>
+                  );
+                }
+              })}
               {loggedIn ? (
                 <>
-                  <Link to="/profile" className={styles.link}>
-                    <Button color="inherit" className={classes.buttonFontSize}>
-                      Profile
-                    </Button>
-                  </Link>
                   <LogoutButton
                     logged={setLoggedIn}
                     className={classes.logoutButton}
@@ -147,58 +174,43 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
     );
   };
 
-  // TODO
+  const getDrawerChoices = () => {
+    return LINKS.map(({ label, href, authWalled }) => {
+      if (!authWalled || (authWalled && loggedIn)) {
+        return (
+          <Link to={href} className={styles.link}>
+            <MenuItem>{label}</MenuItem>
+          </Link>
+        );
+      }
+    });
+  };
+
   const displayMobile = () => {
     return (
-      <div className={classes.root}>
-        <AppBar position="static" color="default" className={classes.AppBar}>
-          <Grid item sm={12} xs={12} className={classes.container}>
-            <Toolbar>
-              <Grid className={classes.grow}>
-                <Button className={classes.mainLogo} href="/">
-                  <Avatar src={Logo} className={classes.avatar} />
-                </Button>
-              </Grid>
-              <Link to="/about" className={styles.link}>
-                <Button color="inherit" className={classes.buttonFontSize}>
-                  About
-                </Button>
-              </Link>
-              <Link to="/items" className={styles.link}>
-                <Button color="inherit" className={classes.buttonFontSize}>
-                  Items
-                </Button>
-              </Link>
-              <Link to="/fits" className={styles.link}>
-                <Button color="inherit" className={classes.buttonFontSize}>
-                  Fits
-                </Button>
-              </Link>
-              {loggedIn ? (
-                <>
-                  <Link to="/profile" className={styles.link}>
-                    <Button color="inherit" className={classes.buttonFontSize}>
-                      Profile
-                    </Button>
-                  </Link>
-                  <LogoutButton
-                    logged={setLoggedIn}
-                    className={classes.logoutButton}
-                  />
-                </>
-              ) : (
-                <>
-                  <LoginDialogue
-                    logged={setLoggedIn}
-                    buttonClassName={classes.loginButton}
-                  />
-                  <RegisterDialogue buttonClassName={classes.loginButton} />
-                </>
-              )}
-            </Toolbar>
-          </Grid>
-        </AppBar>
-      </div>
+      <Toolbar>
+        <IconButton
+          {...{
+            edge: "start",
+            color: "inherit",
+            "aria-label": "menu",
+            "aria-haspopup": "true",
+            onClick: () => setIsDrawerOpen(true),
+          }}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Drawer
+          {...{
+            anchor: "left",
+            open: isDrawerOpen,
+            onClose: () => setIsDrawerOpen(false),
+          }}
+        >
+          <div>{getDrawerChoices()}</div>
+        </Drawer>
+        <img src={Logo} alt="fitme logo" className={styles.MobileLogo} />
+      </Toolbar>
     );
   };
 

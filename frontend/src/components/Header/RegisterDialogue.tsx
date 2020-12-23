@@ -6,6 +6,8 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import styles from "./forms.module.css";
+import { Grid } from "@material-ui/core";
 
 type Props = {
   readonly buttonClassName: string;
@@ -55,31 +57,45 @@ export default function RegisterDialog({ buttonClassName }: Props) {
           <DialogContentText>
             Fill out the items below to register.
           </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-          />
-          <TextField
-            margin="dense"
-            id="name"
-            label="Username"
-            type="username"
-            onChange={(e) => setUsername(e.target.value)}
-            value={username}
-          />
-          <TextField
-            margin="dense"
-            id="password"
-            label="Password"
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-          />
+          <Grid container alignItems="center" justify="center">
+            <Grid item lg={12}>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="name"
+                label="Email Address"
+                type="email"
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
+                className={styles.InputField}
+                required
+              />
+            </Grid>
+            <Grid item lg={12}>
+              <TextField
+                margin="dense"
+                id="name"
+                label="Username"
+                type="username"
+                onChange={(e) => setUsername(e.target.value)}
+                value={username}
+                className={styles.InputField}
+                required
+              />
+            </Grid>
+            <Grid item lg={12}>
+              <TextField
+                margin="dense"
+                id="password"
+                label="Password"
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+                className={styles.InputField}
+                required
+              />
+            </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">

@@ -63,6 +63,17 @@ const useStyles = makeStyles(() =>
         boxShadow: "0px 2px 10px #888888",
       },
     },
+    loginButtonMobile: {
+      background: "#e91e63",
+      color: "#fff",
+      borderRadius: "25px",
+      padding: "0px 25px",
+      marginTop: "10px",
+      "&:hover": {
+        background: "#ff3b7d",
+        boxShadow: "0px 2px 10px #888888",
+      },
+    },
     logoutButton: {
       background: "#fff",
       color: "#000",
@@ -74,6 +85,21 @@ const useStyles = makeStyles(() =>
       "&:hover": {
         background: "grey",
       },
+    },
+    logoutButtonMobile: {
+      background: "#fff",
+      color: "#000",
+      fontSize: "11px",
+      border: "3px solid black",
+      borderRadius: "25px",
+      padding: "0px 25px",
+      marginLeft: "5px",
+      "&:hover": {
+        background: "grey",
+      },
+    },
+    drawerContainer: {
+      padding: "20px 30px",
     },
   })
 );
@@ -152,12 +178,10 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
                 }
               })}
               {loggedIn ? (
-                <>
-                  <LogoutButton
-                    logged={setLoggedIn}
-                    className={classes.logoutButton}
-                  />
-                </>
+                <LogoutButton
+                  logged={setLoggedIn}
+                  className={classes.logoutButton}
+                />
               ) : (
                 <>
                   <LoginDialogue
@@ -178,7 +202,11 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
     return LINKS.map(({ label, href, authWalled }) => {
       if (!authWalled || (authWalled && loggedIn)) {
         return (
-          <Link to={href} className={styles.link}>
+          <Link
+            to={href}
+            className={styles.link}
+            onClick={() => setIsDrawerOpen(false)}
+          >
             <MenuItem>{label}</MenuItem>
           </Link>
         );
@@ -207,7 +235,23 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
             onClose: () => setIsDrawerOpen(false),
           }}
         >
-          <div>{getDrawerChoices()}</div>
+          <div className={classes.drawerContainer}>
+            {getDrawerChoices()}
+            {loggedIn ? (
+              <LogoutButton
+                logged={setLoggedIn}
+                className={classes.logoutButtonMobile}
+              />
+            ) : (
+              <>
+                <LoginDialogue
+                  logged={setLoggedIn}
+                  buttonClassName={classes.loginButtonMobile}
+                />
+                <RegisterDialogue buttonClassName={classes.loginButtonMobile} />
+              </>
+            )}
+          </div>
         </Drawer>
         <img src={Logo} alt="fitme logo" className={styles.MobileLogo} />
       </Toolbar>

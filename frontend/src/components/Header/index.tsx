@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -28,7 +28,7 @@ const useStyles = makeStyles(() =>
       margin: "auto",
     },
     buttonFontSize: {
-      fontSize: "11px",
+      fontSize: "12px",
       color: "#a1a1a1",
       textDecoration: "none",
     },
@@ -80,59 +80,129 @@ type Props = {
 };
 
 function Nav({ loggedIn, setLoggedIn }: Props) {
+  const [inMobileView, setInMobileView] = useState(false);
   const classes = useStyles();
 
-  return (
-    <div className={classes.root}>
-      <AppBar position="static" color="default" className={classes.AppBar}>
-        <Grid item sm={12} xs={12} className={classes.container}>
-          <Toolbar>
-            <Grid className={classes.grow}>
-              <Button className={classes.mainLogo} href="/">
-                <Avatar src={Logo} className={classes.avatar} />
-              </Button>
-            </Grid>
-            <Link to="/about" className={styles.link}>
-              <Button color="inherit" className={classes.buttonFontSize}>
-                About
-              </Button>
-            </Link>
-            <Link to="/items" className={styles.link}>
-              <Button color="inherit" className={classes.buttonFontSize}>
-                Items
-              </Button>
-            </Link>
-            <Link to="/fits" className={styles.link}>
-              <Button color="inherit" className={classes.buttonFontSize}>
-                Fits
-              </Button>
-            </Link>
-            {loggedIn ? (
-              <>
-                <Link to="/profile" className={styles.link}>
-                  <Button color="inherit" className={classes.buttonFontSize}>
-                    Profile
-                  </Button>
-                </Link>
-                <LogoutButton
-                  logged={setLoggedIn}
-                  className={classes.logoutButton}
-                />
-              </>
-            ) : (
-              <>
-                <LoginDialogue
-                  logged={setLoggedIn}
-                  buttonClassName={classes.loginButton}
-                />
-                <RegisterDialogue buttonClassName={classes.loginButton} />
-              </>
-            )}
-          </Toolbar>
-        </Grid>
-      </AppBar>
-    </div>
-  );
+  useEffect(() => {
+    const setResponsiveness = () => {
+      return window.innerWidth < 900
+        ? setInMobileView(true)
+        : setInMobileView(false);
+    };
+    setResponsiveness();
+    window.addEventListener("resize", () => setResponsiveness());
+  }, []);
+
+  const displayDesktop = () => {
+    return (
+      <div className={classes.root}>
+        <AppBar position="static" color="default" className={classes.AppBar}>
+          <Grid item sm={12} xs={12} className={classes.container}>
+            <Toolbar>
+              <Grid className={classes.grow}>
+                <Button className={classes.mainLogo} href="/">
+                  <Avatar src={Logo} className={classes.avatar} />
+                </Button>
+              </Grid>
+              <Link to="/about" className={styles.link}>
+                <Button color="inherit" className={classes.buttonFontSize}>
+                  About
+                </Button>
+              </Link>
+              <Link to="/items" className={styles.link}>
+                <Button color="inherit" className={classes.buttonFontSize}>
+                  Items
+                </Button>
+              </Link>
+              <Link to="/fits" className={styles.link}>
+                <Button color="inherit" className={classes.buttonFontSize}>
+                  Fits
+                </Button>
+              </Link>
+              {loggedIn ? (
+                <>
+                  <Link to="/profile" className={styles.link}>
+                    <Button color="inherit" className={classes.buttonFontSize}>
+                      Profile
+                    </Button>
+                  </Link>
+                  <LogoutButton
+                    logged={setLoggedIn}
+                    className={classes.logoutButton}
+                  />
+                </>
+              ) : (
+                <>
+                  <LoginDialogue
+                    logged={setLoggedIn}
+                    buttonClassName={classes.loginButton}
+                  />
+                  <RegisterDialogue buttonClassName={classes.loginButton} />
+                </>
+              )}
+            </Toolbar>
+          </Grid>
+        </AppBar>
+      </div>
+    );
+  };
+
+  // TODO
+  const displayMobile = () => {
+    return (
+      <div className={classes.root}>
+        <AppBar position="static" color="default" className={classes.AppBar}>
+          <Grid item sm={12} xs={12} className={classes.container}>
+            <Toolbar>
+              <Grid className={classes.grow}>
+                <Button className={classes.mainLogo} href="/">
+                  <Avatar src={Logo} className={classes.avatar} />
+                </Button>
+              </Grid>
+              <Link to="/about" className={styles.link}>
+                <Button color="inherit" className={classes.buttonFontSize}>
+                  About
+                </Button>
+              </Link>
+              <Link to="/items" className={styles.link}>
+                <Button color="inherit" className={classes.buttonFontSize}>
+                  Items
+                </Button>
+              </Link>
+              <Link to="/fits" className={styles.link}>
+                <Button color="inherit" className={classes.buttonFontSize}>
+                  Fits
+                </Button>
+              </Link>
+              {loggedIn ? (
+                <>
+                  <Link to="/profile" className={styles.link}>
+                    <Button color="inherit" className={classes.buttonFontSize}>
+                      Profile
+                    </Button>
+                  </Link>
+                  <LogoutButton
+                    logged={setLoggedIn}
+                    className={classes.logoutButton}
+                  />
+                </>
+              ) : (
+                <>
+                  <LoginDialogue
+                    logged={setLoggedIn}
+                    buttonClassName={classes.loginButton}
+                  />
+                  <RegisterDialogue buttonClassName={classes.loginButton} />
+                </>
+              )}
+            </Toolbar>
+          </Grid>
+        </AppBar>
+      </div>
+    );
+  };
+
+  return inMobileView ? displayMobile() : displayDesktop();
 }
 
 export default Nav;

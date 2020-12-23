@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   AppBar,
   Tabs,
@@ -7,7 +7,6 @@ import {
   Typography,
   makeStyles,
   createStyles,
-  Theme,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import styles from "./index.module.css";
@@ -15,7 +14,7 @@ import LoginDialogue from "./LoginDialogue";
 import RegisterDialogue from "./RegisterDialogue";
 import LogoutButton from "./LogoutButton";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {
       flexGrow: 1,
@@ -26,35 +25,14 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function Nav() {
+type Props = {
+  readonly loggedIn: boolean;
+  readonly setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+function Nav({ loggedIn, setLoggedIn }: Props) {
   const classes = useStyles();
-  const [loggedIn, setLoggedIn] = useState(false);
-  useEffect(() => {
-    const access_token = localStorage.getItem("access_token");
-    setLoggedIn(access_token !== null);
-  }, []);
-  const renderProfileButton = () => {
-    if (loggedIn) {
-      return (
-        <Link className={styles.link} to="/profile">
-          <Tab label="Profile" />
-        </Link>
-      );
-    }
-    return null;
-  };
-  const renderTopRight = () => {
-    if (!loggedIn) {
-      return (
-        <div>
-          <RegisterDialogue />
-          <LoginDialogue logged={setLoggedIn} />
-        </div>
-      );
-    } else {
-      return <LogoutButton logged={setLoggedIn} />;
-    }
-  };
+
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -73,9 +51,20 @@ function Nav() {
             <Link className={styles.link} to="/fits">
               <Tab label="Fits" />
             </Link>
-            {renderProfileButton()}
+            {loggedIn && (
+              <Link className={styles.link} to="/profile">
+                <Tab label="Profile" />
+              </Link>
+            )}
           </Tabs>
-          {renderTopRight()}
+          {loggedIn ? (
+            <LogoutButton logged={setLoggedIn} />
+          ) : (
+            <div>
+              <RegisterDialogue />
+              <LoginDialogue logged={setLoggedIn} />
+            </div>
+          )}
         </Toolbar>
       </AppBar>
     </div>

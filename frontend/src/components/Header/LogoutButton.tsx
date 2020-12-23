@@ -2,11 +2,11 @@ import React from "react";
 import Button from "@material-ui/core/Button";
 import styles from "./LoginDialogue.module.css";
 
-type props = {
-  logged: React.Dispatch<React.SetStateAction<boolean>>;
+type Props = {
+  readonly logged: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function LogoutButton({ logged }: props) {
+export default function LogoutButton({ logged }: Props) {
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     logged(false);

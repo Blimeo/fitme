@@ -8,11 +8,11 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import styles from "./LoginDialogue.module.css";
 
-type props = {
-  logged: React.Dispatch<React.SetStateAction<boolean>>;
+type Props = {
+  readonly logged: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function FormDialog({ logged }: props) {
+export default function FormDialog({ logged }: Props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,7 +38,6 @@ export default function FormDialog({ logged }: props) {
         if (token.access_token) {
           localStorage.setItem("access_token", token.access_token);
           logged(true);
-          // alert(localStorage.getItem("access_token"));
         } else {
           alert("Invalid username/password.");
         }
@@ -66,7 +65,6 @@ export default function FormDialog({ logged }: props) {
             type="email"
             onChange={(e) => setEmail(e.target.value)}
             value={email}
-            fullWidth
           />
           <TextField
             margin="dense"
@@ -75,7 +73,6 @@ export default function FormDialog({ logged }: props) {
             type="password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
-            fullWidth
           />
         </DialogContent>
         <DialogActions>

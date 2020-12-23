@@ -4,8 +4,19 @@ import Home from "./Home";
 import Profile from "./Profile";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import Header from "./components/Header";
+import { createMuiTheme, CssBaseline, ThemeProvider } from "@material-ui/core";
 
 export default function App() {
+  const theme = createMuiTheme({
+    typography: {
+      fontFamily: [
+        "-apple-system",
+        "BlinkMacSystemFont",
+        '"Work Sans"',
+        '"Helvetica Neue"',
+      ].join(","),
+    },
+  });
   const [loggedIn, setLoggedIn] = useState(false);
   useEffect(() => {
     const access_token = localStorage.getItem("access_token");
@@ -15,18 +26,21 @@ export default function App() {
   return (
     <div>
       <BrowserRouter>
-        <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
-        <main>
-          <Switch>
-            <Route path="/" component={Home} exact />
-            <Route path="/about" component={Home} />
-            <Route path="/items" component={Home} />
-            <Route path="/fits" component={Home} />
-            <Route path="/profile">
-              {loggedIn ? <Profile /> : <Redirect to="/" />}
-            </Route>
-          </Switch>
-        </main>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+          <main>
+            <Switch>
+              <Route path="/" component={Home} exact />
+              <Route path="/about" component={Home} />
+              <Route path="/items" component={Home} />
+              <Route path="/fits" component={Home} />
+              <Route path="/profile">
+                {loggedIn ? <Profile /> : <Redirect to="/" />}
+              </Route>
+            </Switch>
+          </main>
+        </ThemeProvider>
       </BrowserRouter>
     </div>
   );

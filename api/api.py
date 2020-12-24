@@ -28,12 +28,16 @@ def register():
     email = req.get('email', None)
     username = req.get('username', None)
 
+    if len(username) < 4 or len(username) > 16:
+        return jsonify(message="bad username"), 409
     if users_collection.find_one({"email": email}):
         return jsonify(message="A user with that email already exists."), 409
     elif users_collection.find_one({'username': username}):
         return jsonify(message="A user with that username already exists."), 409
     else:
         password = req.get('password', None)
+        if len(password) < 8 or len(password) > 128:
+            return jsonify(message="bad password"), 409
         hashed = bcrypt.generate_password_hash(password)
         user_info = dict(email=email,
                          username=username, password=hashed)

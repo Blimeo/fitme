@@ -7,104 +7,142 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import styles from "./forms.module.css";
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
+import { emailIsValid } from "../../util/util-functions";
 
 type Props = {
   readonly buttonClassName: string;
 };
 
 export default function RegisterDialog({ buttonClassName }: Props) {
+  type HelperText = {
+    emailText: [string, boolean];
+    usernameText: [string, boolean];
+    passwordText: [string, boolean];
+  };
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [helperText, setHelperText] = useState<HelperText>({
+    emailText: ["", false],
+    usernameText: ["must be between 4-16 characters", false],
+    passwordText: ["must be at least 8 characters", false],
+  });
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleRegister = (e: any) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const opts = {
-      email: email,
-      username: username,
-      password: password,
-    };
-    fetch("/register", {
-      method: "POST",
-      body: JSON.stringify(opts),
-    })
-      .then((r) => r.json())
-      .then((token) => {
-        alert(token.message);
+    const invalidEmail = !emailIsValid(email);
+    const invalidUsername = username.length < 4 || username.length > 16;
+    const invalidPassword = password.length < 8 || password.length > 128;
+
+    setHelperText({
+      emailText: invalidEmail ? ["Invalid email!", true] : ["", false],
+      usernameText: invalidUsername
+        ? ["username doesn't fit requirements (between 4-16 characters)", true]
+        : ["", false],
+      passwordText: invalidPassword
+        ? ["password doesn't fit requirements (min 8 characters)", true]
+        : ["", false],
+    });
+    if (!invalidEmail && !invalidPassword && !invalidUsername) {
+      const opts = {
+        email: email,
+        username: username,
+        password: password,
+      };
+      const response = await fetch("/register", {
+        method: "POST",
+        body: JSON.stringify(opts),
       });
-    setOpen(false);
+      if (response.ok) {
+        setOpen(false);
+      }
+      const json = await response.json();
+      const emailExists =
+        json.message === "A user with that email already exists.";
+      const usernameExists =
+        json.message === "A user with that username already exists.";
+
+      setHelperText({
+        passwordText: ["", false],
+        usernameText: usernameExists
+          ? ["Someone with that username already exists.", true]
+          : ["", false],
+        emailText: emailExists
+          ? ["Someone with that email already exists.", true]
+          : ["", false],
+      });
+    }
   };
   return (
     <div>
-      <Button className={buttonClassName} onClick={handleClickOpen}>
+      <Button className={buttonClassName} onClick={() => setOpen(true)}>
         Sign Up
       </Button>
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={() => setOpen(false)}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Sign Up</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Fill out the items below to register.
-          </DialogContentText>
-          <Grid container alignItems="center" justify="center">
-            <Grid item lg={12}>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Email Address"
-                type="email"
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-                className={styles.InputField}
-                required
-              />
+        <form onSubmit={handleRegister}>
+          <DialogTitle id="form-dialog-title">Sign Up</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Fill out the items below to register.
+            </DialogContentText>
+            <Grid container alignItems="center" justify="center">
+              <Grid item lg={12}>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="email-input"
+                  label="Email Address"
+                  type="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                  className={styles.InputField}
+                  helperText={helperText.emailText[0]}
+                  required
+                />
+              </Grid>
+              <Grid item lg={12}>
+                <TextField
+                  margin="dense"
+                  id="username-input"
+                  label="Username"
+                  type="username"
+                  onChange={(e) => setUsername(e.target.value)}
+                  value={username}
+                  className={styles.InputField}
+                  helperText={helperText.usernameText[0]}
+                  required
+                />
+              </Grid>
+              <Grid item lg={12}>
+                <TextField
+                  margin="dense"
+                  id="password"
+                  label="Password"
+                  type="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
+                  className={styles.InputField}
+                  helperText={helperText.passwordText[0]}
+                  required
+                />
+              </Grid>
             </Grid>
-            <Grid item lg={12}>
-              <TextField
-                margin="dense"
-                id="name"
-                label="Username"
-                type="username"
-                onChange={(e) => setUsername(e.target.value)}
-                value={username}
-                className={styles.InputField}
-                required
-              />
-            </Grid>
-            <Grid item lg={12}>
-              <TextField
-                margin="dense"
-                id="password"
-                label="Password"
-                type="password"
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
-                className={styles.InputField}
-                required
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleRegister} color="primary">
-            Register
-          </Button>
-        </DialogActions>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpen(false)} color="primary">
+              Cancel
+            </Button>
+            <Button type="submit" color="primary">
+              Register
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </div>
   );

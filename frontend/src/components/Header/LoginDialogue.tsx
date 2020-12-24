@@ -18,6 +18,7 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [badLogin, setBadLogin] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -25,7 +26,7 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let opts = {
       email: email,
@@ -40,11 +41,11 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
         if (token.access_token) {
           localStorage.setItem("access_token", token.access_token);
           logged(true);
+          setOpen(false);
         } else {
-          alert("Invalid username/password.");
+          setBadLogin(true);
         }
       });
-    setOpen(false);
   };
   return (
     <div>
@@ -56,45 +57,49 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Log in</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Please log into your account.</DialogContentText>
-          <Grid container alignItems="center" justify="center">
-            <Grid item lg={12}>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Email Address"
-                type="email"
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-                className={styles.InputField}
-                required
-              />
+        <form onSubmit={handleLogin}>
+          <DialogTitle id="form-dialog-title">Log in</DialogTitle>
+          <DialogContent>
+            <DialogContentText>Please log into your account.</DialogContentText>
+            <Grid container alignItems="center" justify="center">
+              <Grid item lg={12}>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="Email Address"
+                  type="email"
+                  error={badLogin}
+                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                  className={styles.InputField}
+                  required
+                />
+              </Grid>
+              <Grid item lg={12}>
+                <TextField
+                  margin="dense"
+                  id="password"
+                  label="Password"
+                  type="password"
+                  error={badLogin}
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
+                  className={styles.InputField}
+                  required
+                />
+              </Grid>
             </Grid>
-            <Grid item lg={12}>
-              <TextField
-                margin="dense"
-                id="password"
-                label="Password"
-                type="password"
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
-                className={styles.InputField}
-                required
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleLogin} color="primary" type="submit">
-            Login
-          </Button>
-        </DialogActions>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button color="primary" type="submit">
+              Login
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </div>
   );

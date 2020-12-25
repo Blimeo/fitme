@@ -103,6 +103,7 @@ export default function RegisterDialog({ buttonClassName }: Props) {
                   value={email}
                   className={styles.InputField}
                   helperText={helperText.emailText[0]}
+                  error={helperText.emailText[1]}
                   required
                 />
               </Grid>
@@ -116,6 +117,7 @@ export default function RegisterDialog({ buttonClassName }: Props) {
                   value={username}
                   className={styles.InputField}
                   helperText={helperText.usernameText[0]}
+                  error={helperText.usernameText[1]}
                   required
                 />
               </Grid>
@@ -129,6 +131,7 @@ export default function RegisterDialog({ buttonClassName }: Props) {
                   value={password}
                   className={styles.InputField}
                   helperText={helperText.passwordText[0]}
+                  error={helperText.passwordText[1]}
                   required
                 />
               </Grid>

@@ -59,12 +59,13 @@ def login():
         return jsonify(message="Bad Email or Password"), 401
 
 
-@ app.route("/profile_data", methods=["POST"])
-@ jwt_required
+@app.route("/profile_data", methods=["POST"])
+@jwt_required
 def profile_data():
     # req = request.get_json(force=True)
     print(get_jwt_identity())
     return jsonify(identity=get_jwt_identity()), 200
+
 
 @app.route("/submit_item", methods=["POST"])
 @jwt_required
@@ -72,7 +73,12 @@ def submit_item():
     print("hi", flush=True)
     identity = get_jwt_identity()
     print(request, identity)
-    print(request.form)
-    return None
+    data = dict(request.form)
+    images = request.files
+    print(data)
+    print(images)
+    return jsonify(message="yay"), 200
+
+
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

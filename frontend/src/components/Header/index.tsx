@@ -166,7 +166,7 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
               {LINKS.map(({ label, href, authWalled }) => {
                 if (!authWalled || (authWalled && loggedIn)) {
                   return (
-                    <Link to={href} className={styles.link}>
+                    <Link to={href} className={styles.link} key={label}>
                       <Button
                         color="inherit"
                         className={classes.buttonFontSize}
@@ -208,6 +208,7 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
             to={href}
             className={styles.link}
             onClick={() => setIsDrawerOpen(false)}
+            key={label}
           >
             <MenuItem>{label}</MenuItem>
           </Link>

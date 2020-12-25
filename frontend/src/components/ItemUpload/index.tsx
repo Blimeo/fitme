@@ -30,16 +30,10 @@ export default function ItemUpload() {
     description: "",
     images: [],
   });
-  const handleChange = (prop: keyof Item, tags?: string[]) => (
+  const handleChange = (prop: keyof Item) => (
     event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    console.log(tags);
-    if (tags !== undefined) {
-      setValues({ ...values, tags });
-    } else {
-      setValues({ ...values, [prop]: event.target.value });
-    }
-  };
+  ) => setValues({ ...values, [prop]: event.target.value });
+
   const handleSubmit = () => {
     const access_token = localStorage.getItem("access_token");
     const bearer = "Bearer " + access_token;
@@ -114,8 +108,9 @@ export default function ItemUpload() {
           <ChipInput
             className={styles.TagInput}
             label="Tags"
-            onChange={(tags) => handleChange("tags", tags as string[])}
+            onChange={(tags) => setValues({ ...values, tags })}
             variant="outlined"
+            fullWidth
           />
         </Grid>
         {/* <Typography>Give a brief description of the item...</Typography> */}

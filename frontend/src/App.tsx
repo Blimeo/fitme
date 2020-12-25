@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./css/index.css";
 import Home from "./Home";
 import Profile from "./Profile";
+import Items from "./Items"
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import Header from "./components/Header";
 import { createMuiTheme, CssBaseline, ThemeProvider } from "@material-ui/core";
@@ -33,7 +34,9 @@ export default function App() {
             <Switch>
               <Route path="/" component={Home} exact />
               <Route path="/about" component={Home} />
-              <Route path="/items" component={Home} />
+              <Route path="/items">
+                <Items loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+              </Route>
               <Route path="/fits" component={Home} />
               <Route path="/profile">
                 {loggedIn ? <Profile /> : <Redirect to="/" />}

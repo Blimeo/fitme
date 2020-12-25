@@ -66,6 +66,13 @@ def profile_data():
     print(get_jwt_identity())
     return jsonify(identity=get_jwt_identity()), 200
 
-
+@app.route("/submit_item", methods=["POST"])
+@jwt_required
+def submit_item():
+    print("hi", flush=True)
+    identity = get_jwt_identity()
+    print(request, identity)
+    print(request.form)
+    return None
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

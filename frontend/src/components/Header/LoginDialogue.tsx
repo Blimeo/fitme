@@ -43,7 +43,7 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
           logged(true);
           setOpen(false);
         } else {
-          setBadLogin(true);
+          setBadLogin(true); 
         }
       });
   };

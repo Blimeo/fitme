@@ -5,6 +5,8 @@ from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from dotenv import load_dotenv, find_dotenv
 from flask_bcrypt import Bcrypt
+from ImageManager import ImageManager
+import json
 
 load_dotenv(find_dotenv())
 app = Flask(__name__)
@@ -20,6 +22,7 @@ client = pymongo.MongoClient(
     mongo_uri, serverSelectionTimeoutMS=connection_timeout)
 db = client.get_database('fitme_db')
 users_collection = db['users']
+items_collection = db['items']
 
 
 @app.route("/register", methods=["POST"])
@@ -70,14 +73,23 @@ def profile_data():
 @app.route("/submit_item", methods=["POST"])
 @jwt_required
 def submit_item():
-    print("hi", flush=True)
     identity = get_jwt_identity()
     print(request, identity)
     data = dict(request.form)
-    images = request.files
-    print(data)
-    print(images)
-    return jsonify(message="yay"), 200
+    data = json.loads(data["postData"])
+    images = request.files.to_dict()
+    content = []
+    for f in list(images.values()):
+        content.append(f.stream)
+    manager = ImageManager()
+    item_imgs = manager.uploadImage(
+        content, [d["path"] for d in data["images"]])
+    del data['images']
+    data["imgs"] = item_imgs
+    data["uploader"] = users_collection.find_one(
+        {"email": identity})['username']
+    items_collection.insert_one(data)
+    return jsonify(message="Item upload successful!"), 200
 
 
 if __name__ == "__main__":

@@ -38,10 +38,12 @@ export default function ItemUpload() {
     const access_token = localStorage.getItem("access_token");
     const bearer = "Bearer " + access_token;
 
-    let form_data = new FormData();
+    const form_data = new FormData();
     form_data.append("postData", JSON.stringify(values));
+    let i = 0;
     for (const file of values.images) {
-      form_data.append("files[]", file, file.name);
+      form_data.append("files-"+i, file, file.name);
+      i++;
     }
     console.log(values);
     fetch("/submit_item", {

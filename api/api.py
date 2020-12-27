@@ -78,7 +78,8 @@ def my_profile_data():
     if (user_data is None):
         return jsonify(message="User not found"), 404
     del user_data["password"]
-    return jsonify(json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)), 200
+    del user_data["email"]
+    return json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)
 
 
 @app.route("/profile_data/<username>", methods=["GET"])
@@ -88,7 +89,8 @@ def profile_data():
     if (user_data is None):
         return jsonify(message="User not found"), 404
     del user_data["password"]
-    return jsonify(json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)), 200
+    del user_data["email"]
+    return json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)
 
 
 @app.route("/submit_item", methods=["POST"])

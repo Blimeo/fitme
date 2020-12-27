@@ -2,7 +2,6 @@
 export type ProfileUser = string | 'OWN_PROFILE';
 
 export type User = {
-  email: string;
   username: string;
   avatar: string; // link
 	favorite_items: string[]; // array of item IDs of their liked items

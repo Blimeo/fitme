@@ -1,30 +1,6 @@
-import { Typography } from "@material-ui/core";
-import React, { useEffect } from "react";
+import { ReactElement } from "react";
+import ProfileContainer from "./components/ProfileContainer";
 
-function Profile() {
-  useEffect(() => {
-    const access_token = localStorage.getItem("access_token");
-    if (access_token === null) {
-      alert("You are not logged in");
-    } else {
-      const bearer = "Bearer " + access_token;
-      fetch("/profile_data", {
-        method: "POST",
-        headers: {
-          Authorization: bearer,
-        },
-      })
-        .then((r) => r.json())
-        .then((token) => {
-          alert(token.identity);
-        });
-    }
-  });
-  return (
-    <div className="Home">
-      <Typography>Welcome to your profile!</Typography>
-    </div>
-  );
-}
+const Profile = (): ReactElement => <ProfileContainer username="OWN_PROFILE" />;
 
 export default Profile;

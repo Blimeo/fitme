@@ -7,6 +7,8 @@ from dotenv import load_dotenv, find_dotenv
 from flask_bcrypt import Bcrypt
 from ImageManager import ImageManager
 import json
+from bson import BSON
+from bson import json_util
 
 load_dotenv(find_dotenv())
 app = Flask(__name__)
@@ -43,7 +45,13 @@ def register():
             return jsonify(message="bad password"), 409
         hashed = bcrypt.generate_password_hash(password)
         user_info = dict(email=email,
-                         username=username, password=hashed)
+                         username=username,
+                         password=hashed,
+                         avatar="default",
+                         favorite_items=[],
+                         favorite_fits=[],
+                         following=[],
+                         followers=[])
         users_collection.insert_one(user_info)
         return jsonify(message="User added successfully"), 201
 
@@ -62,12 +70,25 @@ def login():
         return jsonify(message="Bad Email or Password"), 401
 
 
-@app.route("/profile_data", methods=["POST"])
+@app.route("/my_profile_data", methods=["GET"])
 @jwt_required
+def my_profile_data():
+    user_data = users_collection.find_one(
+        {"email": get_jwt_identity()})
+    if (user_data is None):
+        return jsonify(message="User not found"), 404
+    del user_data["password"]
+    return jsonify(json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)), 200
+
+
+@app.route("/profile_data/<username>", methods=["GET"])
 def profile_data():
-    # req = request.get_json(force=True)
-    print(get_jwt_identity())
-    return jsonify(identity=get_jwt_identity()), 200
+    user_data = users_collection.find_one(
+        {"username": username})
+    if (user_data is None):
+        return jsonify(message="User not found"), 404
+    del user_data["password"]
+    return jsonify(json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)), 200
 
 
 @app.route("/submit_item", methods=["POST"])

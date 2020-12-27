@@ -7,7 +7,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import styles from "./forms.module.css";
-import { Grid, Typography } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { emailIsValid } from "../../util/util-functions";
 
 type Props = {

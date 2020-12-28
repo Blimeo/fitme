@@ -4,6 +4,7 @@ import {
   CardContent,
   Container,
   Grid,
+  LinearProgress,
   Typography,
 } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
@@ -20,15 +21,16 @@ export default function ItemView({ loggedIn }: Props) {
   const { item_id } = useParams<Record<string, string | undefined>>();
   const history = useHistory();
   const [item, setItem] = useState<Item>({
-    name: "bruh",
-    brand: "bruh",
-    price: 69420,
-    tags: ["ok"],
-    description: "hyperbruh",
-    imgs: ["ok"],
-    uploader: "bruh",
+    name: "",
+    brand: "",
+    price: 0,
+    tags: [],
+    description: "",
+    imgs: [],
+    uploader: "",
   });
   const [galleryImgs, setGalleryImgs] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     let opts = {
       item_id: item_id,
@@ -48,73 +50,80 @@ export default function ItemView({ loggedIn }: Props) {
             d.push({ original: url });
           });
           setGalleryImgs(d);
+          setLoading(false);
         }
       });
   }, [item_id, history]);
 
   return (
     <Container className={styles.container} maxWidth="md">
-      <Grid container spacing={3}>
-        <Grid item xs>
-          <ImageGallery showThumbnails={false} items={galleryImgs} />
-          {loggedIn && (
-            <Card className={styles.itemActionPane} variant="outlined">
+      {loading && <LinearProgress />}
+      {!loading && (
+        <Grid container spacing={3}>
+          <Grid item xs>
+            <ImageGallery showThumbnails={false} items={galleryImgs} />
+            {loggedIn && (
+              <Card className={styles.itemActionPane} variant="outlined">
+                <CardContent>
+                  <Button variant="contained" color="secondary">
+                    Favorite
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </Grid>
+          <Grid item xs>
+            <Card className={styles.itemInfo} variant="outlined">
               <CardContent>
-                <Button variant="contained" color="secondary">
-                  Favorite
-                </Button>
+                <Typography>Brand: {item.brand}</Typography>
+                <Typography variant="h5">
+                  <b>{item.name}</b>
+                </Typography>
+                <Typography variant="h3">${item.price}</Typography>
+                <Typography>
+                  Uploaded by:
+                  <div className="uploaderText" style={{ color: "gray" }}>
+                    {item.uploader}
+                  </div>
+                </Typography>
               </CardContent>
             </Card>
-          )}
+            <Card className={styles.itemDesc} variant="outlined">
+              <CardContent>
+                <Typography>
+                  <b>Item Description</b>
+                </Typography>
+                <Typography>{item.description}</Typography>
+              </CardContent>
+            </Card>
+            <Card className={styles.itemDesc} variant="outlined">
+              <CardContent>
+                <Typography>
+                  <b>Tags</b>
+                </Typography>
+                <Typography>
+                  {item.tags.map((tag) => (
+                    <Button
+                      className={styles.tagButton}
+                      style={{'margin' : '5px', 'backgroundColor' : '#545454', 'color' : 'white'}}
+                      variant="contained"
+                    >
+                      {tag}
+                    </Button>
+                  ))}
+                </Typography>
+              </CardContent>
+            </Card>
+            <Card className={styles.itemDesc} variant="outlined">
+              <CardContent>
+                <Typography>
+                  <b>Links</b>
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-        <Grid item xs>
-          <Card className={styles.itemInfo} variant="outlined">
-            <CardContent>
-              <Typography>Brand: {item.brand}</Typography>
-              <Typography variant="h5">
-                <b>{item.name}</b>
-              </Typography>
-              <Typography variant="h3">${item.price}</Typography>
-              <Typography>
-                Uploaded by:{" "}
-                <div className="uploaderText" style={{ color: "gray" }}>
-                  {item.uploader}
-                </div>
-              </Typography>
-            </CardContent>
-          </Card>
-          <Card className={styles.itemDesc} variant="outlined">
-            <CardContent>
-              <Typography>
-                <b>Item Description</b>
-              </Typography>
-              <Typography>{item.description}</Typography>
-            </CardContent>
-          </Card>
-          <Card className={styles.itemDesc} variant="outlined">
-            <CardContent>
-              <Typography>
-                <b>Tags</b>
-              </Typography>
-              <Typography>
-                {item.tags.map((tag) => (
-                  <Button className={styles.tagButton} variant="contained" color="primary">
-                    {tag}
-                  </Button>
-                ))}
-              </Typography>
-            </CardContent>
-          </Card>
-          <Card className={styles.itemDesc} variant="outlined">
-            <CardContent>
-              <Typography>
-                <b>Links</b>
-              </Typography>
-              
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      )}
     </Container>
   );
 }

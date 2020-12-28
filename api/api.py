@@ -113,9 +113,10 @@ def get_item_objs(ids):
 def get_item():
     req = request.get_json(force=True)
     item_id = req.get('item_id', None)
-    item = get_item_objs([item_id])[item_id]
-    print(item)
-    return jsonify(error="false", item=item)
+    item = get_item_objs([item_id])
+    if not item:
+        return jsonify(error="true")
+    return jsonify(error="false", item=item[item_id])
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

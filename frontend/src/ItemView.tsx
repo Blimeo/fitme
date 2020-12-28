@@ -40,16 +40,17 @@ export default function ItemView({ loggedIn }: Props) {
       .then((r) => r.json())
       .then((response) => {
         if (response.error === "true") {
-          history.push("/");
+          history.push("/items");
+        } else {
+          setItem(response.item as Item);
+          let d: { original: string }[] = [];
+          response.item.imgs.map((url: string) => {
+            d.push({ original: url });
+          });
+          setGalleryImgs(d);
         }
-        setItem(response.item as Item);
-        let d: { original: string }[] = [];
-        response.item.imgs.map((url: string) => {
-          d.push({ original: url });
-        });
-        setGalleryImgs(d);
       });
-  }, [item_id]);
+  }, [item_id, history]);
 
   return (
     <Container className={styles.container} maxWidth="md">
@@ -97,7 +98,7 @@ export default function ItemView({ loggedIn }: Props) {
               </Typography>
               <Typography>
                 {item.tags.map((tag) => (
-                  <Button className={styles.tag} variant="contained" color="primary">
+                  <Button className={styles.tagButton} variant="contained" color="primary">
                     {tag}
                   </Button>
                 ))}

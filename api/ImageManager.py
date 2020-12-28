@@ -20,7 +20,6 @@ class ImageManager:
                 ids.append(new_url)
             except ClientError as e:
                 return False
-        print(ids)
         return ids
 
     def __init__(self):

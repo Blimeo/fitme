@@ -10,6 +10,8 @@ from bson.objectid import ObjectId
 from collections import OrderedDict
 import bson
 import json
+from bson import json_util
+import imghdr
 
 load_dotenv(find_dotenv())
 app = Flask(__name__)
@@ -34,7 +36,7 @@ def register():
     email = req.get('email', None)
     username = req.get('username', None)
 
-    if len(username) < 4 or len(username) > 16:
+    if len(username) < 4 or len(username) > 16 or username.count(" ") > 0:
         return jsonify(message="bad username"), 409
     if users_collection.find_one({"email": email}):
         return jsonify(message="A user with that email already exists."), 409
@@ -46,7 +48,19 @@ def register():
             return jsonify(message="bad password"), 409
         hashed = bcrypt.generate_password_hash(password)
         user_info = dict(email=email,
-                         username=username, password=hashed)
+                         username=username,
+                         password=hashed,
+                         avatar="DEFAULT_PROFILE_IMAGE",
+                         uploaded_items=[],
+                         uploaded_fits=[],
+                         favorite_items=[],
+                         favorite_fits=[],
+                         following=[],
+                         followers=[],
+                         instagram="NONE_PROVIDED",
+                         twitter="NONE_PROVIDED",
+                         youtube="NONE_PROVIDED"
+                         )
         users_collection.insert_one(user_info)
         return jsonify(message="User added successfully"), 201
 
@@ -65,12 +79,50 @@ def login():
         return jsonify(message="Bad Email or Password"), 401
 
 
-@app.route("/profile_data", methods=["POST"])
+@app.route("/my_profile_data", methods=["GET"])
 @jwt_required
+def my_profile_data():
+    user_data = users_collection.find_one(
+        {"email": get_jwt_identity()})
+    if (user_data is None):
+        return jsonify(message="User not found"), 404
+    del user_data["password"]
+    del user_data["email"]
+    return json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)
+
+
+@app.route("/update_profile", methods=["PUT"])
+@jwt_required
+def update_profile():
+    body = json.loads(dict(request.form)["postData"])
+    identity = get_jwt_identity()
+    user_data = users_collection.find_one(
+        {"email": identity})
+    if user_data is None:
+        return jsonify(message="User not found"), 404
+    if body["username"] == "OWN PROFILE":
+        body["username"] = user_data["username"]
+    if body["is_updating_avatar"]:
+        manager = ImageManager()
+        image = request.files.to_dict()["profileImage"]
+        item_img = manager.uploadImage(
+            [image], [imghdr.what(image)])
+        body["avatar"] = "https://fitme.s3.amazonaws.com/" + item_img[0]
+    del body["is_updating_avatar"]
+
+    users_collection.update_one({"email": identity}, {"$set": body})
+    return jsonify(message="Successfully updated"), 200
+
+
+@app.route("/profile_data/<username>", methods=["GET"])
 def profile_data():
-    # req = request.get_json(force=True)
-    print(get_jwt_identity())
-    return jsonify(identity=get_jwt_identity()), 200
+    user_data = users_collection.find_one(
+        {"username": username})
+    if (user_data is None):
+        return jsonify(message="User not found"), 404
+    del user_data["password"]
+    del user_data["email"]
+    return json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)
 
 
 @app.route("/submit_item", methods=["POST"])
@@ -117,6 +169,12 @@ def get_item():
     if not item:
         return jsonify(error="true")
     return jsonify(error="false", item=item[item_id])
+
+@app.route("/verify_access_token", methods=["GET"])
+@jwt_required
+def verify_jwt():
+    return jsonify(message="Good access token"), 200
+
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

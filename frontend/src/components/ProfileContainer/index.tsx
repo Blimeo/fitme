@@ -10,7 +10,6 @@ import {
 import React, { useEffect, useState } from "react";
 import { ProfileUser, User } from "../../util/util-types";
 import DefaultProfileImage from "../../assets/img/default_avatar.png";
-import { getS3ImageLink } from "../../util/util-functions";
 import ProfileHeader from "./ProfileHeader";
 
 type Props = {
@@ -37,9 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     followButton: {
       background: "#e91e63",
-      color: "#000",
-      fontSize: "11px",
-      border: "3px solid black",
+      color: "#fff",
       borderRadius: "25px",
       padding: "0px 25px",
       marginLeft: "5px",
@@ -61,7 +58,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function ProfileContainer({ username }: Props) {
   const [profileData, setProfileData] = useState<User>(null);
-  const [profileImage, setProfileImage] = useState<string>(DefaultProfileImage);
   const classes = useStyles();
 
   useEffect(() => {
@@ -69,7 +65,7 @@ function ProfileContainer({ username }: Props) {
       accessTokenString: string
     ): Promise<void> => {
       fetch(
-        username === "OWN_PROFILE"
+        username === "OWN PROFILE"
           ? "/my_profile_data"
           : `/profile_data/${username}`,
         {
@@ -82,9 +78,6 @@ function ProfileContainer({ username }: Props) {
         .then((r) => r.json())
         .then((data) => {
           setProfileData(data as User);
-          if (data.avatar !== "DEFAULT_PROFILE_IMAGE") {
-            setProfileImage(getS3ImageLink(data.avatar));
-          }
         });
     };
 
@@ -104,12 +97,17 @@ function ProfileContainer({ username }: Props) {
       <ProfileHeader
         classes={classes}
         profileData={profileData}
-        profileImage={profileImage}
+        setProfileData={setProfileData}
+        profileImage={
+          profileData.avatar === "DEFAULT_PROFILE_IMAGE"
+            ? DefaultProfileImage
+            : profileData.avatar
+        }
         username={username}
       />
       <Container maxWidth="lg" className={classes.container}>
         <Typography variant="h5">
-          🤵 {username === "OWN_PROFILE" && "My"} Fits
+          🤵 {username === "OWN PROFILE" && "My"} Fits
         </Typography>
         {profileData.uploaded_fits.length === 0 ? (
           <Typography>
@@ -120,7 +118,7 @@ function ProfileContainer({ username }: Props) {
         )}
 
         <Typography variant="h5">
-          🧣 {username === "OWN_PROFILE" && "My"} Items
+          🧣 {username === "OWN PROFILE" && "My"} Items
         </Typography>
         {profileData.uploaded_items.length === 0 ? (
           <Typography>Nothing here yet.</Typography>
@@ -129,7 +127,7 @@ function ProfileContainer({ username }: Props) {
         )}
 
         <Typography variant="h5">
-          🌟 {username === "OWN_PROFILE" && "My"} Favorites
+          🌟 {username === "OWN PROFILE" && "My"} Favorites
         </Typography>
         {profileData.favorite_items.length === 0 ? (
           <Typography>Nothing here yet.</Typography>

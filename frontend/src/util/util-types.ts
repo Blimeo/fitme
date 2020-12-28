@@ -1,5 +1,5 @@
 
-export type ProfileUser = string | "OWN_PROFILE";
+export type ProfileUser = string | "OWN PROFILE";
 
 export type SocialMediaAccount = string | "NONE_PROVIDED";
 
@@ -16,3 +16,12 @@ export type User = {
 	twitter: SocialMediaAccount;
 	youtube: SocialMediaAccount;
 } | null;
+
+// Does not include avatar
+export type ProfileUpdateRequest = {
+	is_updating_avatar: boolean;
+	username: string;
+	instagram: string;
+	twitter: string;
+	youtube: string;
+}

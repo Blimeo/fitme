@@ -40,10 +40,10 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
       .then((token) => {
         if (token.access_token) {
           localStorage.setItem("access_token", token.access_token);
-          logged(true);
           setOpen(false);
+          logged(true);
         } else {
-          setBadLogin(true); 
+          setBadLogin(true);
         }
       });
   };

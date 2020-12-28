@@ -42,7 +42,7 @@ export default function ItemUpload() {
     form_data.append("postData", JSON.stringify(values));
     let i = 0;
     for (const file of values.images) {
-      form_data.append("files-"+i, file, file.name);
+      form_data.append("files-" + i, file, file.name);
       i++;
     }
     console.log(values);

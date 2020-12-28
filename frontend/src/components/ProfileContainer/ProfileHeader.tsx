@@ -12,8 +12,8 @@ import {
   Tooltip,
   Typography,
 } from "@material-ui/core";
-import React, { useState } from "react";
-import { ProfileUser, User } from "../../util/util-types";
+import React, { useRef, useState } from "react";
+import { ProfileUpdateRequest, ProfileUser, User } from "../../util/util-types";
 import InstagramIcon from "@material-ui/icons/Instagram";
 import YouTubeIcon from "@material-ui/icons/YouTube";
 import TwitterIcon from "@material-ui/icons/Twitter";
@@ -32,7 +32,8 @@ type Props = {
     | "profileTextField",
     string
   >;
-  readonly profileData: User;
+  readonly profileData: NonNullable<User>;
+  readonly setProfileData: React.Dispatch<React.SetStateAction<User>>;
   readonly profileImage: string;
   readonly username: ProfileUser;
 };
@@ -40,18 +41,61 @@ type Props = {
 function ProfileHeader({
   classes,
   profileData,
+  setProfileData,
   profileImage,
   username,
 }: Props) {
   const [currentlyEditing, setCurrentlyEditing] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [profileImageLink, setProfileImageLink] = useState<string>(
+    profileImage
+  );
+  const [formData, setFormData] = useState<ProfileUpdateRequest>({
+    is_updating_avatar: false,
+    username: username,
+    instagram: profileData.instagram,
+    twitter: profileData.twitter,
+    youtube: profileData.youtube,
+  });
 
-  const handleProfileUpdate = (e: React.FormEvent<HTMLFormElement>) => {
+  const inputFile = useRef<HTMLInputElement>(null);
+
+  const handleProfileUpdate = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    const access_token = localStorage.getItem("access_token");
+    const bearer = "Bearer " + access_token;
     e.preventDefault();
+    const requestBody = new FormData();
+    requestBody.append("postData", JSON.stringify(formData));
+    if (profileImageFile !== null) {
+      requestBody.append(
+        "profileImage",
+        profileImageFile,
+        profileImageFile.name
+      );
+    }
+    const response = await fetch("/update_profile", {
+      method: "PUT",
+      headers: {
+        Authorization: bearer,
+      },
+      body: requestBody,
+    });
+    if (response.ok) {
+      const response = await fetch("/my_profile_data", {
+        method: "GET",
+        headers: {
+          Authorization: bearer,
+        },
+      });
+      const data = await response.json();
+      setProfileData(data as User);
+      setCurrentlyEditing(false);
+    } else {
+      alert("error");
+    }
   };
-
-  if (profileData === null) {
-    return null; // impossible
-  }
 
   return (
     <Container maxWidth="lg" className={classes.container}>
@@ -62,10 +106,35 @@ function ProfileHeader({
               <form onSubmit={handleProfileUpdate}>
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={3}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="file"
+                      ref={inputFile}
+                      style={{ display: "none" }}
+                      onChange={(event) => {
+                        // @ts-ignore
+                        setProfileImageFile(event.currentTarget.files[0]);
+                        setProfileImageLink(
+                          // @ts-ignore
+                          URL.createObjectURL(event.currentTarget.files[0])
+                        );
+                        setFormData({ ...formData, is_updating_avatar: true });
+                      }}
+                    />
                     <Tooltip title="Change profile picture">
-                      <IconButton>
+                      <IconButton
+                        onClick={() => {
+                          // @ts-ignore
+                          inputFile.current.click();
+                        }}
+                      >
                         <Avatar
-                          src={profileImage}
+                          src={
+                            profileImageFile === null
+                              ? profileImage
+                              : profileImageLink
+                          }
                           className={`${classes.avatar} ${styles.ProfileImageEditing}`}
                         ></Avatar>
                       </IconButton>
@@ -78,6 +147,9 @@ function ProfileHeader({
                       defaultValue={profileData.username}
                       variant="outlined"
                       className={classes.profileTextField}
+                      onChange={(e) =>
+                        setFormData({ ...formData, username: e.target.value })
+                      }
                       required
                     />
                     <TextField
@@ -91,6 +163,9 @@ function ProfileHeader({
                       variant="outlined"
                       className={classes.profileTextField}
                       type="url"
+                      onChange={(e) =>
+                        setFormData({ ...formData, instagram: e.target.value })
+                      }
                     />
                     <TextField
                       id="youtube"
@@ -103,6 +178,9 @@ function ProfileHeader({
                       variant="outlined"
                       className={classes.profileTextField}
                       type="url"
+                      onChange={(e) =>
+                        setFormData({ ...formData, youtube: e.target.value })
+                      }
                     />
                     <TextField
                       id="twitter"
@@ -115,6 +193,9 @@ function ProfileHeader({
                       variant="outlined"
                       className={classes.profileTextField}
                       type="url"
+                      onChange={(e) =>
+                        setFormData({ ...formData, twitter: e.target.value })
+                      }
                     />
                   </Grid>
                 </Grid>
@@ -122,7 +203,6 @@ function ProfileHeader({
                   color="primary"
                   aria-label="done"
                   className={classes.editIcon}
-                  onClick={() => setCurrentlyEditing(false)}
                   type="submit"
                 >
                   <DoneIcon />
@@ -161,18 +241,20 @@ function ProfileHeader({
                   )}
                 </Grid>
                 <Grid item xs={12} md={3} className={classes.userHeader}>
-                  {username !== "OWN_PROFILE" && (
+                  {username !== "OWN PROFILE" && (
                     <Button className={classes.followButton}>FOLLOW</Button>
                   )}
                 </Grid>
-                <Fab
-                  color="primary"
-                  aria-label="edit"
-                  className={classes.editIcon}
-                  onClick={() => setCurrentlyEditing(true)}
-                >
-                  <EditIcon />
-                </Fab>
+                {username === "OWN PROFILE" && (
+                  <Fab
+                    color="primary"
+                    aria-label="edit"
+                    className={classes.editIcon}
+                    onClick={() => setCurrentlyEditing(true)}
+                  >
+                    <EditIcon />
+                  </Fab>
+                )}
               </Grid>
             )}
           </Container>

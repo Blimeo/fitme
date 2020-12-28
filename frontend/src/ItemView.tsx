@@ -73,8 +73,13 @@ export default function ItemView({ loggedIn }: Props) {
               <Typography variant="h5">
                 <b>{item.name}</b>
               </Typography>
-
               <Typography variant="h3">${item.price}</Typography>
+              <Typography>
+                Uploaded by:{" "}
+                <div className="uploaderText" style={{ color: "gray" }}>
+                  {item.uploader}
+                </div>
+              </Typography>
             </CardContent>
           </Card>
           <Card className={styles.itemDesc} variant="outlined">
@@ -83,6 +88,28 @@ export default function ItemView({ loggedIn }: Props) {
                 <b>Item Description</b>
               </Typography>
               <Typography>{item.description}</Typography>
+            </CardContent>
+          </Card>
+          <Card className={styles.itemDesc} variant="outlined">
+            <CardContent>
+              <Typography>
+                <b>Tags</b>
+              </Typography>
+              <Typography>
+                {item.tags.map((tag) => (
+                  <Button className={styles.tag} variant="contained" color="primary">
+                    {tag}
+                  </Button>
+                ))}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card className={styles.itemDesc} variant="outlined">
+            <CardContent>
+              <Typography>
+                <b>Links</b>
+              </Typography>
+              
             </CardContent>
           </Card>
         </Grid>

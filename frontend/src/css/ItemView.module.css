@@ -7,3 +7,8 @@
 .itemDesc {
     margin-top: 10px;
 }
+
+.tag {
+    margin: 5px;
+    background-color: #545454;
+}

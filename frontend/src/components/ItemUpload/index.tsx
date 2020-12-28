@@ -11,18 +11,10 @@ import React, { useState } from "react";
 import ChipInput from "material-ui-chip-input";
 import { DropzoneArea } from "material-ui-dropzone";
 import styles from "./index.module.css";
-
-type Item = {
-  name: string;
-  brand: string;
-  price: number;
-  tags: string[];
-  description: string;
-  images: File[];
-};
+import {ItemUploadType} from "../../util/util-types"
 
 export default function ItemUpload() {
-  const [values, setValues] = useState<Item>({
+  const [values, setValues] = useState<ItemUploadType>({
     name: "",
     brand: "",
     price: 0.0,
@@ -30,7 +22,7 @@ export default function ItemUpload() {
     description: "",
     images: [],
   });
-  const handleChange = (prop: keyof Item) => (
+  const handleChange = (prop: keyof ItemUploadType) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => setValues({ ...values, [prop]: event.target.value });
 
@@ -52,7 +44,7 @@ export default function ItemUpload() {
         Authorization: bearer,
       },
       body: form_data,
-    }).then((r) => r.json());
+    }).then((r) => r.json())
   };
   return (
     <Card>

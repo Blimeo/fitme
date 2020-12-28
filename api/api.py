@@ -6,6 +6,9 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 from dotenv import load_dotenv, find_dotenv
 from flask_bcrypt import Bcrypt
 from ImageManager import ImageManager
+from bson.objectid import ObjectId
+from collections import OrderedDict
+import bson
 import json
 from bson import json_util
 import imghdr
@@ -143,6 +146,29 @@ def submit_item():
     items_collection.insert_one(data)
     return jsonify(message="Item upload successful!"), 200
 
+# Returns a dict consisting of {item_id : item_obj}
+def get_item_objs(ids):
+    items = OrderedDict()
+    for i in ids:
+        if not bson.objectid.ObjectId.is_valid(i):
+            return None
+    for i in ids:
+        item = items_collection.find_one({'_id' : ObjectId(i)})
+        if not item:
+            return None
+        del item['_id']
+        items[i] = item
+    return items
+            
+
+@app.route("/get_item", methods=["POST"])
+def get_item():
+    req = request.get_json(force=True)
+    item_id = req.get('item_id', None)
+    item = get_item_objs([item_id])
+    if not item:
+        return jsonify(error="true")
+    return jsonify(error="false", item=item[item_id])
 
 @app.route("/verify_access_token", methods=["GET"])
 @jwt_required

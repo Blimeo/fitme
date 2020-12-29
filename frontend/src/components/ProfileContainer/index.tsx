@@ -1,19 +1,20 @@
 import {
   Container,
-  Grid,
   LinearProgress,
   makeStyles,
   Typography,
   createStyles,
   Theme,
 } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ProfileUser, User } from "../../util/util-types";
 import DefaultProfileImage from "../../assets/img/default_avatar.png";
 import ProfileHeader from "./ProfileHeader";
+import NotFound from "../Error/NotFound";
 
 type Props = {
-  readonly username: ProfileUser;
+  readonly username: ProfileUser | undefined;
+  readonly loggedIn: boolean;
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -44,6 +45,16 @@ const useStyles = makeStyles((theme: Theme) =>
         background: "#ff3b7d",
       },
     },
+    unfollowButton: {
+      background: "#d6d6d6",
+      color: "#fff",
+      borderRadius: "25px",
+      padding: "0px 25px",
+      marginLeft: "5px",
+      "&:hover": {
+        background: "#999999",
+      },
+    },
     socialMediaLink: {
       marginTop: "0.2em",
       marginRight: "1em",
@@ -56,18 +67,39 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function ProfileContainer({ username }: Props) {
+function ProfileContainer({ username, loggedIn }: Props) {
   const [profileData, setProfileData] = useState<User>(null);
+  const [doesUsernameExist, setDoesUsernameExist] = useState<boolean>(true);
+  const [viewerIsFollowingThisUser, setViewerIsFollowingThisUser] = useState<
+    boolean | undefined
+  >(undefined);
   const classes = useStyles();
 
+  const fetchFollowersList = useCallback(async (): Promise<void> => {
+    const access_token = localStorage.getItem("access_token");
+    const accessTokenString = `Bearer ${access_token}`;
+    const response = await fetch("/my_profile_data", {
+      method: "GET",
+      headers: {
+        Authorization: accessTokenString,
+      },
+    });
+    const data = (await response.json()) as User;
+    if (username !== undefined) {
+      setViewerIsFollowingThisUser(
+        data !== null && data?.following.includes(username)
+      );
+    } else {
+      setViewerIsFollowingThisUser(false);
+    }
+  }, [username]);
+
   useEffect(() => {
-    const fetchProfileData = async (
-      accessTokenString: string
-    ): Promise<void> => {
+    const fetchProfileData = (accessTokenString: string): void => {
       fetch(
         username === "OWN PROFILE"
           ? "/my_profile_data"
-          : `/profile_data/${username}`,
+          : `/profile_data?username=${username}`,
         {
           method: "GET",
           headers: {
@@ -75,10 +107,17 @@ function ProfileContainer({ username }: Props) {
           },
         }
       )
-        .then((r) => r.json())
+        .then((r) => {
+          if (r.ok) {
+            return r.json();
+          } else {
+            setDoesUsernameExist(false);
+          }
+        })
         .then((data) => {
           setProfileData(data as User);
-        });
+        })
+        .catch(() => setDoesUsernameExist(false));
     };
 
     const access_token = localStorage.getItem("access_token");
@@ -87,10 +126,20 @@ function ProfileContainer({ username }: Props) {
     } else {
       const bearer = `Bearer ${access_token}`;
       fetchProfileData(bearer);
+      if (loggedIn) {
+        fetchFollowersList();
+      } else {
+        setViewerIsFollowingThisUser(false);
+      }
     }
-  }, [username]);
+  }, [fetchFollowersList, loggedIn, username]);
 
-  return profileData === null ? (
+  if (!doesUsernameExist) {
+    return <NotFound />;
+  }
+  return profileData === null ||
+    username === undefined ||
+    viewerIsFollowingThisUser === undefined ? (
     <LinearProgress />
   ) : (
     <>
@@ -104,15 +153,16 @@ function ProfileContainer({ username }: Props) {
             : profileData.avatar
         }
         username={username}
+        loggedIn={loggedIn}
+        viewerIsFollowingThisUser={viewerIsFollowingThisUser}
+        fetchFollowersList={fetchFollowersList}
       />
       <Container maxWidth="lg" className={classes.container}>
         <Typography variant="h5">
           🤵 {username === "OWN PROFILE" && "My"} Fits
         </Typography>
         {profileData.uploaded_fits.length === 0 ? (
-          <Typography>
-            Nothing here yet. Add some fits to show to the Fitme community!
-          </Typography>
+          <Typography>Nothing here yet.</Typography>
         ) : (
           <Typography>TODO</Typography>
         )}

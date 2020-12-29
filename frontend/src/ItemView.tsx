@@ -46,7 +46,7 @@ export default function ItemView({ loggedIn }: Props) {
         } else {
           setItem(response.item as Item);
           let d: { original: string }[] = [];
-          response.item.imgs.map((url: string) => {
+          response.item.imgs.forEach((url: string) => {
             d.push({ original: url });
           });
           setGalleryImgs(d);
@@ -105,7 +105,11 @@ export default function ItemView({ loggedIn }: Props) {
                   {item.tags.map((tag) => (
                     <Button
                       className={styles.tagButton}
-                      style={{'margin' : '5px', 'backgroundColor' : '#545454', 'color' : 'white'}}
+                      style={{
+                        margin: "5px",
+                        backgroundColor: "#545454",
+                        color: "white",
+                      }}
                       variant="contained"
                     >
                       {tag}

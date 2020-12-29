@@ -1,7 +1,14 @@
-import { Container, Fab, Tooltip, Typography } from "@material-ui/core";
+import {
+  Card,
+  CardContent,
+  Container,
+  Fab,
+  Tooltip,
+  Typography,
+} from "@material-ui/core";
 import { spacing } from "@material-ui/system";
 
-import React from "react";
+import React, { useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
 import styles from "./css/Items.module.css";
 import ItemUpload from "./components/ItemUpload";
@@ -11,6 +18,7 @@ type Props = {
 };
 
 function Items({ loggedIn, setLoggedIn }: Props) {
+  const [uploadHidden, setUploadHidden] = useState(true);
   return (
     <Container className={styles.container} maxWidth="md">
       <div className={styles.topExplanation}>
@@ -22,15 +30,25 @@ function Items({ loggedIn, setLoggedIn }: Props) {
       {loggedIn ? (
         <div className={styles.topBox}>
           <Tooltip title="Upload a new item" aria-label="Upload a new item">
-            <Fab className={styles.fab} color="primary" aria-label="add">
+            <Fab
+              onClick={() => {
+                setUploadHidden(!uploadHidden);
+              }}
+              className={styles.fab}
+              color="primary"
+              aria-label="add"
+            >
               <AddIcon />
             </Fab>
           </Tooltip>
-          <ItemUpload />
+          {uploadHidden && <ItemUpload />}
         </div>
       ) : null}
-
-      <Typography>Welcome to the items page!</Typography>
+      <Card>
+        <CardContent>
+          <Typography>Welcome to the items page!</Typography>
+        </CardContent>
+      </Card>
     </Container>
   );
 }

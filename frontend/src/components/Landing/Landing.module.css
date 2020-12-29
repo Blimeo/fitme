@@ -1,0 +1,37 @@
+.HeroContainerBackground {
+  background: white;
+  margin-top: 6px;
+  min-height: calc(64vh - 64px);
+  position: relative;
+}
+
+.HeroIllustration {
+  position: absolute;
+  right: 3em;
+  width: 300px;
+  height: 300px;
+  z-index: 1;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.HeroHeading {
+  font-weight: 600 !important;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+}
+
+@media screen and (max-width: 840px) {
+  .HeroIllustration {
+    position: absolute;
+    right: 3em;
+    width: 300px;
+    height: 300px;
+    z-index: 1;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.4;
+  }
+}

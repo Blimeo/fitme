@@ -1,6 +1,5 @@
 import {
   Container,
-  Grid,
   LinearProgress,
   makeStyles,
   Typography,
@@ -11,9 +10,10 @@ import React, { useEffect, useState } from "react";
 import { ProfileUser, User } from "../../util/util-types";
 import DefaultProfileImage from "../../assets/img/default_avatar.png";
 import ProfileHeader from "./ProfileHeader";
+import NotFound from "../Error/NotFound";
 
 type Props = {
-  readonly username: ProfileUser;
+  readonly username: ProfileUser | undefined;
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -58,6 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function ProfileContainer({ username }: Props) {
   const [profileData, setProfileData] = useState<User>(null);
+  const [doesUsernameExist, setDoesUsernameExist] = useState<boolean>(true);
   const classes = useStyles();
 
   useEffect(() => {
@@ -67,7 +68,7 @@ function ProfileContainer({ username }: Props) {
       fetch(
         username === "OWN PROFILE"
           ? "/my_profile_data"
-          : `/profile_data/${username}`,
+          : `/profile_data?username=${username}`,
         {
           method: "GET",
           headers: {
@@ -75,10 +76,17 @@ function ProfileContainer({ username }: Props) {
           },
         }
       )
-        .then((r) => r.json())
+        .then((r) => {
+          if (r.ok) {
+            return r.json();
+          } else {
+            setDoesUsernameExist(false);
+          }
+        })
         .then((data) => {
           setProfileData(data as User);
-        });
+        })
+        .catch(() => setDoesUsernameExist(false));
     };
 
     const access_token = localStorage.getItem("access_token");
@@ -90,7 +98,10 @@ function ProfileContainer({ username }: Props) {
     }
   }, [username]);
 
-  return profileData === null ? (
+  if (!doesUsernameExist) {
+    return <NotFound />;
+  }
+  return profileData === null || username === undefined ? (
     <LinearProgress />
   ) : (
     <>
@@ -110,9 +121,7 @@ function ProfileContainer({ username }: Props) {
           🤵 {username === "OWN PROFILE" && "My"} Fits
         </Typography>
         {profileData.uploaded_fits.length === 0 ? (
-          <Typography>
-            Nothing here yet. Add some fits to show to the Fitme community!
-          </Typography>
+          <Typography>Nothing here yet.</Typography>
         ) : (
           <Typography>TODO</Typography>
         )}

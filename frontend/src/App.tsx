@@ -7,6 +7,7 @@ import ItemView from "./ItemView";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import Header from "./components/Header";
 import { createMuiTheme, CssBaseline, ThemeProvider } from "@material-ui/core";
+import NotFound from "./components/Error/NotFound";
 
 export default function App() {
   const theme = createMuiTheme({
@@ -51,9 +52,13 @@ export default function App() {
               <Route path="/profile">
                 {loggedIn ? <Profile /> : <Redirect to="/" />}
               </Route>
+              <Route path="/user/:username">
+                <Profile />
+              </Route>
               <Route path="/item/:item_id">
                 <ItemView loggedIn={loggedIn} />
               </Route>
+              <Route component={NotFound} />
             </Switch>
           </main>
         </ThemeProvider>

@@ -50,10 +50,10 @@ export default function App() {
               </Route>
               <Route path="/fits" component={Home} />
               <Route path="/profile">
-                {loggedIn ? <Profile /> : <Redirect to="/" />}
+                {loggedIn ? <Profile loggedIn /> : <Redirect to="/" />}
               </Route>
               <Route path="/user/:username">
-                <Profile />
+                <Profile loggedIn={loggedIn} />
               </Route>
               <Route path="/item/:item_id">
                 <ItemView loggedIn={loggedIn} />

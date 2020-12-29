@@ -119,7 +119,6 @@ def profile_data():
     username = request.args["username"]
     user_data = users_collection.find_one(
         {"username": username})
-    print(user_data)
     if (user_data is None):
         return jsonify(message="User not found"), 404
     del user_data["password"]
@@ -127,6 +126,7 @@ def profile_data():
     return json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)
 
 
+# Follows/unfollows a user.
 @app.route("/follow_user", methods=["PUT"])
 @jwt_required
 def follow_user():
@@ -138,16 +138,18 @@ def follow_user():
         {"username": user_to_follow})
     if user_data is None or user_to_follow_data is None:
         return jsonify(message="User not found"), 404
-    curr_following = set(user_data["following"])
-    curr_followers = set(user_to_follow_data["followers"])
-    curr_following.add(user_to_follow)
-    curr_followers.add(user_data["username"])
-    user_data["following"] = list(curr_following)
-    user_to_follow_data["followers"] = list(curr_followers)
+    if user_to_follow in user_data["following"]:
+        user_data["following"].remove(user_to_follow)
+        user_to_follow_data["followers"].remove(user_data["username"])
+    else:
+        user_data["following"].append(user_to_follow)
+        user_to_follow_data["followers"].append(user_data["username"])
+
     users_collection.update_one({"email": identity},
                                 {"$set": {"following": user_data["following"]}})
     users_collection.update_one({"username": user_to_follow},
                                 {"$set": {"followers": user_to_follow_data["followers"]}})
+    return jsonify(message="Follow/unfollow successful"), 200
 
 
 @ app.route("/submit_item", methods=["POST"])

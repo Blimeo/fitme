@@ -36,11 +36,12 @@ export type ItemUploadType = {
 };
 
 export type Item = {
+	_id: string;
     name: string;
     brand: string;
     price: number;
     tags: string[];
     description: string;
     imgs: string[];
-    uploader: string;
+	uploader: string;
 };

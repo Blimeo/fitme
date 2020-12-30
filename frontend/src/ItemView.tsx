@@ -21,6 +21,7 @@ export default function ItemView({ loggedIn }: Props) {
   const { item_id } = useParams<Record<string, string | undefined>>();
   const history = useHistory();
   const [item, setItem] = useState<Item>({
+    _id: "",
     name: "",
     brand: "",
     price: 0,

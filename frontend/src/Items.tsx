@@ -1,4 +1,11 @@
-import { Container, Fab, Tooltip, Typography, Grid } from "@material-ui/core";
+import {
+  Container,
+  Fab,
+  Tooltip,
+  Typography,
+  Grid,
+  LinearProgress,
+} from "@material-ui/core";
 
 import React, { useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
@@ -14,6 +21,7 @@ type Props = {
 function Items({ loggedIn, setLoggedIn }: Props) {
   const [uploadHidden, setUploadHidden] = useState(true);
   const [items, setItems] = useState<Item[]>([]);
+  
   useEffect(() => {
     fetch("/discover", {
       method: "GET",
@@ -39,7 +47,7 @@ function Items({ loggedIn, setLoggedIn }: Props) {
               <AddIcon />
             </Fab>
           </Tooltip>
-          {uploadHidden && <ItemUpload setUploadHidden={setUploadHidden} />}
+          {!uploadHidden && <ItemUpload setUploadHidden={setUploadHidden} />}
         </div>
       )}
       <div className={styles.topExplanation}>
@@ -54,7 +62,6 @@ function Items({ loggedIn, setLoggedIn }: Props) {
         </Typography>
         <Grid container alignItems="stretch" spacing={1}>
           {items.map((it) => {
-            console.log(it);
             return (
               <Grid item xs={3} style={{ display: "flex" }}>
                 <ItemCard item={it} />

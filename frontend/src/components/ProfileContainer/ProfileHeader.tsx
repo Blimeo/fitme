@@ -27,6 +27,7 @@ type Props = {
     | "avatar"
     | "userHeader"
     | "followButton"
+    | "unfollowButton"
     | "socialMediaLink"
     | "editIcon"
     | "profileTextField",
@@ -36,6 +37,9 @@ type Props = {
   readonly setProfileData: React.Dispatch<React.SetStateAction<User>>;
   readonly profileImage: string;
   readonly username: ProfileUser;
+  readonly loggedIn: boolean;
+  readonly viewerIsFollowingThisUser: boolean;
+  readonly fetchFollowersList: () => Promise<void>;
 };
 
 function ProfileHeader({
@@ -44,6 +48,9 @@ function ProfileHeader({
   setProfileData,
   profileImage,
   username,
+  loggedIn,
+  viewerIsFollowingThisUser,
+  fetchFollowersList,
 }: Props) {
   const [currentlyEditing, setCurrentlyEditing] = useState(false);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
@@ -59,6 +66,26 @@ function ProfileHeader({
   });
 
   const inputFile = useRef<HTMLInputElement>(null);
+
+  const handleFollowUser = async (): Promise<void> => {
+    const access_token = localStorage.getItem("access_token");
+    const bearer = "Bearer " + access_token;
+    const response = await fetch(`/follow_user?username=${username}`, {
+      method: "PUT",
+      headers: {
+        Authorization: bearer,
+      },
+    });
+    if (response.ok) {
+      const response = await fetch(`/profile_data?username=${username}`, {
+        method: "GET",
+      });
+      const data = await response.json();
+      const userData = data as User;
+      setProfileData(userData);
+      fetchFollowersList();
+    }
+  };
 
   const handleProfileUpdate = async (
     e: React.FormEvent<HTMLFormElement>
@@ -224,25 +251,37 @@ function ProfileHeader({
                   <Typography variant="subtitle2">
                     {profileData.followers.length ?? 0} Followers
                   </Typography>
-                  {profileData.instagram !== "NONE_PROVIDED" && (
-                    <Link href={profileData.instagram} color="inherit">
-                      <InstagramIcon className={classes.socialMediaLink} />
-                    </Link>
-                  )}
-                  {profileData.youtube !== "NONE_PROVIDED" && (
-                    <Link href={profileData.youtube} color="inherit">
-                      <YouTubeIcon className={classes.socialMediaLink} />
-                    </Link>
-                  )}
-                  {profileData.twitter !== "NONE_PROVIDED" && (
-                    <Link href={profileData.twitter} color="inherit">
-                      <TwitterIcon className={classes.socialMediaLink} />
-                    </Link>
-                  )}
+                  {profileData.instagram.trim() !== "" &&
+                    profileData.instagram !== "NONE_PROVIDED" && (
+                      <Link href={profileData.instagram} color="inherit">
+                        <InstagramIcon className={classes.socialMediaLink} />
+                      </Link>
+                    )}
+                  {profileData.youtube.trim() !== "" &&
+                    profileData.youtube !== "NONE_PROVIDED" && (
+                      <Link href={profileData.youtube} color="inherit">
+                        <YouTubeIcon className={classes.socialMediaLink} />
+                      </Link>
+                    )}
+                  {profileData.twitter.trim() !== "" &&
+                    profileData.twitter !== "NONE_PROVIDED" && (
+                      <Link href={profileData.twitter} color="inherit">
+                        <TwitterIcon className={classes.socialMediaLink} />
+                      </Link>
+                    )}
                 </Grid>
                 <Grid item xs={12} md={3} className={classes.userHeader}>
-                  {username !== "OWN PROFILE" && (
-                    <Button className={classes.followButton}>FOLLOW</Button>
+                  {username !== "OWN PROFILE" && loggedIn && (
+                    <Button
+                      className={
+                        viewerIsFollowingThisUser
+                          ? classes.unfollowButton
+                          : classes.followButton
+                      }
+                      onClick={handleFollowUser}
+                    >
+                      {viewerIsFollowingThisUser ? "UNFOLLOW" : "FOLLOW"}
+                    </Button>
                   )}
                 </Grid>
                 {username === "OWN PROFILE" && (

@@ -115,8 +115,9 @@ def update_profile():
     return jsonify(message="Successfully updated"), 200
 
 
-@app.route("/profile_data/<username>", methods=["GET"])
+@app.route("/profile_data", methods=["GET"])
 def profile_data():
+    username = request.args["username"]
     user_data = users_collection.find_one(
         {"username": username})
     if (user_data is None):
@@ -126,11 +127,36 @@ def profile_data():
     return json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)
 
 
-@app.route("/submit_item", methods=["POST"])
+# Follows/unfollows a user.
+@app.route("/follow_user", methods=["PUT"])
 @jwt_required
+def follow_user():
+    user_to_follow = request.args["username"]
+    identity = get_jwt_identity()
+    user_data = users_collection.find_one(
+        {"email": identity})
+    user_to_follow_data = users_collection.find_one(
+        {"username": user_to_follow})
+    if user_data is None or user_to_follow_data is None:
+        return jsonify(message="User not found"), 404
+    if user_to_follow in user_data["following"]:
+        user_data["following"].remove(user_to_follow)
+        user_to_follow_data["followers"].remove(user_data["username"])
+    else:
+        user_data["following"].append(user_to_follow)
+        user_to_follow_data["followers"].append(user_data["username"])
+
+    users_collection.update_one({"email": identity},
+                                {"$set": {"following": user_data["following"]}})
+    users_collection.update_one({"username": user_to_follow},
+                                {"$set": {"followers": user_to_follow_data["followers"]}})
+    return jsonify(message="Follow/unfollow successful"), 200
+
+
+@ app.route("/submit_item", methods=["POST"])
+@ jwt_required
 def submit_item():
     identity = get_jwt_identity()
-    print(request, identity)
     data = dict(request.form)
     data = json.loads(data["postData"])
     images = request.files.to_dict()
@@ -148,21 +174,23 @@ def submit_item():
     return jsonify(message="Item upload successful!"), 200
 
 # Returns a dict consisting of {item_id : item_obj}
+
+
 def get_item_objs(ids):
     items = OrderedDict()
     for i in ids:
         if not bson.objectid.ObjectId.is_valid(i):
             return None
     for i in ids:
-        item = items_collection.find_one({'_id' : ObjectId(i)})
+        item = items_collection.find_one({'_id': ObjectId(i)})
         if not item:
             return None
         item['_id'] = str(item['_id'])
         items[i] = item
     return items
-            
 
-@app.route("/get_item", methods=["POST"])
+
+@ app.route("/get_item", methods=["POST"])
 def get_item():
     req = request.get_json(force=True)
     item_id = req.get('item_id', None)

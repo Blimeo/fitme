@@ -4,7 +4,6 @@ import {
   Tooltip,
   Typography,
   Grid,
-  LinearProgress,
 } from "@material-ui/core";
 
 import React, { useEffect, useState } from "react";
@@ -63,7 +62,7 @@ function Items({ loggedIn, setLoggedIn }: Props) {
         <Grid container alignItems="stretch" spacing={1}>
           {items.map((it) => {
             return (
-              <Grid item xs={3} style={{ display: "flex" }}>
+              <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
                 <ItemCard item={it} />
               </Grid>
             );

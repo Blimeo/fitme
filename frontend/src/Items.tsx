@@ -1,10 +1,4 @@
-import {
-  Container,
-  Fab,
-  Tooltip,
-  Typography,
-  Grid,
-} from "@material-ui/core";
+import { Container, Fab, Tooltip, Typography, Grid } from "@material-ui/core";
 
 import React, { useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
@@ -19,17 +13,30 @@ type Props = {
 
 function Items({ loggedIn, setLoggedIn }: Props) {
   const [uploadHidden, setUploadHidden] = useState(true);
-  const [items, setItems] = useState<Item[]>([]);
-  
+  const [discoverItems, setDiscoverItems] = useState<Item[]>([]);
+  const [recommendedItems, setRecommendedItems] = useState<Item[]>([]);
+  const access_token = localStorage.getItem("access_token");
+  const accessTokenString = `Bearer ${access_token}`;
   useEffect(() => {
-    fetch("/discover", {
+    fetch("/discover_items", {
       method: "GET",
     })
       .then((r) => r.json())
       .then((response) => {
-        setItems(response.items as Item[]);
+        setDiscoverItems(response.items as Item[]);
       });
-  }, []);
+
+    fetch("/recommended_items", {
+      method: "GET",
+      headers: {
+        Authorization: loggedIn ? accessTokenString : "",
+      },
+    })
+      .then((r) => r.json())
+      .then((response) => {
+        setRecommendedItems(response.items as Item[]);
+      });
+  }, [accessTokenString, loggedIn]);
   return (
     <Container className={styles.container} maxWidth="md">
       {loggedIn && (
@@ -51,16 +58,35 @@ function Items({ loggedIn, setLoggedIn }: Props) {
       )}
       <div className={styles.topExplanation}>
         <Typography>
-          Browse articles of clothing. You can filter existing items and upload
-          your own{loggedIn ? null : " if you are logged in"}!
+          {!loggedIn &&
+            "Log in to get personalized recommendations and upload your own items!"}
         </Typography>
       </div>
-      <div className={styles.discover}>
-        <Typography variant="h5">
-          <b>Discover</b>
-        </Typography>
+      <div className={styles.recommended}>
+        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+          <Typography variant="h5">
+            <b>Recommended</b>
+          </Typography>
+        </div>
+
         <Grid container alignItems="stretch" spacing={1}>
-          {items.map((it) => {
+          {recommendedItems.map((it) => {
+            return (
+              <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
+                <ItemCard item={it} />
+              </Grid>
+            );
+          })}
+        </Grid>
+      </div>
+      <div className={styles.discover}>
+        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+          <Typography variant="h5">
+            <b>Discover</b>
+          </Typography>
+        </div>
+        <Grid container alignItems="stretch" spacing={1}>
+          {discoverItems.map((it) => {
             return (
               <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
                 <ItemCard item={it} />

@@ -12,6 +12,7 @@ import bson
 import json
 from bson import json_util
 import imghdr
+import random
 
 load_dotenv(find_dotenv())
 app = Flask(__name__)
@@ -184,7 +185,7 @@ def get_item_objs(ids):
         item = items_collection.find_one({'_id': ObjectId(i)})
         if not item:
             return None
-        del item['_id']
+        item['_id'] = str(item['_id'])
         items[i] = item
     return items
 
@@ -198,9 +199,17 @@ def get_item():
         return jsonify(error="true")
     return jsonify(error="false", item=item[item_id])
 
+@app.route("/discover", methods=["GET"])
+def discover():
+    docs = list(items_collection.find({}))
+    random.shuffle(docs)
+    for item in docs:
+        item['_id'] = str(item['_id'])
+    return jsonify(items=docs)
 
-@ app.route("/verify_access_token", methods=["GET"])
-@ jwt_required
+
+@app.route("/verify_access_token", methods=["GET"])
+@jwt_required
 def verify_jwt():
     return jsonify(message="Good access token"), 200
 

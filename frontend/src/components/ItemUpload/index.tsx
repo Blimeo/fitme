@@ -13,7 +13,11 @@ import { DropzoneArea } from "material-ui-dropzone";
 import styles from "./index.module.css";
 import {ItemUploadType} from "../../util/util-types"
 
-export default function ItemUpload() {
+type Props = {
+  readonly setUploadHidden: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export default function ItemUpload({setUploadHidden} : Props) {
   const [values, setValues] = useState<ItemUploadType>({
     name: "",
     brand: "",
@@ -37,7 +41,6 @@ export default function ItemUpload() {
       form_data.append("files-" + i, file, file.name);
       i++;
     }
-    console.log(values);
     fetch("/submit_item", {
       method: "POST",
       headers: {
@@ -45,6 +48,9 @@ export default function ItemUpload() {
       },
       body: form_data,
     }).then((r) => r.json())
+    .then((r) => {
+      setUploadHidden(true);
+    })
   };
   return (
     <Card>

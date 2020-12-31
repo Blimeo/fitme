@@ -21,6 +21,7 @@ export default function ItemView({ loggedIn }: Props) {
   const { item_id } = useParams<Record<string, string | undefined>>();
   const history = useHistory();
   const [item, setItem] = useState<Item>({
+    _id: "",
     name: "",
     brand: "",
     price: 0,
@@ -80,12 +81,10 @@ export default function ItemView({ loggedIn }: Props) {
                   <b>{item.name}</b>
                 </Typography>
                 <Typography variant="h3">${item.price}</Typography>
-                <Typography>
-                  Uploaded by:
-                  <div className="uploaderText" style={{ color: "gray" }}>
-                    {item.uploader}
-                  </div>
-                </Typography>
+                <Typography>Uploaded by:</Typography>
+                <div className="uploaderText" style={{ color: "gray" }}>
+                  <Typography>{item.uploader}</Typography>
+                </div>
               </CardContent>
             </Card>
             <Card className={styles.itemDesc} variant="outlined">

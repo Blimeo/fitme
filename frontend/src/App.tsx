@@ -47,7 +47,7 @@ export default function App() {
               <Route path="/" component={Home} exact />
               <Route path="/about" component={Home} />
               <Route path="/items">
-                <Items loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+                <Items loggedIn={loggedIn} />
               </Route>
               <Route path="/fits" component={Home} />
               <Route path="/profile">

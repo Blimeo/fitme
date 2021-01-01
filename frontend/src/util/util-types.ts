@@ -27,21 +27,21 @@ export type ProfileUpdateRequest = {
 }
 
 export type ItemUploadType = {
-    name: string;
-    brand: string;
-    price: number;
-    tags: string[];
-    description: string;
-    images: File[];
+	name: string;
+	brand: string;
+	price: number;
+	tags: string[];
+	description: string;
+	images: File[];
 };
 
 export type Item = {
 	_id: string;
-    name: string;
-    brand: string;
-    price: number;
-    tags: string[];
-    description: string;
-    imgs: string[];
+	name: string;
+	brand: string;
+	price: number;
+	tags: string[];
+	description: string;
+	imgs: string[];
 	uploader: string;
 };

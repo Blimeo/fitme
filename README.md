@@ -6,6 +6,7 @@ A platform allowing users to share and discover fashion inspiration
 ### Frontend
 
 - MVC: React
+  - State Management: Redux
 - UI Library: MaterialUI
 - Build System: Yarn
 

@@ -1,0 +1,14 @@
+# Pytorch
+--find-links https://download.pytorch.org/whl/torch_stable.html
+torch==1.7.1+cpu 
+torchvision==0.8.2+cpu
+
+# Detectron
+--find-links https://dl.fbaipublicfiles.com/detectron2/wheels/cu101/index.html
+detectron2
+
+cython
+wheel
+pyyaml
+numpy
+opencv-python

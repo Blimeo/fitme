@@ -2,7 +2,7 @@
 import os
 import pymongo
 from flask import Flask, jsonify, request
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, jwt_optional
 from dotenv import load_dotenv, find_dotenv
 from flask_bcrypt import Bcrypt
 from ImageManager import ImageManager
@@ -199,13 +199,26 @@ def get_item():
         return jsonify(error="true")
     return jsonify(error="false", item=item[item_id])
 
-@app.route("/discover", methods=["GET"])
+@app.route("/discover_items", methods=["GET"])
 def discover():
     docs = list(items_collection.find({}))
     random.shuffle(docs)
     for item in docs:
         item['_id'] = str(item['_id'])
     return jsonify(items=docs)
+
+@app.route("/recommended_items", methods=["GET"])
+@jwt_optional
+def recommended():
+    identity = get_jwt_identity()
+    if identity:
+        # TODO: custom recommendations
+        pass
+    docs = list(items_collection.find({}))
+    random.shuffle(docs)
+    for item in docs:
+        item['_id'] = str(item['_id'])
+    return jsonify(items=docs[:4])
 
 
 @app.route("/verify_access_token", methods=["GET"])

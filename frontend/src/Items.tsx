@@ -8,7 +8,11 @@ import { Item } from "./util/util-types";
 import ItemCard from "./components/ItemCard";
 import { connect } from "react-redux";
 import { RootState } from "./store/rootReducer";
-import { ItemsSliceState, setItems } from "./store/slices/itemsSlice";
+import {
+  ItemsSliceState,
+  patchDiscover,
+  patchRecommended,
+} from "./store/slices/itemsSlice";
 import { Dispatch } from "@reduxjs/toolkit";
 
 type OwnProps = {
@@ -22,19 +26,32 @@ type Props = OwnProps & {
 
 const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
   const [uploadHidden, setUploadHidden] = useState(true);
-  const { itemsData, lastUpdated } = items;
+  const { discoverData, recommendedData, lastUpdated } = items;
 
   useEffect(() => {
-    console.log(itemsData);
-    if (itemsData.length === 0 || Date.now() - lastUpdated.getTime() > 100000) {
-      fetch("/discover", {
+    if (
+      discoverData.length === 0 ||
+      Date.now() - lastUpdated.getTime() > 100000
+    ) {
+      const access_token = localStorage.getItem("access_token");
+      const accessTokenString = `Bearer ${access_token}`;
+      fetch("/discover_items", {
         method: "GET",
       })
         .then((r) => r.json())
         .then((response) => {
-          const itemsResponse: Item[] = response.items as Item[];
-          console.log(itemsResponse);
-          dispatch(setItems(itemsResponse));
+          dispatch(patchDiscover(response.items as Item[]));
+        });
+
+      fetch("/recommended_items", {
+        method: "GET",
+        headers: {
+          Authorization: loggedIn ? accessTokenString : "",
+        },
+      })
+        .then((r) => r.json())
+        .then((response) => {
+          dispatch(patchRecommended(response.items as Item[]));
         });
     }
   });
@@ -59,16 +76,35 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
       )}
       <div className={styles.topExplanation}>
         <Typography>
-          Browse articles of clothing. You can filter existing items and upload
-          your own{loggedIn ? null : " if you are logged in"}!
+          {!loggedIn &&
+            "Log in to get personalized recommendations and upload your own items!"}
         </Typography>
       </div>
-      <div className={styles.discover}>
-        <Typography variant="h5">
-          <b>Discover</b>
-        </Typography>
+      <div className={styles.recommended}>
+        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+          <Typography variant="h5">
+            <b>Recommended</b>
+          </Typography>
+        </div>
+
         <Grid container alignItems="stretch" spacing={1}>
-          {itemsData.map((it) => {
+          {recommendedData.map((it) => {
+            return (
+              <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
+                <ItemCard item={it} />
+              </Grid>
+            );
+          })}
+        </Grid>
+      </div>
+      <div className={styles.discover}>
+        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+          <Typography variant="h5">
+            <b>Discover</b>
+          </Typography>
+        </div>
+        <Grid container alignItems="stretch" spacing={1}>
+          {discoverData.map((it) => {
             return (
               <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
                 <ItemCard item={it} />

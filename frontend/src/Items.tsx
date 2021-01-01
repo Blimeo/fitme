@@ -1,35 +1,43 @@
-import {
-  Container,
-  Fab,
-  Tooltip,
-  Typography,
-  Grid,
-} from "@material-ui/core";
+import { Container, Fab, Tooltip, Typography, Grid } from "@material-ui/core";
 
-import React, { useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
 import styles from "./css/Items.module.css";
 import ItemUpload from "./components/ItemUpload";
 import { Item } from "./util/util-types";
 import ItemCard from "./components/ItemCard";
-type Props = {
+import { connect } from "react-redux";
+import { RootState } from "./store/rootReducer";
+import { ItemsSliceState, setItems } from "./store/slices/itemsSlice";
+import { Dispatch } from "@reduxjs/toolkit";
+
+type OwnProps = {
   readonly loggedIn: boolean;
-  readonly setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+};
+// Subscribed from Redux store.
+type Props = OwnProps & {
+  items: ItemsSliceState;
+  dispatch: Dispatch;
 };
 
-function Items({ loggedIn, setLoggedIn }: Props) {
+const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
   const [uploadHidden, setUploadHidden] = useState(true);
-  const [items, setItems] = useState<Item[]>([]);
-  
+  const { itemsData, lastUpdated } = items;
+
   useEffect(() => {
-    fetch("/discover", {
-      method: "GET",
-    })
-      .then((r) => r.json())
-      .then((response) => {
-        setItems(response.items as Item[]);
-      });
-  }, []);
+    console.log(itemsData);
+    if (itemsData.length === 0 || Date.now() - lastUpdated.getTime() > 100000) {
+      fetch("/discover", {
+        method: "GET",
+      })
+        .then((r) => r.json())
+        .then((response) => {
+          const itemsResponse: Item[] = response.items as Item[];
+          console.log(itemsResponse);
+          dispatch(setItems(itemsResponse));
+        });
+    }
+  });
   return (
     <Container className={styles.container} maxWidth="md">
       {loggedIn && (
@@ -60,7 +68,7 @@ function Items({ loggedIn, setLoggedIn }: Props) {
           <b>Discover</b>
         </Typography>
         <Grid container alignItems="stretch" spacing={1}>
-          {items.map((it) => {
+          {itemsData.map((it) => {
             return (
               <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
                 <ItemCard item={it} />
@@ -71,6 +79,7 @@ function Items({ loggedIn, setLoggedIn }: Props) {
       </div>
     </Container>
   );
-}
+};
 
-export default Items;
+const Connected = connect(({ items }: RootState) => ({ items }))(Items);
+export default Connected;

@@ -16,12 +16,4 @@ So final directory structure should look something like
     
 
 To setup:
-python3 -m venv ml-env
-source ml-env/bin/activate
-python3 -m pip install -r requirements.txt
-
-Then get in and out of virtualenv with 
-source ml-env/bin/activate
-and
-deactivate
-, respectively.
+pip3 install -r requirements.txt

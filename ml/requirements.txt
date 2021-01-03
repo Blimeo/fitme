@@ -5,7 +5,7 @@ torchvision==0.8.2+cpu
 
 # Detectron
 --find-links https://dl.fbaipublicfiles.com/detectron2/wheels/cu101/index.html
-detectron2
+#detectron2==0.3
 
 setuptools
 cython

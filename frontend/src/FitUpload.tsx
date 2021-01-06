@@ -1,5 +1,5 @@
 import {
-    Button,
+  Button,
   CircularProgress,
   Container,
   Grid,
@@ -11,6 +11,11 @@ import { FitUploadType } from "./util/util-types";
 import styles from "./css/FitUpload.module.css";
 import ChipInput from "material-ui-chip-input";
 import { DropzoneArea } from "material-ui-dropzone";
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+import { Crop } from "react-image-crop";
+
+
 export default function FitUpload() {
   const [fit, setFit] = useState<FitUploadType>({
     name: "",
@@ -23,19 +28,45 @@ export default function FitUpload() {
 
   //possible views for this page:
   //AWAITING_IMAGE: user has not yet uploaded image
-  //IMAGE_PROCESSING: image uploaded but ML not done yet, display loading
+  //CROP_SCREEN: crop the image they have uploaded (need 3:4 aspect)
+  //PROCESSING: display loading
   //IMAGE_RETURNED: ML done, show final submit button
   const [view, setView] = useState("AWAITING_IMAGE");
   const handleChange = (prop: keyof FitUploadType) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => setFit({ ...fit, [prop]: event.target.value });
+
+  const [crop, setCrop] = useState<Crop>({ aspect: 3 / 4, width: 300 });
+  const [cropURL, setCropURL] = useState("");
+
   const handleSubmitImg = () => {
-      if (fit.img.length === 0) {
-        alert('Please submit an image.')
-      } else {
-        setView("IMAGE_PROCESSING");
-      }
+    if (fit.img.length === 0) {
+      alert("Please submit an image.");
+    } else {
+      setView("PROCESSING");
+      setCropURL(URL.createObjectURL(fit.img[0]));
+      
+      setView("CROP_SCREEN");
+    }
   };
+
+  const handleSubmitCroppedImg = async (): Promise<void> => {
+    setView("PROCESSING");
+    const access_token = localStorage.getItem("access_token");
+    const bearer = "Bearer " + access_token;
+    const form_data = new FormData();
+    
+    form_data.append("img", fit.img[0], fit.img[0].name);
+    form_data.append("crop", JSON.stringify(crop));
+    const response = await fetch(`/submit_fit_image`, {
+      method: "POST",
+      headers: {
+        Authorization: bearer,
+      },
+      body: form_data,
+    });
+  };
+
   return (
     <Container className={styles.container} maxWidth="md">
       <Typography gutterBottom variant="h5" component="h2">
@@ -57,13 +88,28 @@ export default function FitUpload() {
           </Button>
         </div>
       )}
-      {view === "IMAGE_PROCESSING" && (
+      {view === "CROP_SCREEN" && (
         <div>
-          <Typography>Identifying clothes in your fit...</Typography>
+          <Typography>
+            Before we proceed, let's crop your image...
+          </Typography>
+          <ReactCrop src={cropURL} minWidth={200} crop={crop} onChange={(newCrop : Crop) => setCrop(newCrop)} />
+          <br />
+          <Button variant="outlined" onClick={() => setView("AWAITING_IMAGE")}>
+            Back
+          </Button>
+          <Button variant="outlined" onClick={() => handleSubmitCroppedImg()}>
+            Next
+          </Button>
+        </div>
+      )}
+      {view === "PROCESSING" && (
+        <div>
           <CircularProgress />
         </div>
       )}
-      <Grid container spacing={1}>
+      {view === "IMAGE_RETURNED" && (
+        <Grid container spacing={1}>
         <Grid item xs={12}>
           <TextField
             autoFocus
@@ -101,6 +147,8 @@ export default function FitUpload() {
           />
         </Grid>
       </Grid>
+      )}
+      
     </Container>
   );
 }

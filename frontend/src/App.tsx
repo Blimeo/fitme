@@ -55,8 +55,8 @@ export default function App() {
                 {loggedIn ? <Profile loggedIn /> : <Redirect to="/" />}
               </Route>
               <Route path="/fit-upload">
-                {/* <FitUpload /> */}
-                {loggedIn ? <FitUpload /> : <Redirect to="/fits" />}
+                <FitUpload />
+                {/* {loggedIn ? <FitUpload /> : <Redirect to="/fits" />} */}
               </Route>
               <Route path="/user/:username">
                 <Profile loggedIn={loggedIn} />

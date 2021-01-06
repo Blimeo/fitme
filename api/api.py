@@ -226,6 +226,17 @@ def recommended():
 def verify_jwt():
     return jsonify(message="Good access token"), 200
 
+@app.route("/submit_fit_image", methods=["POST"])
+@jwt_required
+def submit_fit_image():
+    data = dict(request.form)
+    crop_params = json.loads(data["crop"])
+    image = request.files.to_dict()['img']
+    mngr = ImageManager()
+    # url contains the s3 url for the image to be processed
+    url = mngr.crop_upload(image.stream, crop_params)
+    #todo: ml inference goes here, add to task queue?
+    return jsonify(img_url=url)
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

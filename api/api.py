@@ -199,6 +199,7 @@ def get_item():
         return jsonify(error="true")
     return jsonify(error="false", item=item[item_id])
 
+
 @app.route("/discover_items", methods=["GET"])
 def discover():
     docs = list(items_collection.find({}))
@@ -206,6 +207,7 @@ def discover():
     for item in docs:
         item['_id'] = str(item['_id'])
     return jsonify(items=docs)
+
 
 @app.route("/recommended_items", methods=["GET"])
 @jwt_optional
@@ -227,5 +229,7 @@ def verify_jwt():
     return jsonify(message="Good access token"), 200
 
 
+@app.route("/inference", methods=["GET"])
+@jwt_required
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

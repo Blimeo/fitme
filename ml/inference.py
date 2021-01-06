@@ -27,6 +27,7 @@ im = cv2.imread("a.jpg")  # or whatever filename you want
 outputs = predictor(im)
 print(outputs)
 
+"""
 # uncomment these lines for bbox visualization
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 # adjust scale if u feel like output is too small
@@ -36,3 +37,4 @@ cv2.imwrite('output.png', v.get_image()[:, :, ::-1])
 
 plt.imshow(cv2.cvtColor(v.get_image()[:, :, ::-1], cv2.COLOR_BGR2RGB))
 plt.show()
+"""

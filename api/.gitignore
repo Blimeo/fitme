@@ -140,3 +140,5 @@ cython_debug/
 # VS Code prefs
 .vscode/
 .aws_creds
+
+model.pth

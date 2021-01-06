@@ -141,4 +141,4 @@ cython_debug/
 .vscode/
 .aws_creds
 
-model.pth
+output/

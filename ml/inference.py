@@ -25,7 +25,7 @@ predictor = DefaultPredictor(cfg)
 
 im = cv2.imread("a.jpg")  # or whatever filename you want
 outputs = predictor(im)
-print(outputs)
+print(outputs["instances"])
 
 """
 # uncomment these lines for bbox visualization

@@ -13,6 +13,8 @@ import json
 from bson import json_util
 import imghdr
 import random
+from OutfitMLModel import OutfitMLModel
+from PIL import Image
 
 load_dotenv(find_dotenv())
 app = Flask(__name__)
@@ -29,6 +31,7 @@ client = pymongo.MongoClient(
 db = client.get_database('fitme_db')
 users_collection = db['users']
 items_collection = db['items']
+model = OutfitMLModel()
 
 
 @app.route("/register", methods=["POST"])
@@ -229,7 +232,21 @@ def verify_jwt():
     return jsonify(message="Good access token"), 200
 
 
-@app.route("/inference", methods=["GET"])
+@app.route("/submit_fit_image", methods=["POST"])
 @jwt_required
+def submit_fit_image():
+    data = dict(request.form)
+    crop_params = json.loads(data["crop"])
+    image = request.files["img"]
+    if image:
+        mngr = ImageManager()
+        # url contains the s3 url for the image to be processed
+        url = mngr.crop_upload(image.stream, crop_params)
+        boxes, scores = model.label_image(url)
+        return jsonify(img_url=url, boxes=boxes, scores=scores)
+    else:
+        return jsonify(error="Bad image upload")
+
+
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

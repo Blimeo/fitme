@@ -4,6 +4,7 @@ import Home from "./Home";
 import Profile from "./Profile";
 import Items from "./Items";
 import ItemView from "./ItemView";
+import FitUpload from "./FitUpload";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import Header from "./components/Header";
 import { createMuiTheme, CssBaseline, ThemeProvider } from "@material-ui/core";
@@ -45,13 +46,16 @@ export default function App() {
           <main>
             <Switch>
               <Route path="/" component={Home} exact />
-              <Route path="/about" component={Home} />
               <Route path="/items">
                 <Items loggedIn={loggedIn} />
               </Route>
               <Route path="/fits" component={Home} />
               <Route path="/profile">
                 {loggedIn ? <Profile loggedIn /> : <Redirect to="/" />}
+              </Route>
+              <Route path="/fit-upload">
+                <FitUpload />
+                {/* {loggedIn ? <FitUpload /> : <Redirect to="/fits" />} */}
               </Route>
               <Route path="/user/:username">
                 <Profile loggedIn={loggedIn} />

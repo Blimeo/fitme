@@ -1,6 +1,9 @@
 import boto3
 from botocore.exceptions import ClientError
 import uuid
+from PIL import Image
+import io
+
 
 S3_BASE_URL = "https://fitme.s3.amazonaws.com/"
 class ImageManager:
@@ -14,13 +17,27 @@ class ImageManager:
             ext = name.split(".")[-1]
             try:
                 new_filename = uuid.uuid4().hex + "." + ext
+                print(f, self.bucket, new_filename)
                 response = self.client.upload_fileobj(
                     f, self.bucket, new_filename)
                 new_url = S3_BASE_URL + new_filename 
                 ids.append(new_url)
             except ClientError as e:
+                print(e)
                 return False
         return ids
+    
+    # Crops image and uploads it
+    def crop_upload(self, image, crop):
+        im = Image.open(image)
+        left, right = crop['x'], crop['x'] + crop['width']
+        top, bottom = crop['y'], crop['y'] + int(crop['height'])
+        im = im.crop((left, top, right, bottom))
+        file_obj = io.BytesIO()
+        im.save(file_obj, "JPEG")
+        file_obj.seek(0)
+        return self.uploadImage([file_obj], ["a.jpeg"])[0]
+
 
     def __init__(self):
         aws_creds = open(".aws_creds", "r").read()

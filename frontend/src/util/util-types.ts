@@ -49,7 +49,9 @@ export type FitUploadType = {
   name: string;
   tags: string[];
   description: string;
-  img: File[];
+  img_url: string;
   items: string[]; //item ids
   itemBoxes: number[][]; // [[x1, y1, x2, y2], ...] where (x1, y1) is top-left and (x2, y2) is bottom-right
 };
+
+

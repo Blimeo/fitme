@@ -14,17 +14,19 @@ import { DropzoneArea } from "material-ui-dropzone";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { Crop } from "react-image-crop";
+import FitCreator from "./components/FitCreator";
+
 
 export default function FitUpload() {
   const [fit, setFit] = useState<FitUploadType>({
     name: "",
     tags: [],
     description: "",
-    img: [], //it's only a single image but the dropzone library requires an array of files
+    img_url: "",
     items: [],
     itemBoxes: [],
   });
-
+  const [img, setImg] = useState<File[]>([]); //it's only a single image but the dropzone library requires an array of files
   type View =
     | "AWAITING_IMAGE"
     | "CROP_SCREEN"
@@ -44,11 +46,11 @@ export default function FitUpload() {
   const [cropURL, setCropURL] = useState("");
 
   const handleSubmitImg = () => {
-    if (fit.img.length === 0) {
+    if (img.length === 0) {
       alert("Please submit an image.");
     } else {
       setView("PROCESSING");
-      setCropURL(URL.createObjectURL(fit.img[0]));
+      setCropURL(URL.createObjectURL(img[0]));
 
       setView("CROP_SCREEN");
     }
@@ -60,7 +62,7 @@ export default function FitUpload() {
     const bearer = "Bearer " + access_token;
     const form_data = new FormData();
 
-    form_data.append("img", fit.img[0], fit.img[0].name);
+    form_data.append("img", img[0], img[0].name);
     form_data.append("crop", JSON.stringify(crop));
     const response = await fetch(`/submit_fit_image`, {
       method: "POST",
@@ -72,6 +74,7 @@ export default function FitUpload() {
     if (response.ok) {
       const labelData = await response.json();
       console.log(labelData);
+      setFit({...fit, img_url: labelData.img_url, itemBoxes : labelData.boxes});
       setView("IMAGE_RETURNED");
     } else {
       setView("AWAITING_IMAGE");
@@ -89,7 +92,7 @@ export default function FitUpload() {
             Upload an image featuring multiple items! 5MB maximum.
           </Typography>
           <DropzoneArea
-            onChange={(files: File[]) => setFit({ ...fit, img: files })}
+            onChange={(files: File[]) => setImg(files)}
             filesLimit={1}
             acceptedFiles={["image/jpeg", "image/png"]}
             maxFileSize={5000000}
@@ -124,6 +127,9 @@ export default function FitUpload() {
       )}
       {view === "IMAGE_RETURNED" && (
         <Grid container spacing={1}>
+          <Grid item xs={12}>
+            <FitCreator img={fit.img_url} boxes={fit.itemBoxes}/>
+          </Grid>
           <Grid item xs={12}>
             <TextField
               autoFocus

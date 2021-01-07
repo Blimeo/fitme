@@ -46,7 +46,6 @@ export default function App() {
           <main>
             <Switch>
               <Route path="/" component={Home} exact />
-              <Route path="/about" component={Home} />
               <Route path="/items">
                 <Items loggedIn={loggedIn} />
               </Route>

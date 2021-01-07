@@ -6,15 +6,14 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FitUploadType } from "./util/util-types";
 import styles from "./css/FitUpload.module.css";
 import ChipInput from "material-ui-chip-input";
 import { DropzoneArea } from "material-ui-dropzone";
-import ReactCrop from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
+import ReactCrop from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 import { Crop } from "react-image-crop";
-
 
 export default function FitUpload() {
   const [fit, setFit] = useState<FitUploadType>({
@@ -26,12 +25,17 @@ export default function FitUpload() {
     itemBoxes: [],
   });
 
+  type View =
+    | "AWAITING_IMAGE"
+    | "CROP_SCREEN"
+    | "PROCESSING"
+    | "IMAGE_RETURNED";
   //possible views for this page:
   //AWAITING_IMAGE: user has not yet uploaded image
   //CROP_SCREEN: crop the image they have uploaded (need 3:4 aspect)
   //PROCESSING: display loading
   //IMAGE_RETURNED: ML done, show final submit button
-  const [view, setView] = useState("AWAITING_IMAGE");
+  const [view, setView] = useState<View>("AWAITING_IMAGE");
   const handleChange = (prop: keyof FitUploadType) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => setFit({ ...fit, [prop]: event.target.value });
@@ -45,7 +49,7 @@ export default function FitUpload() {
     } else {
       setView("PROCESSING");
       setCropURL(URL.createObjectURL(fit.img[0]));
-      
+
       setView("CROP_SCREEN");
     }
   };
@@ -55,7 +59,7 @@ export default function FitUpload() {
     const access_token = localStorage.getItem("access_token");
     const bearer = "Bearer " + access_token;
     const form_data = new FormData();
-    
+
     form_data.append("img", fit.img[0], fit.img[0].name);
     form_data.append("crop", JSON.stringify(crop));
     const response = await fetch(`/submit_fit_image`, {
@@ -65,6 +69,13 @@ export default function FitUpload() {
       },
       body: form_data,
     });
+    if (response.ok) {
+      const labelData = await response.json();
+      console.log(labelData);
+      setView("IMAGE_RETURNED");
+    } else {
+      setView("AWAITING_IMAGE");
+    }
   };
 
   return (
@@ -90,10 +101,13 @@ export default function FitUpload() {
       )}
       {view === "CROP_SCREEN" && (
         <div>
-          <Typography>
-            Before we proceed, let's crop your image...
-          </Typography>
-          <ReactCrop src={cropURL} minWidth={200} crop={crop} onChange={(newCrop : Crop) => setCrop(newCrop)} />
+          <Typography>Before we proceed, let's crop your image...</Typography>
+          <ReactCrop
+            src={cropURL}
+            minWidth={200}
+            crop={crop}
+            onChange={(newCrop: Crop) => setCrop(newCrop)}
+          />
           <br />
           <Button variant="outlined" onClick={() => setView("AWAITING_IMAGE")}>
             Back
@@ -110,45 +124,44 @@ export default function FitUpload() {
       )}
       {view === "IMAGE_RETURNED" && (
         <Grid container spacing={1}>
-        <Grid item xs={12}>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Name of fit"
-            type="text"
-            fullWidth
-            onChange={handleChange("name")}
-            variant="outlined"
-            value={fit.name}
-          />
+          <Grid item xs={12}>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Name of fit"
+              type="text"
+              fullWidth
+              onChange={handleChange("name")}
+              variant="outlined"
+              value={fit.name}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              id="standard-multiline-flexible"
+              label="Description (<500 characters)"
+              multiline
+              fullWidth
+              rows={5}
+              variant="outlined"
+              inputProps={{ maxLength: 500 }}
+              value={fit.description}
+              error={fit.description.length >= 500}
+              onChange={handleChange("description")}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <ChipInput
+              className={styles.TagInput}
+              label="Tags"
+              onChange={(tags) => setFit({ ...fit, tags: tags })}
+              variant="outlined"
+              fullWidth
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <TextField
-            id="standard-multiline-flexible"
-            label="Description (<500 characters)"
-            multiline
-            fullWidth
-            rows={5}
-            variant="outlined"
-            inputProps={{ maxLength: 500 }}
-            value={fit.description}
-            error={fit.description.length >= 500}
-            onChange={handleChange("description")}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <ChipInput
-            className={styles.TagInput}
-            label="Tags"
-            onChange={(tags) => setFit({ ...fit, tags: tags })}
-            variant="outlined"
-            fullWidth
-          />
-        </Grid>
-      </Grid>
       )}
-      
     </Container>
   );
 }

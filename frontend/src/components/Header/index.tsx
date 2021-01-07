@@ -121,11 +121,6 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
   };
   const LINKS: Link[] = [
     {
-      label: "About",
-      href: "/about",
-      authWalled: false,
-    },
-    {
       label: "Items",
       href: "/items",
       authWalled: false,
@@ -159,9 +154,11 @@ function Nav({ loggedIn, setLoggedIn }: Props) {
           <Grid item sm={12} xs={12} className={classes.container}>
             <Toolbar>
               <Grid className={classes.grow}>
-                <Button className={classes.mainLogo} href="/">
-                  <Avatar src={Logo} className={classes.avatar} />
-                </Button>
+                <Link to="/">
+                  <Button className={classes.mainLogo}>
+                    <Avatar src={Logo} className={classes.avatar} />
+                  </Button>
+                </Link>
               </Grid>
               {LINKS.map(({ label, href, authWalled }) => {
                 if (!authWalled || (authWalled && loggedIn)) {

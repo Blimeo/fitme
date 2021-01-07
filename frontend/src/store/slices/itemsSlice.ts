@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Item } from '../../util/util-types';
-import { RootState } from "../rootReducer";
 
 export type ItemsSliceState = {
   discoverData: Item[];

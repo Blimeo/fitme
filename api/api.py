@@ -238,12 +238,17 @@ def submit_fit_image():
     data = dict(request.form)
     crop_params = json.loads(data["crop"])
     image = request.files["img"]
+    print(crop_params)
     if image:
         mngr = ImageManager()
         # url contains the s3 url for the image to be processed
         url = mngr.crop_upload(image.stream, crop_params)
         boxes, scores = model.label_image(url)
-        return jsonify(img_url=url, boxes=boxes, scores=scores)
+        return jsonify(img_url=url,
+                       boxes=boxes,
+                       scores=scores,
+                       width=crop_params["width"],
+                       height=crop_params["height"])
     else:
         return jsonify(error="Bad image upload")
 

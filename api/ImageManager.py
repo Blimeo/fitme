@@ -6,6 +6,8 @@ import io
 
 
 S3_BASE_URL = "https://fitme.s3.amazonaws.com/"
+
+
 class ImageManager:
     # Uploads images to S3 and returns unique filenames
     def uploadImage(self, files, filenames):
@@ -20,13 +22,13 @@ class ImageManager:
                 print(f, self.bucket, new_filename)
                 response = self.client.upload_fileobj(
                     f, self.bucket, new_filename)
-                new_url = S3_BASE_URL + new_filename 
+                new_url = S3_BASE_URL + new_filename
                 ids.append(new_url)
             except ClientError as e:
                 print(e)
                 return False
         return ids
-    
+
     # Crops image and uploads it
     def crop_upload(self, image, crop):
         im = Image.open(image)
@@ -37,7 +39,6 @@ class ImageManager:
         im.save(file_obj, "JPEG")
         file_obj.seek(0)
         return self.uploadImage([file_obj], ["a.jpeg"])[0]
-
 
     def __init__(self):
         aws_creds = open(".aws_creds", "r").read()

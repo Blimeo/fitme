@@ -16,6 +16,7 @@ import "react-image-crop/dist/ReactCrop.css";
 import { Crop } from "react-image-crop";
 import FitCreator from "./components/FitCreator";
 
+type View = "AWAITING_IMAGE" | "CROP_SCREEN" | "PROCESSING" | "IMAGE_RETURNED";
 
 export default function FitUpload() {
   const [fit, setFit] = useState<FitUploadType>({
@@ -25,18 +26,10 @@ export default function FitUpload() {
     img_url: "",
     items: [],
     itemBoxes: [],
+    width: 0,
+    height: 0,
   });
   const [img, setImg] = useState<File[]>([]); //it's only a single image but the dropzone library requires an array of files
-  type View =
-    | "AWAITING_IMAGE"
-    | "CROP_SCREEN"
-    | "PROCESSING"
-    | "IMAGE_RETURNED";
-  //possible views for this page:
-  //AWAITING_IMAGE: user has not yet uploaded image
-  //CROP_SCREEN: crop the image they have uploaded (need 3:4 aspect)
-  //PROCESSING: display loading
-  //IMAGE_RETURNED: ML done, show final submit button
   const [view, setView] = useState<View>("AWAITING_IMAGE");
   const handleChange = (prop: keyof FitUploadType) => (
     event: React.ChangeEvent<HTMLInputElement>
@@ -74,7 +67,13 @@ export default function FitUpload() {
     if (response.ok) {
       const labelData = await response.json();
       console.log(labelData);
-      setFit({...fit, img_url: labelData.img_url, itemBoxes : labelData.boxes});
+      setFit({
+        ...fit,
+        img_url: labelData.img_url,
+        itemBoxes: labelData.boxes,
+        width: labelData.width,
+        height: labelData.height,
+      });
       setView("IMAGE_RETURNED");
     } else {
       setView("AWAITING_IMAGE");
@@ -128,7 +127,12 @@ export default function FitUpload() {
       {view === "IMAGE_RETURNED" && (
         <Grid container spacing={1}>
           <Grid item xs={12}>
-            <FitCreator img={fit.img_url} boxes={fit.itemBoxes}/>
+            <FitCreator
+              img={fit.img_url}
+              boxes={fit.itemBoxes}
+              width={fit.width}
+              height={fit.height}
+            />
           </Grid>
           <Grid item xs={12}>
             <TextField

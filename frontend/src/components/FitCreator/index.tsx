@@ -1,6 +1,7 @@
-import { Grid } from "@material-ui/core";
+import { Card, Grid } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import Annotation from "react-image-annotation";
+import AnnotationEditor from "./AnnotationEditor.js";
 
 type Props = {
   readonly img: string;
@@ -37,9 +38,16 @@ const setMLAnnotations = (boxes: number[][], width: number, height: number) => {
 export default function FitCreator({ img, boxes, width, height }: Props) {
   const [annotations, setAnnotations] = useState<any>([]);
   const [baseAnnotation, setBaseAnnotation] = useState<any>({});
-
+  const [allItems, setAllItems] = useState<string[]>([]);
   useEffect(() => {
     setAnnotations(setMLAnnotations(boxes, width, height));
+    fetch("/item_names", {
+      method: "GET",
+    })
+      .then((r) => r.json())
+      .then((r) => {
+        setAllItems(r.items);
+      });
   }, [boxes, img, width, height]);
 
   const onSubmit = (annotation: any) => {
@@ -56,7 +64,14 @@ export default function FitCreator({ img, boxes, width, height }: Props) {
       },
     ]);
   };
-
+  const renderEditor = ({ annotation, onChange, onSubmit }: any) => (
+    <AnnotationEditor
+      annotation={annotation}
+      onChange={onChange}
+      onSubmit={onSubmit}
+      itemNames={allItems}
+    />
+  );
   return (
     <Grid container spacing={1}>
       <Grid item xs={6}>
@@ -67,11 +82,14 @@ export default function FitCreator({ img, boxes, width, height }: Props) {
           value={baseAnnotation}
           onChange={setBaseAnnotation}
           onSubmit={onSubmit}
+          renderEditor={renderEditor}
           allowTouch
         />
       </Grid>
       <Grid item xs={6}>
-        <h1>placeholder</h1>
+        {annotations.map((anno: any) => {
+          return <Card>{anno.data.text}</Card>;
+        })}
       </Grid>
     </Grid>
   );

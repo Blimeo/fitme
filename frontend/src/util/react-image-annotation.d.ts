@@ -61,17 +61,7 @@ declare module "react-image-annotation" {
       { annotation, active }: { annotation: IAnnotation; active: boolean }
     ) => any;
     disableEditor?: boolean;
-    renderEditor?: (
-      {
-        annotation,
-        onChange,
-        onSubmit
-      }: {
-        annotation: IAnnotation;
-        onChange: (annotation: IAnnotation | {}) => any;
-        onSubmit: (e?: any) => any;
-      }
-    ) => any;
+    renderEditor?: any;
 
     renderHighlight?: (
       { annotation, active }: { annotation: IAnnotation; active: boolean }

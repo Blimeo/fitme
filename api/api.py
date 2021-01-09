@@ -225,6 +225,11 @@ def recommended():
         item['_id'] = str(item['_id'])
     return jsonify(items=docs[:4])
 
+@app.route("/item_names", methods=["GET"])
+def item_names():
+    docs = list(items_collection.find({}))
+    item_names = [item['name'] for item in docs]
+    return jsonify(items=item_names)
 
 @app.route("/verify_access_token", methods=["GET"])
 @jwt_required

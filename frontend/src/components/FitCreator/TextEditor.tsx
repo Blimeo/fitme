@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
@@ -49,13 +49,15 @@ function TextEditor({ itemNames, value, onChange, onSubmit }: Props) {
           id="combo-box-demo"
           options={itemNames}
           style={{ width: 300 }}
+          onChange={(_, value: any) => {
+            onChange(value);
+          }}
           renderInput={(params) => (
             <TextField
               {...params}
               label="Search for an item... "
               variant="outlined"
               value={value}
-              onChange={onChange}
             />
           )}
         />

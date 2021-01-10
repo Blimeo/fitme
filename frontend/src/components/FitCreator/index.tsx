@@ -87,8 +87,8 @@ export default function FitCreator({ img, boxes, width, height }: Props) {
         />
       </Grid>
       <Grid item xs={6}>
-        {annotations.map((anno: any) => {
-          return <Card>{anno.data.text}</Card>;
+        {annotations.map((anno: any, index: number) => {
+          return <Card key={index}>{anno.data.text}</Card>;
         })}
       </Grid>
     </Grid>

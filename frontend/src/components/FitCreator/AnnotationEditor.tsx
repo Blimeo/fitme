@@ -49,18 +49,18 @@ function AnnotationEditor({
       }}
     >
       <TextEditor
-        onChange={(e: any) =>
+        onChange={(val: any) =>
           onChange({
             ...annotation,
             data: {
               ...annotation.data,
-              text: e.target.value, //what does this do
+              text: val,
             },
           })
         }
         onSubmit={onSubmit}
         itemNames={itemNames}
-        value={annotation.data && annotation.data.text} //idk what to do here
+        value={annotation.data && annotation.data.text}
       />
     </Container>
   );

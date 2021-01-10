@@ -1,7 +1,7 @@
 import { Card, Grid } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import Annotation from "react-image-annotation";
-import AnnotationEditor from "./AnnotationEditor.js";
+import AnnotationEditor from "./AnnotationEditor";
 
 type Props = {
   readonly img: string;
@@ -77,7 +77,7 @@ export default function FitCreator({ img, boxes, width, height }: Props) {
       <Grid item xs={6}>
         <Annotation
           src={img}
-          alt="wutface"
+          alt="Your fit upload image"
           annotations={annotations}
           value={baseAnnotation}
           onChange={setBaseAnnotation}

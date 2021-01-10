@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
 
@@ -34,30 +34,34 @@ const Button = styled.div`
   }
 `;
 
-function TextEditor(props) {
+type Props = {
+  readonly itemNames: any;
+  readonly value: any;
+  readonly onChange: any;
+  readonly onSubmit: any;
+};
+
+function TextEditor({ itemNames, value, onChange, onSubmit }: Props) {
   return (
-    <React.Fragment>
+    <>
       <Inner>
         <Autocomplete
           id="combo-box-demo"
-          options={props.itemNames}
-          getOptionLabel={(option) => option}
-          onFocus={props.onFocus}
-          onBlur={props.onBlur}
+          options={itemNames}
           style={{ width: 300 }}
           renderInput={(params) => (
             <TextField
               {...params}
               label="Search for an item... "
               variant="outlined"
-              value={props.value} //i think this is wrong
-              onChange={props.onChange}
+              value={value}
+              onChange={onChange}
             />
           )}
         />
       </Inner>
-      {props.value && <Button onClick={props.onSubmit}>ok</Button>}
-    </React.Fragment>
+      {value && <Button onClick={onSubmit}>ok</Button>}
+    </>
   );
 }
 

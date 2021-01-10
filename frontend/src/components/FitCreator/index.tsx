@@ -38,16 +38,8 @@ const setMLAnnotations = (boxes: number[][], width: number, height: number) => {
 export default function FitCreator({ img, boxes, width, height }: Props) {
   const [annotations, setAnnotations] = useState<any>([]);
   const [baseAnnotation, setBaseAnnotation] = useState<any>({});
-  const [allItems, setAllItems] = useState<string[]>([]);
   useEffect(() => {
     setAnnotations(setMLAnnotations(boxes, width, height));
-    fetch("/item_names", {
-      method: "GET",
-    })
-      .then((r) => r.json())
-      .then((r) => {
-        setAllItems(r.items);
-      });
   }, [boxes, img, width, height]);
 
   const onSubmit = (annotation: any) => {
@@ -69,7 +61,6 @@ export default function FitCreator({ img, boxes, width, height }: Props) {
       annotation={annotation}
       onChange={onChange}
       onSubmit={onSubmit}
-      itemNames={allItems}
     />
   );
   return (

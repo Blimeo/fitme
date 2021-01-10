@@ -28,17 +28,17 @@ type Props = {
   readonly annotation: any;
   readonly onSubmit: any;
   readonly onChange: any;
-  readonly itemNames: any;
 };
 
 function AnnotationEditor({
   annotation,
   onChange,
   onSubmit,
-  itemNames,
 }: Props) {
+
   const { geometry } = annotation;
   if (!geometry) return null;
+
 
   return (
     <Container
@@ -59,7 +59,6 @@ function AnnotationEditor({
           })
         }
         onSubmit={onSubmit}
-        itemNames={itemNames}
         value={annotation.data && annotation.data.text}
       />
     </Container>

@@ -225,11 +225,23 @@ def recommended():
         item['_id'] = str(item['_id'])
     return jsonify(items=docs[:4])
 
+
 @app.route("/item_names", methods=["GET"])
 def item_names():
     docs = list(items_collection.find({}))
     item_names = [item['name'] for item in docs]
     return jsonify(items=item_names)
+
+
+@app.route("/item_search/<query>", methods=["GET"])
+def item_search(query):
+    docs = list(items_collection.find({'name':
+                                    {'$regex': query, '$options': 'i'}}, projection=['name']))
+    print(docs)
+    for item in docs:
+        item['_id'] = str(item['_id'])
+    return jsonify(items=docs)
+
 
 @app.route("/verify_access_token", methods=["GET"])
 @jwt_required

@@ -35,22 +35,45 @@ const Button = styled.div`
 `;
 
 type Props = {
-  readonly itemNames: any;
   readonly value: any;
   readonly onChange: any;
   readonly onSubmit: any;
 };
 
-function TextEditor({ itemNames, value, onChange, onSubmit }: Props) {
+type SearchResult = {
+  readonly id : string;
+  readonly name : string;
+}
+
+function TextEditor({value, onChange, onSubmit }: Props) {
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchResults, setSearchResults] = React.useState<SearchResult[]>([]);
+  useEffect(() => {
+    if (searchQuery) {
+      fetch("/item_search/" + searchQuery, {
+        method: "GET",
+      })
+        .then((r) => r.json())
+        .then((r) => {
+          setSearchResults(r.items);
+        });
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
   return (
     <>
       <Inner>
         <Autocomplete
           id="combo-box-demo"
-          options={itemNames}
+          options={searchResults.map((result) => result.name)}
           style={{ width: 300 }}
+          freeSolo
           onChange={(_, value: any) => {
             onChange(value);
+          }}
+          onInputChange={(_, newInputValue) => {
+            setSearchQuery(newInputValue);
           }}
           renderInput={(params) => (
             <TextField
@@ -62,7 +85,7 @@ function TextEditor({ itemNames, value, onChange, onSubmit }: Props) {
           )}
         />
       </Inner>
-      {value && <Button onClick={onSubmit}>ok</Button>}
+      {value && <Button onClick={onSubmit}>Save</Button>}
     </>
   );
 }

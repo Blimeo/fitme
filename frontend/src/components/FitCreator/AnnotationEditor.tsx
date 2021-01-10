@@ -1,3 +1,4 @@
+import { Button } from "@material-ui/core";
 import React from "react";
 import styled, { keyframes } from "styled-components";
 import TextEditor from "./TextEditor";
@@ -58,9 +59,9 @@ function AnnotationEditor({
             },
           })
         }
-        onSubmit={onSubmit}
         value={annotation.data && annotation.data.text}
       />
+      <Button onClick={onSubmit}>Save</Button>
     </Container>
   );
 }

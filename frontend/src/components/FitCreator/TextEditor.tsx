@@ -37,7 +37,6 @@ const Button = styled.div`
 type Props = {
   readonly value: any;
   readonly onChange: any;
-  readonly onSubmit: any;
 };
 
 type SearchResult = {
@@ -45,7 +44,7 @@ type SearchResult = {
   readonly name : string;
 }
 
-function TextEditor({value, onChange, onSubmit }: Props) {
+function TextEditor({value, onChange}: Props) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [searchResults, setSearchResults] = React.useState<SearchResult[]>([]);
   useEffect(() => {
@@ -85,7 +84,6 @@ function TextEditor({value, onChange, onSubmit }: Props) {
           )}
         />
       </Inner>
-      {value && <Button onClick={onSubmit}>Save</Button>}
     </>
   );
 }

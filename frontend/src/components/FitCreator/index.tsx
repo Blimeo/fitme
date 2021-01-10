@@ -1,7 +1,8 @@
-import { Card, Grid } from "@material-ui/core";
+import { Button, Card, Grid, TextField, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import Annotation from "react-image-annotation";
 import AnnotationEditor from "./AnnotationEditor";
+import TextEditor from "./TextEditor";
 
 type Props = {
   readonly img: string;
@@ -38,6 +39,7 @@ const setMLAnnotations = (boxes: number[][], width: number, height: number) => {
 export default function FitCreator({ img, boxes, width, height }: Props) {
   const [annotations, setAnnotations] = useState<any>([]);
   const [baseAnnotation, setBaseAnnotation] = useState<any>({});
+  const [activeAnnotations, setActiveAnnotations] = useState<any>([]);
   useEffect(() => {
     setAnnotations(setMLAnnotations(boxes, width, height));
   }, [boxes, img, width, height]);
@@ -56,6 +58,7 @@ export default function FitCreator({ img, boxes, width, height }: Props) {
       },
     ]);
   };
+
   const renderEditor = ({ annotation, onChange, onSubmit }: any) => (
     <AnnotationEditor
       annotation={annotation}
@@ -71,6 +74,7 @@ export default function FitCreator({ img, boxes, width, height }: Props) {
           alt="Your fit upload image"
           annotations={annotations}
           value={baseAnnotation}
+          activeAnnotations={activeAnnotations}
           onChange={setBaseAnnotation}
           onSubmit={onSubmit}
           renderEditor={renderEditor}
@@ -78,9 +82,37 @@ export default function FitCreator({ img, boxes, width, height }: Props) {
         />
       </Grid>
       <Grid item xs={6}>
-        {annotations.map((anno: any, index: number) => {
-          return <Card key={index}>{anno.data.text}</Card>;
-        })}
+        <Grid container spacing={1}>
+          {annotations.map((anno: any, index: number) => {
+            return (
+              <Grid item xs={12}>
+                <Card
+                  style={{padding : "6px"}}
+                  onMouseOver={() => setActiveAnnotations([anno])}
+                  key={index}
+                >
+                  <Typography>{anno.data.text || "Label this fit item!"}</Typography>
+                  <TextEditor
+                    value={anno.data.text}
+                    onChange={(value: string) => {
+                      anno.data.text = value;
+                    }}
+                  />
+
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() =>
+                      setAnnotations(annotations.filter((a: any) => a !== anno))
+                    }
+                  >
+                    Remove
+                  </Button>
+                </Card>
+              </Grid>
+            );
+          })}
+        </Grid>
       </Grid>
     </Grid>
   );

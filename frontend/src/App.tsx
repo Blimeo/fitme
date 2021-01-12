@@ -4,6 +4,7 @@ import Home from "./Home";
 import Profile from "./Profile";
 import Items from "./Items";
 import ItemView from "./ItemView";
+import FitView from "./FitView";
 import FitUpload from "./FitUpload";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import Header from "./components/Header";
@@ -62,6 +63,9 @@ export default function App() {
               </Route>
               <Route path="/item/:item_id">
                 <ItemView loggedIn={loggedIn} />
+              </Route>
+              <Route path="/fit/:fit_id">
+                <FitView loggedIn={loggedIn} />
               </Route>
               <Route component={NotFound} />
             </Switch>

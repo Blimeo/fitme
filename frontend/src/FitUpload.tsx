@@ -24,13 +24,13 @@ export default function FitUpload() {
     tags: [],
     description: "",
     img_url: "",
-    items: [],
     itemBoxes: [],
     width: 0,
     height: 0,
   });
   const [img, setImg] = useState<File[]>([]); //it's only a single image but the dropzone library requires an array of files
   const [view, setView] = useState<View>("AWAITING_IMAGE");
+  const [annotations, setAnnotations] = useState<any>([]);
   const handleChange = (prop: keyof FitUploadType) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => setFit({ ...fit, [prop]: event.target.value });
@@ -47,6 +47,25 @@ export default function FitUpload() {
 
       setView("CROP_SCREEN");
     }
+  };
+
+  const handleSubmitFit = () => {
+    const access_token = localStorage.getItem("access_token");
+    const bearer = "Bearer " + access_token;
+    const form_data = new FormData();
+
+    form_data.append("data", JSON.stringify(fit));
+    form_data.append("annotations", JSON.stringify(annotations));
+    fetch("/upload_fit", {
+      method: "POST",
+      headers: {
+        Authorization: bearer,
+      },
+      body: form_data,
+    }).then((r) => r.json())
+    .then((r) => {
+      console.log("ok");
+    })
   };
 
   const handleSubmitCroppedImg = async (): Promise<void> => {
@@ -127,11 +146,17 @@ export default function FitUpload() {
       {view === "IMAGE_RETURNED" && (
         <Grid container spacing={1}>
           <Grid item xs={12}>
+            <Typography>
+              Draw a rectangle over each item you want to label, then search for
+              the item in our database!
+            </Typography>
             <FitCreator
               img={fit.img_url}
               boxes={fit.itemBoxes}
               width={fit.width}
               height={fit.height}
+              annotations={annotations}
+              setAnnotations={setAnnotations}
             />
           </Grid>
           <Grid item xs={12}>
@@ -169,6 +194,11 @@ export default function FitUpload() {
               variant="outlined"
               fullWidth
             />
+          </Grid>
+          <Grid item xs={12}>
+            <Button variant="outlined" onClick={() => handleSubmitFit()}>
+              Publish
+            </Button>
           </Grid>
         </Grid>
       )}

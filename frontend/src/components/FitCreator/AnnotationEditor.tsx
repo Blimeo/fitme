@@ -61,7 +61,7 @@ function AnnotationEditor({
         }
         value={annotation.data && annotation.data.text}
       />
-      <Button onClick={onSubmit}>Save</Button>
+      {annotation.data && <Button onClick={onSubmit}>Save</Button>}
     </Container>
   );
 }

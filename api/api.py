@@ -31,6 +31,7 @@ client = pymongo.MongoClient(
 db = client.get_database('fitme_db')
 users_collection = db['users']
 items_collection = db['items']
+fits_collection = db['fits']
 model = OutfitMLModel()
 
 
@@ -202,6 +203,35 @@ def get_item():
         return jsonify(error="true")
     return jsonify(error="false", item=item[item_id])
 
+@ app.route("/get_fit/<fit_id>", methods=["GET"])
+def get_fit(fit_id):
+    if not bson.objectid.ObjectId.is_valid(fit_id):
+        return jsonify(error="true")
+    fit = fits_collection.find_one({'_id': ObjectId(fit_id)})
+    if not fit:
+        return jsonify(error="true")
+    fit['_id'] = str(fit['_id'])
+    for item in fit['items']:
+        item['_id'] = str(item['_id'])
+    return jsonify(error="false", fit=fit)
+
+@app.route("/upload_fit", methods=["POST"])
+@jwt_required
+def upload_fit():
+    identity = get_jwt_identity()
+    data = dict(request.form)
+    fit = json.loads(data["data"])
+    annotations = json.loads(data["annotations"])
+    del fit['itemBoxes'], fit['width'], fit['height']
+    item_names = [item['data']['text'] for item in annotations]
+    items = [items_collection.find_one({"name" : name}) for name in item_names]
+    fit["items"] = items
+    fit["annotations"] = annotations
+    fit["uploader"] = users_collection.find_one(
+        {"email": identity})['username']
+    fits_collection.insert_one(fit)
+    #TODO: update item objects that are included in this fit
+    return jsonify(ok=True)
 
 @app.route("/discover_items", methods=["GET"])
 def discover():

@@ -52,7 +52,16 @@ export type FitUploadType = {
   img_url: string;
   width: number;
   height: number;
-  items: string[]; //item ids
   itemBoxes: number[][]; // [[x1, y1, x2, y2], ...] where (x1, y1) is top-left and (x2, y2) is bottom-right
 };
 
+export type Fit = {
+  _id: string;
+  name: string;
+  tags: string[];
+  description: string;
+  img_url: string;
+  items: Item[];
+  uploader: string;
+  annotations: any;
+}

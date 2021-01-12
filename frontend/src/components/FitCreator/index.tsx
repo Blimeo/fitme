@@ -9,6 +9,8 @@ type Props = {
   readonly boxes: number[][];
   readonly width: number;
   readonly height: number;
+  readonly annotations: any;
+  readonly setAnnotations: any;
 };
 
 // Precomputation on given boxes to make them annotations
@@ -36,8 +38,7 @@ const setMLAnnotations = (boxes: number[][], width: number, height: number) => {
 };
 
 // prodigious use of any because react-image-annotation does not have TS support
-export default function FitCreator({ img, boxes, width, height }: Props) {
-  const [annotations, setAnnotations] = useState<any>([]);
+export default function FitCreator({ img, boxes, width, height, annotations, setAnnotations }: Props) {
   const [baseAnnotation, setBaseAnnotation] = useState<any>({});
   const [activeAnnotations, setActiveAnnotations] = useState<any>([]);
   useEffect(() => {
@@ -81,17 +82,18 @@ export default function FitCreator({ img, boxes, width, height }: Props) {
           allowTouch
         />
       </Grid>
-      <Grid item xs={6}>
-        <Grid container spacing={1}>
+      <Grid item xs={6} >
+        <Grid container direction="column" spacing={1}>
           {annotations.map((anno: any, index: number) => {
             return (
               <Grid item xs={12}>
                 <Card
                   style={{padding : "6px"}}
                   onMouseOver={() => setActiveAnnotations([anno])}
+                  onMouseOut={() => setActiveAnnotations([])}
                   key={index}
                 >
-                  <Typography>{anno.data.text || "Label this fit item!"}</Typography>
+                  <Typography><b>{anno.data.text || "Label this fit item!"}</b></Typography>
                   <TextEditor
                     value={anno.data.text}
                     onChange={(value: string) => {

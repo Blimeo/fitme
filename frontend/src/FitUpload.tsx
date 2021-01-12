@@ -3,6 +3,7 @@ import {
   CircularProgress,
   Container,
   Grid,
+  Snackbar,
   TextField,
   Typography,
 } from "@material-ui/core";
@@ -15,6 +16,8 @@ import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { Crop } from "react-image-crop";
 import FitCreator from "./components/FitCreator";
+import { Alert } from "@material-ui/lab";
+import { useHistory } from "react-router-dom";
 
 type View = "AWAITING_IMAGE" | "CROP_SCREEN" | "PROCESSING" | "IMAGE_RETURNED";
 
@@ -30,6 +33,7 @@ export default function FitUpload() {
   });
   const [img, setImg] = useState<File[]>([]); //it's only a single image but the dropzone library requires an array of files
   const [view, setView] = useState<View>("AWAITING_IMAGE");
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [annotations, setAnnotations] = useState<any>([]);
   const handleChange = (prop: keyof FitUploadType) => (
     event: React.ChangeEvent<HTMLInputElement>
@@ -37,7 +41,7 @@ export default function FitUpload() {
 
   const [crop, setCrop] = useState<Crop>({ aspect: 3 / 4, width: 300 });
   const [cropURL, setCropURL] = useState("");
-
+  const history = useHistory();
   const handleSubmitImg = () => {
     if (img.length === 0) {
       alert("Please submit an image.");
@@ -53,7 +57,6 @@ export default function FitUpload() {
     const access_token = localStorage.getItem("access_token");
     const bearer = "Bearer " + access_token;
     const form_data = new FormData();
-
     form_data.append("data", JSON.stringify(fit));
     form_data.append("annotations", JSON.stringify(annotations));
     fetch("/upload_fit", {
@@ -62,10 +65,14 @@ export default function FitUpload() {
         Authorization: bearer,
       },
       body: form_data,
-    }).then((r) => r.json())
-    .then((r) => {
-      console.log("ok");
     })
+      .then((r) => r.json())
+      .then((r) => {
+        if (r.ok) {
+          setUploadSuccess(true);
+          setTimeout(() => {history.push("/items")}, 2000)
+        }
+      });
   };
 
   const handleSubmitCroppedImg = async (): Promise<void> => {
@@ -200,6 +207,9 @@ export default function FitUpload() {
               Publish
             </Button>
           </Grid>
+          <Snackbar open={uploadSuccess} autoHideDuration={6000}>
+            <Alert severity="success">Upload successful!</Alert>
+          </Snackbar>
         </Grid>
       )}
     </Container>

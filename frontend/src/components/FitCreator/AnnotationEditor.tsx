@@ -47,6 +47,7 @@ function AnnotationEditor({
         position: "absolute",
         left: `${geometry.x}%`,
         top: `${geometry.y + geometry.height}%`,
+        zIndex: 9999,
       }}
     >
       <TextEditor

@@ -31,6 +31,7 @@ export default function ItemView({ loggedIn }: Props) {
     items: [],
     uploader: "",
     annotations: [],
+    favorited: [],
   });
 
   const [loading, setLoading] = useState(true);
@@ -49,6 +50,50 @@ export default function ItemView({ loggedIn }: Props) {
       });
   }, [fit_id, history]);
 
+  const [favorited, setFavorited] = useState(false);
+  useEffect(() => {
+    if (loggedIn) {
+      const access_token = localStorage.getItem("access_token");
+      if (access_token !== null) {
+        fetch("/fit_favorite_status/" + fit_id, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        })
+          .then((r) => r.json())
+          .then((response) => {
+            setFavorited(response.found);
+          });
+      }
+    }
+  }, [loggedIn]);
+
+  const handleFavorite = () => {
+    const access_token = localStorage.getItem("access_token");
+    if (access_token !== null) {
+      fetch("/favorite_fit/" + fit_id, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+      setFavorited(true);
+    }
+  };
+
+  const handleUnfavorite = () => {
+    const access_token = localStorage.getItem("access_token");
+    if (access_token !== null) {
+      fetch("/unfavorite_fit/" + fit_id, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+      setFavorited(false);
+    }
+  };
   return (
     <Container className={styles.container} maxWidth="md">
       {loading && <LinearProgress />}
@@ -135,9 +180,19 @@ export default function ItemView({ loggedIn }: Props) {
             {loggedIn && (
               <Card className={styles.itemActionPane} variant="outlined">
                 <CardContent>
-                  <Button variant="contained" color="secondary">
-                    Favorite
-                  </Button>
+                  {favorited ? (
+                    <Button variant="contained" onClick={handleUnfavorite}>
+                      Unfavorite
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={handleFavorite}
+                    >
+                      Favorite
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}

@@ -189,7 +189,7 @@ def submit_item():
     identity = get_jwt_identity()
     data = dict(request.form)
     data = json.loads(data["postData"])
-    if data["name"].strip() is "" or data["brand"].strip() is "" or len(data["images"]) == 0:
+    if (not data["name"].strip()) or (not data["brand"].strip()) or len(data["images"]) == 0:
         return jsonify(error="Bad item data")
     print(data["images"])
     images = request.files.to_dict()
@@ -265,17 +265,26 @@ def upload_fit():
     return jsonify(ok=True)
 
 @app.route("/discover_items", methods=["GET"])
-def discover():
+def discover_items():
     docs = list(items_collection.find({}))
     random.shuffle(docs)
     for item in docs:
         item['_id'] = str(item['_id'])
     return jsonify(items=docs)
 
+@app.route("/discover_fits", methods=["GET"])
+def discover_fits():
+    docs = list(fits_collection.find({}))
+    random.shuffle(docs)
+    for fit in docs:
+        fit['_id'] = str(fit['_id'])
+        for item in fit['items']:
+            item['_id'] = str(item['_id'])
+    return jsonify(fits=docs)
 
 @app.route("/recommended_items", methods=["GET"])
 @jwt_optional
-def recommended():
+def recommended_items():
     identity = get_jwt_identity()
     if identity:
         # TODO: custom recommendations
@@ -285,6 +294,21 @@ def recommended():
     for item in docs:
         item['_id'] = str(item['_id'])
     return jsonify(items=docs[:4])
+
+@app.route("/recommended_fits", methods=["GET"])
+@jwt_optional
+def recommended_fits():
+    identity = get_jwt_identity()
+    if identity:
+        # TODO: custom recommendations
+        pass
+    docs = list(fits_collection.find({}))
+    random.shuffle(docs)
+    for fit in docs:
+        fit['_id'] = str(fit['_id'])
+        for item in fit['items']:
+            item['_id'] = str(item['_id'])
+    return jsonify(fits=docs[:4])
 
 
 @app.route("/item_names", methods=["GET"])

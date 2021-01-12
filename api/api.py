@@ -114,7 +114,33 @@ def update_profile():
             [image], [imghdr.what(image)])
         body["avatar"] = "https://fitme.s3.amazonaws.com/" + item_img[0]
     del body["is_updating_avatar"]
-
+    # Bulk update user's items and fits if they change their username
+    if body["username"] is not user_data["username"]:
+        print("yes")
+        # Bulk update items
+        bulk = db["items"].initialize_unordered_bulk_op()
+        counter = 0
+        for id in user_data["uploaded_items"]:
+            bulk.find({ "_id": id }).update({ "$set": { "uploader": body["username"] } })
+            counter += 1
+            # 500 limit bypass
+            if (counter % 500 == 0):
+                bulk.execute()
+                bulk = db["users"].initialize_ordered_bulk_op()
+        if (counter % 500 != 0):
+            bulk.execute()
+        # Bulk update fits
+        bulk = db["fits"].initialize_unordered_bulk_op()
+        counter = 0
+        for id in user_data["uploaded_fits"]:
+            bulk.find({ "_id": id }).update({ "$set": { "uploader": body["username"] } })
+            counter += 1
+            # 500 limit bypass
+            if (counter % 500 == 0):
+                bulk.execute()
+                bulk = db["fits"].initialize_ordered_bulk_op()
+        if (counter % 500 != 0):
+            bulk.execute()
     users_collection.update_one({"email": identity}, {"$set": body})
     return jsonify(message="Successfully updated"), 200
 
@@ -157,12 +183,15 @@ def follow_user():
     return jsonify(message="Follow/unfollow successful"), 200
 
 
-@ app.route("/submit_item", methods=["POST"])
-@ jwt_required
+@app.route("/submit_item", methods=["POST"])
+@jwt_required
 def submit_item():
     identity = get_jwt_identity()
     data = dict(request.form)
     data = json.loads(data["postData"])
+    if data["name"].strip() is "" or data["brand"].strip() is "" or len(data["images"]) == 0:
+        return jsonify(error="Bad item data")
+    print(data["images"])
     images = request.files.to_dict()
     content = []
     for f in list(images.values()):
@@ -170,11 +199,13 @@ def submit_item():
     manager = ImageManager()
     item_imgs = manager.uploadImage(
         content, [d["path"] for d in data["images"]])
-    del data['images']
+    del data["images"]
     data["imgs"] = item_imgs
     data["uploader"] = users_collection.find_one(
         {"email": identity})['username']
-    items_collection.insert_one(data)
+    _id = items_collection.insert_one(data)
+    _id = _id.inserted_id
+    users_collection.update({"email": identity}, {"$push": {"uploaded_items": _id }})
     return jsonify(message="Item upload successful!"), 200
 
 # Returns a dict consisting of {item_id : item_obj}

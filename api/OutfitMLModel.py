@@ -31,5 +31,5 @@ class OutfitMLModel:
         self.cfg.MODEL.WEIGHTS = os.path.join(
             self.cfg.OUTPUT_DIR, "model.pth")
         # set the testing threshold for this model (lower -> increase sensitivity but also more false positives)
-        self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.27
+        self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.40
         self.predictor = DefaultPredictor(self.cfg)

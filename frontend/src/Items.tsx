@@ -1,7 +1,15 @@
-import { Container, Fab, Tooltip, Typography, Grid } from "@material-ui/core";
+import {
+  Container,
+  Fab,
+  Tooltip,
+  Typography,
+  Grid,
+  LinearProgress,
+} from "@material-ui/core";
 
 import React, { ReactElement, useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
+import CloseIcon from "@material-ui/icons/Close";
 import styles from "./css/Items.module.css";
 import ItemUpload from "./components/ItemUpload";
 import { Item } from "./util/util-types";
@@ -14,6 +22,7 @@ import {
   patchRecommended,
 } from "./store/slices/itemsSlice";
 import { Dispatch } from "@reduxjs/toolkit";
+import { useTitle } from "./util/util-functions";
 
 type OwnProps = {
   readonly loggedIn: boolean;
@@ -27,6 +36,8 @@ type Props = OwnProps & {
 const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
   const [uploadHidden, setUploadHidden] = useState(true);
   const { discoverData, recommendedData, lastUpdated } = items;
+
+  useTitle("fitme | Items");
 
   useEffect(() => {
     if (
@@ -55,66 +66,77 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
         });
     }
   });
-  return (
-    <Container className={styles.container} maxWidth="md">
-      {loggedIn && (
-        <div className={styles.topBox}>
-          <Tooltip title="Upload a new item" aria-label="Upload a new item">
-            <Fab
-              onClick={() => {
-                setUploadHidden(!uploadHidden);
-              }}
-              className={styles.fab}
-              color="primary"
-              aria-label="add"
-            >
-              <AddIcon />
-            </Fab>
-          </Tooltip>
-          {!uploadHidden && <ItemUpload setUploadHidden={setUploadHidden} />}
-        </div>
-      )}
-      <div className={styles.topExplanation}>
-        <Typography>
-          {!loggedIn &&
-            "Log in to get personalized recommendations and upload your own items!"}
-        </Typography>
-      </div>
-      <div className={styles.recommended}>
-        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
-          <Typography variant="h5">
-            <b>Recommended</b>
-          </Typography>
-        </div>
+  if (discoverData.length === 0 || recommendedData.length === 0) {
+    return <LinearProgress />;
+  } else {
+    return (
+      <>
+        <Container className={styles.container} maxWidth="md">
+          {loggedIn && (
+            <div className={styles.topBox}>
+              <Tooltip
+                title={uploadHidden ? "Upload a new item" : "Close editor"}
+                aria-label="Upload a new item"
+              >
+                <Fab
+                  onClick={() => {
+                    setUploadHidden(!uploadHidden);
+                  }}
+                  className={styles.fab}
+                  color="primary"
+                  aria-label={uploadHidden ? "add" : "close"}
+                >
+                  {uploadHidden ? <AddIcon /> : <CloseIcon />}
+                </Fab>
+              </Tooltip>
+              {!uploadHidden && (
+                <ItemUpload setUploadHidden={setUploadHidden} />
+              )}
+            </div>
+          )}
+          <div className={styles.topExplanation}>
+            <Typography>
+              {!loggedIn &&
+                "Log in to get personalized recommendations and upload your own items!"}
+            </Typography>
+          </div>
+          <div className={styles.recommended}>
+            <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+              <Typography variant="h3">
+                <b>Recommended</b>
+              </Typography>
+            </div>
 
-        <Grid container alignItems="stretch" spacing={1}>
-          {recommendedData.map((it) => {
-            return (
-              <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
-                <ItemCard item={it} />
-              </Grid>
-            );
-          })}
-        </Grid>
-      </div>
-      <div className={styles.discover}>
-        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
-          <Typography variant="h5">
-            <b>Discover</b>
-          </Typography>
-        </div>
-        <Grid container alignItems="stretch" spacing={1}>
-          {discoverData.map((it) => {
-            return (
-              <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
-                <ItemCard item={it} />
-              </Grid>
-            );
-          })}
-        </Grid>
-      </div>
-    </Container>
-  );
+            <Grid container alignItems="stretch" spacing={1}>
+              {recommendedData.map((it) => {
+                return (
+                  <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
+                    <ItemCard item={it} />
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </div>
+          <div className={styles.discover}>
+            <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+              <Typography variant="h3">
+                <b>Discover</b>
+              </Typography>
+            </div>
+            <Grid container alignItems="stretch" spacing={1}>
+              {discoverData.map((it) => {
+                return (
+                  <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
+                    <ItemCard item={it} />
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </div>
+        </Container>
+      </>
+    );
+  }
 };
 
 const Connected = connect(({ items }: RootState) => ({ items }))(Items);

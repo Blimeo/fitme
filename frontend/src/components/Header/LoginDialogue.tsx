@@ -6,7 +6,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import { Grid } from "@material-ui/core";
+import { Grid, CircularProgress } from "@material-ui/core";
 import styles from "./forms.module.css";
 
 type Props = {
@@ -19,7 +19,7 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [badLogin, setBadLogin] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -32,6 +32,7 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
       email: email,
       password: password,
     };
+    setIsLoading(true);
     fetch("/login", {
       method: "POST",
       body: JSON.stringify(opts),
@@ -45,6 +46,7 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
         } else {
           setBadLogin(true);
         }
+        setIsLoading(false);
       });
   };
   return (
@@ -95,9 +97,13 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
             <Button onClick={handleClose} color="primary">
               Cancel
             </Button>
-            <Button color="primary" type="submit">
-              Login
-            </Button>
+            {isLoading ? (
+              <CircularProgress className={styles.LoadingAnimation} size={25} />
+            ) : (
+              <Button color="primary" type="submit">
+                Login
+              </Button>
+            )}
           </DialogActions>
         </form>
       </Dialog>

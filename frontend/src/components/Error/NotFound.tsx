@@ -2,8 +2,10 @@ import { Container, Typography } from "@material-ui/core";
 import React from "react";
 import styles from "./NotFound.module.css";
 import { Link } from "react-router-dom";
+import { useTitle } from "../../util/util-functions";
 
 export default function NotFound() {
+  useTitle("fitme | Page Not Found");
   return (
     <Container maxWidth="md" className={styles.Container}>
       <div className={styles.TextContainer}>

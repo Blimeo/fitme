@@ -3,6 +3,7 @@ import "./css/index.css";
 import Home from "./Home";
 import Profile from "./Profile";
 import Items from "./Items";
+import Fits from "./Fits";
 import ItemView from "./ItemView";
 import FitView from "./FitView";
 import FitUpload from "./FitUpload";
@@ -50,7 +51,9 @@ export default function App() {
               <Route path="/items">
                 <Items loggedIn={loggedIn} />
               </Route>
-              <Route path="/fits" component={Home} />
+              <Route path="/fits">
+                <Fits loggedIn={loggedIn} />
+              </Route>
               <Route path="/profile">
                 {loggedIn ? <Profile loggedIn /> : <Redirect to="/" />}
               </Route>

@@ -1,4 +1,4 @@
-import { Button, Card, Grid, TextField, Typography } from "@material-ui/core";
+import { Button, Card, Grid, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import Annotation from "react-image-annotation";
 import AnnotationEditor from "./AnnotationEditor";
@@ -38,12 +38,19 @@ const setMLAnnotations = (boxes: number[][], width: number, height: number) => {
 };
 
 // prodigious use of any because react-image-annotation does not have TS support
-export default function FitCreator({ img, boxes, width, height, annotations, setAnnotations }: Props) {
+export default function FitCreator({
+  img,
+  boxes,
+  width,
+  height,
+  annotations,
+  setAnnotations,
+}: Props) {
   const [baseAnnotation, setBaseAnnotation] = useState<any>({});
   const [activeAnnotations, setActiveAnnotations] = useState<any>([]);
   useEffect(() => {
     setAnnotations(setMLAnnotations(boxes, width, height));
-  }, [boxes, img, width, height]);
+  }, [boxes, img, width, height, setAnnotations]);
 
   const onSubmit = (annotation: any) => {
     const { geometry, data } = annotation;
@@ -82,18 +89,20 @@ export default function FitCreator({ img, boxes, width, height, annotations, set
           allowTouch
         />
       </Grid>
-      <Grid item xs={6} >
+      <Grid item xs={6}>
         <Grid container direction="column" spacing={1}>
           {annotations.map((anno: any, index: number) => {
             return (
               <Grid item xs={12}>
                 <Card
-                  style={{padding : "6px"}}
+                  style={{ padding: "6px" }}
                   onMouseOver={() => setActiveAnnotations([anno])}
                   onMouseOut={() => setActiveAnnotations([])}
                   key={index}
                 >
-                  <Typography><b>{anno.data.text || "Label this fit item!"}</b></Typography>
+                  <Typography>
+                    <b>{anno.data.text || "Label this fit item!"}</b>
+                  </Typography>
                   <TextEditor
                     value={anno.data.text}
                     onChange={(value: string) => {

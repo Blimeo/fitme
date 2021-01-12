@@ -12,6 +12,7 @@ import { Link, useHistory, useParams } from "react-router-dom";
 import { Fit } from "./util/util-types";
 import styles from "./css/FitView.module.css";
 import Annotation from "react-image-annotation";
+import AvatarUsername from "./components/Util/AvatarUsername";
 type Props = {
   readonly loggedIn: boolean;
 };
@@ -69,14 +70,12 @@ export default function ItemView({ loggedIn }: Props) {
             />
           </Grid>
           <Grid item xs={6}>
-          <Card className={styles.itemDesc} variant="outlined">
+            <Card className={styles.itemDesc} variant="outlined">
               <CardContent>
-              <Typography>
+                <Typography>
                   <b>Uploaded by:</b>
                 </Typography>
-                <div style={{ color: "gray" }}>
-                            <Typography>{fit.uploader}</Typography>
-                          </div>
+                <AvatarUsername username={fit.uploader} />
                 <Typography>
                   <b>Fit Description</b>
                 </Typography>
@@ -105,37 +104,35 @@ export default function ItemView({ loggedIn }: Props) {
                 </Typography>
               </CardContent>
             </Card>
-              <Grid container direction="column" spacing={1}>
-                {fit.annotations.map((anno: any, index: number) => {
-                  return (
-                    <Grid item xs={12}>
-                      <Link
-                        to={"/item/" + fit.items[index]._id}
-                        style={{ textDecoration: "none" }}
+            <Grid container direction="column" spacing={1}>
+              {fit.annotations.map((anno: any, index: number) => {
+                return (
+                  <Grid item xs={12}>
+                    <Link
+                      to={"/item/" + fit.items[index]._id}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <Card
+                        style={{ padding: "6px" }}
+                        onMouseOver={() => setActiveAnnotations([anno])}
+                        onMouseOut={() => setActiveAnnotations([])}
+                        key={index}
                       >
-                        <Card
-                          style={{ padding: "6px" }}
-                          onMouseOver={() => setActiveAnnotations([anno])}
-                          onMouseOut={() => setActiveAnnotations([])}
-                          key={index}
-                        >
-                          <div style={{ color: "gray" }}>
-                            <Typography>Item</Typography>
-                          </div>
-                          <Typography>
-                            <b>{anno.data.text}</b>
-                          </Typography>
-                        </Card>
-                      </Link>
-                    </Grid>
-                  );
-                })}
-              </Grid>
-              
-            
+                        <div style={{ color: "gray" }}>
+                          <Typography>Item</Typography>
+                        </div>
+                        <Typography>
+                          <b>{anno.data.text}</b>
+                        </Typography>
+                      </Card>
+                    </Link>
+                  </Grid>
+                );
+              })}
+            </Grid>
           </Grid>
           <Grid item xs={6}>
-          {loggedIn && (
+            {loggedIn && (
               <Card className={styles.itemActionPane} variant="outlined">
                 <CardContent>
                   <Button variant="contained" color="secondary">
@@ -145,9 +142,7 @@ export default function ItemView({ loggedIn }: Props) {
               </Card>
             )}
           </Grid>
-          <Grid item xs={6}>
-          
-          </Grid>
+          <Grid item xs={6}></Grid>
         </Grid>
       )}
     </Container>

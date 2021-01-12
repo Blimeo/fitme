@@ -1,0 +1,9 @@
+.Container {
+  align-items: center;
+  display: flex;
+}
+
+.Text {
+  color: grey;
+  margin-left: 0.5em !important;
+}

@@ -43,7 +43,8 @@ export type Item = {
   description: string;
   imgs: string[];
   uploader: string;
-  favorited: string[];
+  favorited: number;
+  inFits: string[];
 };
 
 export type FitUploadType = {
@@ -65,5 +66,5 @@ export type Fit = {
   items: Item[];
   uploader: string;
   annotations: any;
-  favorited: string[];
+  favorited: number;
 }

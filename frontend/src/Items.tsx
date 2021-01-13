@@ -110,7 +110,13 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
             <Grid container alignItems="stretch" spacing={1}>
               {recommendedData.map((it) => {
                 return (
-                  <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
+                  <Grid
+                    item
+                    xs={12}
+                    md={3}
+                    key={it._id}
+                    style={{ display: "flex" }}
+                  >
                     <ItemCard item={it} />
                   </Grid>
                 );
@@ -126,7 +132,13 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
             <Grid container alignItems="stretch" spacing={1}>
               {discoverData.map((it) => {
                 return (
-                  <Grid item xs={3} key={it._id} style={{ display: "flex" }}>
+                  <Grid
+                    item
+                    xs={12}
+                    md={3}
+                    key={it._id}
+                    style={{ display: "flex" }}
+                  >
                     <ItemCard item={it} />
                   </Grid>
                 );

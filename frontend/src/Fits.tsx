@@ -7,7 +7,7 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect } from "react";
 import AddIcon from "@material-ui/icons/Add";
 import styles from "./css/Fits.module.css";
 import { Fit } from "./util/util-types";
@@ -97,7 +97,13 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
             <Grid container alignItems="stretch" spacing={1}>
               {recommendedData.map((fit) => {
                 return (
-                  <Grid item xs={3} key={fit._id} style={{ display: "flex" }}>
+                  <Grid
+                    item
+                    xs={12}
+                    md={3}
+                    key={fit._id}
+                    style={{ display: "flex" }}
+                  >
                     <FitCard fit={fit} />
                   </Grid>
                 );
@@ -113,7 +119,13 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
             <Grid container alignItems="stretch" spacing={1}>
               {discoverData.map((fit) => {
                 return (
-                  <Grid item xs={3} key={fit._id} style={{ display: "flex" }}>
+                  <Grid
+                    item
+                    xs={12}
+                    md={3}
+                    key={fit._id}
+                    style={{ display: "flex" }}
+                  >
                     <FitCard fit={fit} />
                   </Grid>
                 );

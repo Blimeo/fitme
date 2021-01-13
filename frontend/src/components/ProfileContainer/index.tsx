@@ -95,18 +95,23 @@ function ProfileContainer({ username, loggedIn }: Props) {
   }, [username]);
 
   useEffect(() => {
-    const fetchProfileData = (accessTokenString: string): void => {
-      fetch(
-        username === "OWN PROFILE"
-          ? "/my_profile_data"
-          : `/profile_data?username=${username}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: accessTokenString,
-          },
-        }
-      )
+    const fetchProfileData = (accessTokenString?: string): void => {
+      const profilePromise = accessTokenString
+        ? fetch(
+            username === "OWN PROFILE"
+              ? "/my_profile_data"
+              : `/profile_data?username=${username}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: accessTokenString,
+              },
+            }
+          )
+        : fetch(`/profile_data?username=${username}`, {
+            method: "GET",
+          });
+      profilePromise
         .then((r) => {
           if (r.ok) {
             return r.json();
@@ -120,19 +125,16 @@ function ProfileContainer({ username, loggedIn }: Props) {
         .catch(() => setDoesUsernameExist(false));
     };
 
-    const access_token = localStorage.getItem("access_token");
-    if (access_token === null) {
-      alert("You are not logged in");
-    } else {
+    if (loggedIn) {
+      const access_token = localStorage.getItem("access_token");
       const bearer = `Bearer ${access_token}`;
       fetchProfileData(bearer);
-      if (loggedIn) {
-        fetchFollowersList();
-      } else {
-        setViewerIsFollowingThisUser(false);
-      }
+      fetchFollowersList();
+    } else {
+      fetchProfileData();
+      setViewerIsFollowingThisUser(false);
     }
-  }, [fetchFollowersList, loggedIn, username]);
+  }, [doesUsernameExist, fetchFollowersList, loggedIn, username]);
 
   if (!doesUsernameExist) {
     return <NotFound />;

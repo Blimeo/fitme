@@ -10,7 +10,7 @@ type Props = {
 
 const Profile = ({ loggedIn }: Props): ReactElement => {
   const { username } = useParams<Record<string, string | undefined>>();
-  const [isOwnProfile, setIsOwnProfile] = useState(true);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
   useTitle(
     () =>
       username === undefined
@@ -24,20 +24,24 @@ const Profile = ({ loggedIn }: Props): ReactElement => {
     if (access_token === null) {
       setIsOwnProfile(false);
     }
-    fetch("/my_profile_data", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const user = data as User;
-        if (user && user.username !== username) {
-          setIsOwnProfile(false);
-        }
-      });
-  });
+    if (loggedIn) {
+      fetch("/my_profile_data", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const user = data as User;
+          if (user && user.username !== username) {
+            setIsOwnProfile(false);
+          } else {
+            setIsOwnProfile(true);
+          }
+        });
+    }
+  }, [loggedIn, username]);
 
   return (
     <ProfileContainer

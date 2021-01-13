@@ -83,7 +83,7 @@ def login():
     else:
         return jsonify(message="Bad Email or Password"), 401
 
-
+# Converts following/followers IDs to usernames.
 @app.route("/my_profile_data", methods=["GET"])
 @jwt_required
 def my_profile_data():
@@ -93,6 +93,10 @@ def my_profile_data():
         return jsonify(message="User not found"), 404
     del user_data["password"]
     del user_data["email"]
+    if user_data["following"] is not None:
+        user_data["following"] = list(map(lambda id_: users_collection.find_one({"_id": id_})["username"], user_data["following"]))
+    if user_data["followers"] is not None:
+        user_data["followers"] = list(map(lambda id_: users_collection.find_one({"_id": id_})["username"], user_data["followers"]))
     return json.dumps(user_data, sort_keys=True, indent=4, default=json_util.default)
 
 
@@ -112,7 +116,7 @@ def update_profile():
         image = request.files.to_dict()["profileImage"]
         item_img = manager.uploadImage(
             [image], [imghdr.what(image)])
-        body["avatar"] = "https://fitme.s3.amazonaws.com/" + item_img[0]
+        body["avatar"] = item_img[0]
     del body["is_updating_avatar"]
     # Bulk update user's items and fits if they change their username
     if body["username"] is not user_data["username"]:
@@ -167,18 +171,19 @@ def follow_user():
         {"email": identity})
     user_to_follow_data = users_collection.find_one(
         {"username": user_to_follow})
+    user_to_follow = user_to_follow_data["_id"]
     if user_data is None or user_to_follow_data is None:
         return jsonify(message="User not found"), 404
     if user_to_follow in user_data["following"]:
-        user_data["following"].remove(user_to_follow)
-        user_to_follow_data["followers"].remove(user_data["username"])
+        user_data["following"].remove(user_to_follow_data["_id"])
+        user_to_follow_data["followers"].remove(user_data["_id"])
     else:
-        user_data["following"].append(user_to_follow)
-        user_to_follow_data["followers"].append(user_data["username"])
+        user_data["following"].append(user_to_follow_data["_id"])
+        user_to_follow_data["followers"].append(user_data["_id"])
 
-    users_collection.update_one({"email": identity},
+    users_collection.update_one({"_id": user_data["_id"]},
                                 {"$set": {"following": user_data["following"]}})
-    users_collection.update_one({"username": user_to_follow},
+    users_collection.update_one({"_id": user_to_follow},
                                 {"$set": {"followers": user_to_follow_data["followers"]}})
     return jsonify(message="Follow/unfollow successful"), 200
 

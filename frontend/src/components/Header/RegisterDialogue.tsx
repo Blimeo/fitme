@@ -7,12 +7,17 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import styles from "./forms.module.css";
-import { Grid } from "@material-ui/core";
+import { Grid, Snackbar } from "@material-ui/core";
 import { emailIsValid } from "../../util/util-functions";
+import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 
 type Props = {
   readonly buttonClassName: string;
 };
+
+function Alert(props: AlertProps) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function RegisterDialog({ buttonClassName }: Props) {
   type HelperText = {
@@ -24,6 +29,8 @@ export default function RegisterDialog({ buttonClassName }: Props) {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [successfulRegistration, setSuccessfulRegistration] = useState(false);
+
   const [helperText, setHelperText] = useState<HelperText>({
     emailText: ["", false],
     usernameText: ["must be between 4-16 characters", false],
@@ -57,6 +64,7 @@ export default function RegisterDialog({ buttonClassName }: Props) {
       });
       if (response.ok) {
         setOpen(false);
+        setSuccessfulRegistration(true);
       }
       const json = await response.json();
       const emailExists =
@@ -77,6 +85,14 @@ export default function RegisterDialog({ buttonClassName }: Props) {
   };
   return (
     <div>
+      <Snackbar open={successfulRegistration} autoHideDuration={6000}>
+        <Alert
+          onClose={() => setSuccessfulRegistration(false)}
+          severity="success"
+        >
+          Registration successful! You can now log in on the top right.
+        </Alert>
+      </Snackbar>
       <Button className={buttonClassName} onClick={() => setOpen(true)}>
         Sign Up
       </Button>

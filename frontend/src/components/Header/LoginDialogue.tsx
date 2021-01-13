@@ -24,6 +24,8 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
     setOpen(true);
   };
   const handleClose = () => {
+    setEmail("");
+    setPassword("");
     setOpen(false);
   };
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {

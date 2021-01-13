@@ -31,7 +31,7 @@ export default function ItemView({ loggedIn }: Props) {
     items: [],
     uploader: "",
     annotations: [],
-    favorited: [],
+    favorited: 0,
   });
 
   const [loading, setLoading] = useState(true);
@@ -78,6 +78,7 @@ export default function ItemView({ loggedIn }: Props) {
           Authorization: `Bearer ${access_token}`,
         },
       });
+      setFit({...fit, favorited: fit.favorited+1});
       setFavorited(true);
     }
   };
@@ -91,6 +92,7 @@ export default function ItemView({ loggedIn }: Props) {
           Authorization: `Bearer ${access_token}`,
         },
       });
+      setFit({...fit, favorited: fit.favorited-1});
       setFavorited(false);
     }
   };
@@ -180,6 +182,7 @@ export default function ItemView({ loggedIn }: Props) {
             {loggedIn && (
               <Card className={styles.itemActionPane} variant="outlined">
                 <CardContent>
+                  <Typography>❤️ {fit.favorited}</Typography>
                   {favorited ? (
                     <Button variant="contained" onClick={handleUnfavorite}>
                       Unfavorite

@@ -30,6 +30,7 @@ export default function ItemView({ loggedIn }: Props) {
     description: "",
     imgs: [],
     uploader: "",
+    gender: "UNISEX",
   });
   const [galleryImgs, setGalleryImgs] = useState<any>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +60,6 @@ export default function ItemView({ loggedIn }: Props) {
 
   if (loading) {
     return <LinearProgress />;
-  } else {
   }
   return (
     <Container className={styles.container} maxWidth="md">

@@ -31,6 +31,7 @@ export default function ItemView({ loggedIn }: Props) {
     items: [],
     uploader: "",
     annotations: [],
+    gender: "UNISEX",
   });
 
   const [loading, setLoading] = useState(true);

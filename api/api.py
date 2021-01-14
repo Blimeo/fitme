@@ -251,6 +251,9 @@ def get_fit(fit_id):
         item['_id'] = str(item['_id'])
     return jsonify(error="false", fit=fit)
 
+def is_gender(text):
+    return text == "MEN" or text == "WOMEN" or text == "UNISEX"
+
 @app.route("/upload_fit", methods=["POST"])
 @jwt_required
 def upload_fit():
@@ -258,6 +261,11 @@ def upload_fit():
     data = dict(request.form)
     fit = json.loads(data["data"])
     annotations = json.loads(data["annotations"])
+    if (fit.name == "" or fit.img_url == "" or is_gender(fit.gender)):
+        return jsonify(error="Bad fit metadata")
+    for anno in annotations: 
+        if (anno.data.text == "Label this fit item!"):
+            return jsonify(error="Unannotated item")
     del fit['itemBoxes'], fit['width'], fit['height']
     item_names = [item['data']['text'] for item in annotations]
     items = [items_collection.find_one({"name" : name}) for name in item_names]
@@ -269,9 +277,28 @@ def upload_fit():
     #TODO: update item objects that are included in this fit
     return jsonify(ok=True)
 
+def comma_separated_params_to_list(param):
+    result = []
+    for val in param.split(','):
+        if val:
+            result.append(val)
+    return result
+
+def get_filter_from_request(request):
+    request_data = {}
+    params = request.args.getlist("filter") or request.form.getlist("filter")
+    if len(params) == 1 and ',' in params[0]:
+        request_data["filter"] = comma_separated_params_to_list(params[0])
+    else:
+        request_data["filter"] = params
+    return request_data["filter"]
+
 @app.route("/discover_items", methods=["GET"])
 def discover_items():
-    docs = list(items_collection.find({}))
+    condition = []
+    for filter in get_filter_from_request(request):
+        condition.append({"gender": filter })
+    docs = list(items_collection.find({"$or": condition}))
     random.shuffle(docs)
     for item in docs:
         item['_id'] = str(item['_id'])
@@ -279,7 +306,10 @@ def discover_items():
 
 @app.route("/discover_fits", methods=["GET"])
 def discover_fits():
-    docs = list(fits_collection.find({}))
+    condition = []
+    for filter in get_filter_from_request(request):
+        condition.append({"gender": filter })
+    docs = list(fits_collection.find({"$or": condition}))
     random.shuffle(docs)
     for fit in docs:
         fit['_id'] = str(fit['_id'])
@@ -294,7 +324,10 @@ def recommended_items():
     if identity:
         # TODO: custom recommendations
         pass
-    docs = list(items_collection.find({}))
+    condition = []
+    for filter in get_filter_from_request(request):
+        condition.append({"gender": filter })
+    docs = list(items_collection.find({"$or": condition}))
     random.shuffle(docs)
     for item in docs:
         item['_id'] = str(item['_id'])
@@ -307,7 +340,10 @@ def recommended_fits():
     if identity:
         # TODO: custom recommendations
         pass
-    docs = list(fits_collection.find({}))
+    condition = []
+    for filter in get_filter_from_request(request):
+        condition.append({"gender": filter})
+    docs = list(fits_collection.find({"$or": condition}))
     random.shuffle(docs)
     for fit in docs:
         fit['_id'] = str(fit['_id'])

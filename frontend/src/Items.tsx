@@ -6,7 +6,6 @@ import {
   Grid,
   LinearProgress,
 } from "@material-ui/core";
-
 import React, { ReactElement, useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
@@ -23,6 +22,7 @@ import {
 } from "./store/slices/itemsSlice";
 import { Dispatch } from "@reduxjs/toolkit";
 import { useTitle } from "./util/util-functions";
+import GenderFilterUI from "./components/Util/GenderFilterUI";
 
 type OwnProps = {
   readonly loggedIn: boolean;
@@ -36,17 +36,29 @@ type Props = OwnProps & {
 const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
   const [uploadHidden, setUploadHidden] = useState(true);
   const { discoverData, recommendedData, lastUpdated } = items;
+  const [genderFilter, setGenderFilter] = useState(() => [
+    "MEN",
+    "WOMEN",
+    "UNISEX",
+  ]);
+
+  const handleGenderFilter = (
+    _: React.MouseEvent<HTMLElement>,
+    genders: string[]
+  ) => {
+    setGenderFilter(genders);
+  };
 
   useTitle("fitme | Items");
 
   useEffect(() => {
     if (
-      discoverData.length === 0 ||
-      Date.now() - lastUpdated.getTime() > 100000
+      Date.now() - lastUpdated.getTime() > 100000 ||
+      (discoverData.length > 0 && discoverData[0]._id === "LOADING")
     ) {
       const access_token = localStorage.getItem("access_token");
       const accessTokenString = `Bearer ${access_token}`;
-      fetch("/discover_items", {
+      fetch(`/discover_items?filter=${genderFilter.toString()}`, {
         method: "GET",
       })
         .then((r) => r.json())
@@ -54,7 +66,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
           dispatch(patchDiscover(response.items as Item[]));
         });
 
-      fetch("/recommended_items", {
+      fetch(`/recommended_items?filter=${genderFilter.toString()}`, {
         method: "GET",
         headers: {
           Authorization: loggedIn ? accessTokenString : "",
@@ -64,9 +76,16 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
         .then((response) => {
           dispatch(patchRecommended(response.items as Item[]));
         });
+      console.log(discoverData);
+      console.log(recommendedData);
     }
-  });
-  if (discoverData.length === 0 || recommendedData.length === 0) {
+  }, [genderFilter]);
+
+  if (
+    discoverData.length > 0 &&
+    recommendedData.length > 0 &&
+    (discoverData[0]._id === "LOADING" || recommendedData[0]._id === "LOADING")
+  ) {
     return <LinearProgress />;
   } else {
     return (
@@ -100,6 +119,10 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
                 "Log in to get personalized recommendations and upload your own items!"}
             </Typography>
           </div>
+          <GenderFilterUI
+            genderFilter={genderFilter}
+            handleGenderFilter={handleGenderFilter}
+          />
           <div className={styles.recommended}>
             <div style={{ marginTop: "5px", marginBottom: "5px" }}>
               <Typography variant="h3">

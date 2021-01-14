@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Item } from '../../util/util-types';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Item } from "../../util/util-types";
 
 export type ItemsSliceState = {
   discoverData: Item[];
@@ -7,9 +7,25 @@ export type ItemsSliceState = {
   lastUpdated: Date;
 };
 
+const defaultItem: Item = {
+  _id: "LOADING",
+  name: "",
+  brand: "",
+  price: 0,
+  tags: [],
+  description: "",
+  uploader: "",
+  imgs: [],
+  gender: "UNISEX",
+};
+
 export const itemsSlice = createSlice({
-  name: 'items',
-  initialState: { discoverData: [], recommendedData: [], lastUpdated: new Date() } as ItemsSliceState,
+  name: "items",
+  initialState: {
+    discoverData: [defaultItem],
+    recommendedData: [defaultItem],
+    lastUpdated: new Date(),
+  } as ItemsSliceState,
   reducers: {
     patchDiscover: (state, action: PayloadAction<Item[]>) => {
       state.discoverData = action.payload;

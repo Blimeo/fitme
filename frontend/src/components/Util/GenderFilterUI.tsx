@@ -1,12 +1,13 @@
 import React, { ReactElement } from "react";
 import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
 import { Typography, withStyles } from "@material-ui/core";
+import { Gender } from "../../util/util-types";
 
 type Props = {
   readonly genderFilter: readonly string[];
   readonly handleGenderFilter: (
     _: React.MouseEvent<HTMLElement>,
-    genders: string[]
+    genders: Gender[]
   ) => void;
 };
 
@@ -29,7 +30,7 @@ const GenderFilterUI = ({
 }: Props): ReactElement => {
   return (
     <StyledToggleButtonGroup
-      size="small"
+      size="large"
       value={genderFilter}
       onChange={handleGenderFilter}
       aria-label="Filter by gender"

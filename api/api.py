@@ -120,7 +120,6 @@ def update_profile():
     del body["is_updating_avatar"]
     # Bulk update user's items and fits if they change their username
     if body["username"] is not user_data["username"]:
-        print("yes")
         # Bulk update items
         bulk = db["items"].initialize_unordered_bulk_op()
         counter = 0
@@ -261,10 +260,11 @@ def upload_fit():
     data = dict(request.form)
     fit = json.loads(data["data"])
     annotations = json.loads(data["annotations"])
-    if (fit.name == "" or fit.img_url == "" or is_gender(fit.gender)):
+    if (fit["name"] == "" or fit["img_url"] == "" or not is_gender(fit["gender"])):
         return jsonify(error="Bad fit metadata")
     for anno in annotations: 
-        if (anno.data.text == "Label this fit item!"):
+        _data = anno["data"]
+        if (_data["text"] == "Label this fit item!"):
             return jsonify(error="Unannotated item")
     del fit['itemBoxes'], fit['width'], fit['height']
     item_names = [item['data']['text'] for item in annotations]
@@ -273,7 +273,8 @@ def upload_fit():
     fit["annotations"] = annotations
     fit["uploader"] = users_collection.find_one(
         {"email": identity})['username']
-    fits_collection.insert_one(fit)
+    _id = fits_collection.insert_one(fit)
+    users_collection.update({"email": identity}, {"$push": {"uploaded_fits": _id }})
     #TODO: update item objects that are included in this fit
     return jsonify(ok=True)
 

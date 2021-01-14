@@ -111,7 +111,6 @@ export default function FitUpload() {
     });
     if (response.ok) {
       const labelData = await response.json();
-      console.log(labelData);
       setFit({
         ...fit,
         img_url: labelData.img_url,

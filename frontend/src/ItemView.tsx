@@ -110,6 +110,7 @@ export default function ItemView({ loggedIn }: Props) {
                       backgroundColor: "#545454",
                       color: "white",
                     }}
+                    key={tag}
                     variant="contained"
                   >
                     {tag}

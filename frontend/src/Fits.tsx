@@ -5,23 +5,26 @@ import {
   Typography,
   Grid,
   LinearProgress,
+  CircularProgress,
 } from "@material-ui/core";
 
-import React, { ReactElement, useEffect } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
 import styles from "./css/Fits.module.css";
-import { Fit } from "./util/util-types";
+import { Fit, Gender } from "./util/util-types";
 import { connect } from "react-redux";
 import { RootState } from "./store/rootReducer";
 import FitCard from "./components/FitCard";
 import {
   FitsSliceState,
   patchDiscover,
+  patchGenderFilter,
   patchRecommended,
 } from "./store/slices/fitsSlice";
 import { Dispatch } from "@reduxjs/toolkit";
-import { useTitle } from "./util/util-functions";
+import { arraysSetEquality, useTitle } from "./util/util-functions";
 import { Link } from "react-router-dom";
+import GenderFilterUI from "./components/Util/GenderFilterUI";
 
 type OwnProps = {
   readonly loggedIn: boolean;
@@ -33,18 +36,40 @@ type Props = OwnProps & {
 };
 
 const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
-  const { discoverData, recommendedData, lastUpdated } = fits;
+  const {
+    discoverData,
+    recommendedData,
+    lastUpdated,
+    currentGenderFilter,
+  } = fits;
 
   useTitle("fitme | Fits");
 
+  const [genderFilter, setGenderFilter] = useState<Gender[]>(() => [
+    "MEN",
+    "WOMEN",
+    "UNISEX",
+  ]);
+  const [loading, setLoading] = useState(false);
+
+  const handleGenderFilter = (
+    _: React.MouseEvent<HTMLElement>,
+    genders: Gender[]
+  ) => {
+    setGenderFilter(genders);
+  };
+
   useEffect(() => {
     if (
-      discoverData.length === 0 ||
-      Date.now() - lastUpdated.getTime() > 100000
+      !arraysSetEquality(genderFilter, currentGenderFilter) ||
+      Date.now() - lastUpdated > 180000 ||
+      (discoverData.length === 1 && discoverData[0]._id === "LOADING") ||
+      (recommendedData.length === 1 && recommendedData[0]._id === "LOADING")
     ) {
+      setLoading(true);
       const access_token = localStorage.getItem("access_token");
       const accessTokenString = `Bearer ${access_token}`;
-      fetch("/discover_fits", {
+      fetch(`/discover_fits?filter=${genderFilter.toString()}`, {
         method: "GET",
       })
         .then((r) => r.json())
@@ -52,7 +77,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
           dispatch(patchDiscover(response.fits as Fit[]));
         });
 
-      fetch("/recommended_fits", {
+      fetch(`/recommended_fits?filter=${genderFilter.toString()}`, {
         method: "GET",
         headers: {
           Authorization: loggedIn ? accessTokenString : "",
@@ -61,10 +86,17 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
         .then((r) => r.json())
         .then((response) => {
           dispatch(patchRecommended(response.fits as Fit[]));
+          setLoading(false);
         });
+      dispatch(patchGenderFilter(genderFilter));
     }
-  });
-  if (discoverData.length === 0 || recommendedData.length === 0) {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [genderFilter]);
+  if (
+    discoverData.length === 1 &&
+    recommendedData.length === 1 &&
+    (discoverData[0]._id === "LOADING" || recommendedData[0]._id === "LOADING")
+  ) {
     return <LinearProgress />;
   } else {
     return (
@@ -87,6 +119,14 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
                 "Log in to get personalized recommendations and upload your own fits!"}
             </Typography>
           </div>
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <GenderFilterUI
+              genderFilter={genderFilter}
+              handleGenderFilter={handleGenderFilter}
+            />
+          )}
           <div className={styles.recommended}>
             <div style={{ marginTop: "5px", marginBottom: "5px" }}>
               <Typography variant="h3">
@@ -95,19 +135,23 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
             </div>
 
             <Grid container alignItems="stretch" spacing={1}>
-              {recommendedData.map((fit) => {
-                return (
-                  <Grid
-                    item
-                    xs={12}
-                    md={3}
-                    key={fit._id}
-                    style={{ display: "flex" }}
-                  >
-                    <FitCard fit={fit} />
-                  </Grid>
-                );
-              })}
+              {loading ? (
+                <CircularProgress />
+              ) : (
+                recommendedData.map((fit) => {
+                  return (
+                    <Grid
+                      item
+                      xs={12}
+                      md={3}
+                      key={fit._id}
+                      style={{ display: "flex" }}
+                    >
+                      <FitCard fit={fit} />
+                    </Grid>
+                  );
+                })
+              )}
             </Grid>
           </div>
           <div className={styles.discover}>
@@ -117,19 +161,23 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
               </Typography>
             </div>
             <Grid container alignItems="stretch" spacing={1}>
-              {discoverData.map((fit) => {
-                return (
-                  <Grid
-                    item
-                    xs={12}
-                    md={3}
-                    key={fit._id}
-                    style={{ display: "flex" }}
-                  >
-                    <FitCard fit={fit} />
-                  </Grid>
-                );
-              })}
+              {loading ? (
+                <CircularProgress />
+              ) : (
+                discoverData.map((fit) => {
+                  return (
+                    <Grid
+                      item
+                      xs={12}
+                      md={3}
+                      key={fit._id}
+                      style={{ display: "flex" }}
+                    >
+                      <FitCard fit={fit} />
+                    </Grid>
+                  );
+                })
+              )}
             </Grid>
           </div>
         </Container>

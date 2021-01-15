@@ -126,19 +126,26 @@ export default function ItemView({ loggedIn }: Props) {
           />
         </Grid>
         <Grid item xs={6}>
-          
           <Card className={styles.itemDesc} variant="outlined">
             <CardContent>
               <Typography>
                 <b>Uploaded by:</b>
               </Typography>
               <AvatarUsername username={fit.uploader} />
+              <Typography style={{ color: "gray" }}>
+                {fit.uploadDate}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card className={styles.itemDesc} variant="outlined">
+            <CardContent>
               <Typography>
                 <b>Fit Description</b>
               </Typography>
               <Typography>{fit.description}</Typography>
             </CardContent>
           </Card>
+
           <Card className={styles.itemDesc} variant="outlined">
             <CardContent>
               <Typography>

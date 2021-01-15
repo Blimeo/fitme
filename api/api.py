@@ -207,7 +207,7 @@ def submit_item():
     data["imgs"] = item_imgs
     data["uploader"] = users_collection.find_one(
         {"email": identity})['username']
-    data["favorited"] = []
+    data["favorited"] = 0
     data["inFits"] = []
     _id = items_collection.insert_one(data)
     _id = _id.inserted_id
@@ -291,7 +291,7 @@ def upload_fit():
     fit["annotations"] = annotations
     fit["uploader"] = users_collection.find_one(
         {"email": identity})['username']
-    fit["favorited"] = []
+    fit["favorited"] = 0
     fit_id = fits_collection.insert_one(fit)
     users_collection.update({"email": identity}, {"$push": {"uploaded_fits": fit_id }})
     #TODO: update item objects that are included in this fit

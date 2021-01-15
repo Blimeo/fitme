@@ -255,7 +255,7 @@ def get_fit(fit_id):
     return jsonify(error="false", fit=fit)
 
 def is_gender(text):
-    return text == "MEN" or text == "WOMEN" or text == "UNISEX"
+    return text == "Men" or text == "Women" or text == "Unisex"
 
 @app.route("/get_fits", methods=["POST"])
 def get_fits():
@@ -280,6 +280,7 @@ def upload_fit():
     data = dict(request.form)
     fit = json.loads(data["data"])
     annotations = json.loads(data["annotations"])
+    print(fit, annotations)
     if (fit["name"] == "" or fit["img_url"] == "" or not is_gender(fit["gender"])):
         return jsonify(error="Bad fit metadata")
     for anno in annotations: 
@@ -296,9 +297,8 @@ def upload_fit():
     fit["favorited"] = 0
     fit["uploadDate"] = datetime.today().strftime('%Y-%m-%d')
     fit_id = fits_collection.insert_one(fit)
-    users_collection.update({"email": identity}, {"$push": {"uploaded_fits": fit_id }})
-    #TODO: update item objects that are included in this fit
     fit_id = str(fit_id.inserted_id)
+    users_collection.update({"email": identity}, {"$push": {"uploaded_fits": fit_id }}) 
     for item in items:
         item_id = item['_id']
         items_collection.update_one({"_id": item_id}, {"$addToSet": {"inFits": fit_id}})

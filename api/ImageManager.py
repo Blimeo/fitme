@@ -36,6 +36,8 @@ class ImageManager:
         top, bottom = crop['y'], crop['y'] + int(crop['height'])
         im = im.crop((left, top, right, bottom))
         file_obj = io.BytesIO()
+        if im.mode in ("RGBA", "P"):
+            im = im.convert("RGB")
         im.save(file_obj, "JPEG")
         file_obj.seek(0)
         return self.uploadImage([file_obj], ["a.jpeg"])[0]

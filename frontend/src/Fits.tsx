@@ -46,9 +46,9 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
   useTitle("fitme | Fits");
 
   const [genderFilter, setGenderFilter] = useState<Gender[]>(() => [
-    "MEN",
-    "WOMEN",
-    "UNISEX",
+    "Men",
+    "Women",
+    "Unisex",
   ]);
   const [loading, setLoading] = useState(false);
 
@@ -69,7 +69,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
       setLoading(true);
       const access_token = localStorage.getItem("access_token");
       const accessTokenString = `Bearer ${access_token}`;
-      fetch(`/discover_fits?filter=${genderFilter.toString()}`, {
+      fetch(`/discover_fits?gender=${genderFilter.toString()}`, {
         method: "GET",
       })
         .then((r) => r.json())
@@ -77,7 +77,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
           dispatch(patchDiscover(response.fits as Fit[]));
         });
 
-      fetch(`/recommended_fits?filter=${genderFilter.toString()}`, {
+      fetch(`/recommended_fits?gender=${genderFilter.toString()}`, {
         method: "GET",
         headers: {
           Authorization: loggedIn ? accessTokenString : "",

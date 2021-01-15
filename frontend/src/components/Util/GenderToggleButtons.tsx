@@ -18,13 +18,13 @@ const GenderToggleButtons = ({ value, onChange }: Props): ReactElement => {
       aria-required
       className={styles.ToggleButtons}
     >
-      <ToggleButton value="MEN" aria-label="MEN">
+      <ToggleButton value="Men" aria-label="MEN">
         <Typography>Men</Typography>
       </ToggleButton>
-      <ToggleButton value="WOMEN" aria-label="WOMEN">
+      <ToggleButton value="Women" aria-label="WOMEN">
         <Typography>Women</Typography>
       </ToggleButton>
-      <ToggleButton value="UNISEX" aria-label="UNISEX">
+      <ToggleButton value="Unisex" aria-label="UNISEX">
         <Typography>Unisex</Typography>
       </ToggleButton>
     </ToggleButtonGroup>

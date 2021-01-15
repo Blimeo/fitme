@@ -25,7 +25,7 @@ export type ProfileUpdateRequest = {
   youtube: string;
 };
 
-export type Gender = "MEN" | "WOMEN" | "UNISEX";
+export type Gender = "Men" | "Women" | "Unisex";
 
 export type ItemUploadType = {
   name: string;
@@ -35,6 +35,7 @@ export type ItemUploadType = {
   description: string;
   images: File[];
   gender: Gender;
+  category: string;
 };
 
 export type Item = {
@@ -49,6 +50,8 @@ export type Item = {
   gender: Gender;
   favorited: number;
   inFits: string[];
+  category: string;
+  uploadDate: string;
 };
 
 export type FitUploadType = {
@@ -73,4 +76,5 @@ export type Fit = {
   annotations: any;
   gender: Gender;
   favorited: number;
+  uploadDate: string;
 };

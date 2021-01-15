@@ -31,9 +31,11 @@ export default function ItemView({ loggedIn }: Props) {
     description: "",
     imgs: [],
     uploader: "",
-    gender: "UNISEX",
+    gender: "Unisex",
     favorited: 0,
     inFits: [],
+    category: "",
+    uploadDate: "",
   });
   const [galleryImgs, setGalleryImgs] = useState<any>([]);
   const [loading, setLoading] = useState(true);
@@ -158,13 +160,16 @@ export default function ItemView({ loggedIn }: Props) {
             <Grid item xs={12}>
               <Card variant="outlined">
                 <CardContent>
+                <Typography variant="body2">{item.gender} {'|'} {item.category}</Typography>
                   <Typography>Brand: {item.brand}</Typography>
+                  
                   <Typography variant="h5">
                     <b>{item.name}</b>
                   </Typography>
                   <Typography variant="h3">${item.price}</Typography>
                   <Typography>Uploaded by:</Typography>
                   <AvatarUsername username={item.uploader} />
+                  <Typography style={{color: "gray"}}>{item.uploadDate}</Typography>
                 </CardContent>
               </Card>
             </Grid>

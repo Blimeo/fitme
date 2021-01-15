@@ -32,8 +32,9 @@ export default function ItemView({ loggedIn }: Props) {
     items: [],
     uploader: "",
     annotations: [],
-    gender: "UNISEX",
+    gender: "Unisex",
     favorited: 0,
+    uploadDate: "",
   });
 
   useTitle(() =>
@@ -131,12 +132,20 @@ export default function ItemView({ loggedIn }: Props) {
                 <b>Uploaded by:</b>
               </Typography>
               <AvatarUsername username={fit.uploader} />
+              <Typography style={{ color: "gray" }}>
+                {fit.uploadDate}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card className={styles.itemDesc} variant="outlined">
+            <CardContent>
               <Typography>
                 <b>Fit Description</b>
               </Typography>
               <Typography>{fit.description}</Typography>
             </CardContent>
           </Card>
+
           <Card className={styles.itemDesc} variant="outlined">
             <CardContent>
               <Typography>
@@ -186,36 +195,7 @@ export default function ItemView({ loggedIn }: Props) {
             })}
           </Grid>
         </Grid>
-        <Grid item xs={6}>
-          {loggedIn && (
-            <>
-              <Grid container direction="column" spacing={1}>
-                {fit.annotations.map((anno: any, index: number) => (
-                  <Grid item xs={12}>
-                    <Link
-                      to={"/item/" + fit.items[index]._id}
-                      style={{ textDecoration: "none" }}
-                    >
-                      <Card
-                        style={{ padding: "6px" }}
-                        onMouseOver={() => setActiveAnnotations([anno])}
-                        onMouseOut={() => setActiveAnnotations([])}
-                        key={index}
-                      >
-                        <div style={{ color: "gray" }}>
-                          <Typography>Item</Typography>
-                        </div>
-                        <Typography>
-                          <b>{anno.data.text}</b>
-                        </Typography>
-                      </Card>
-                    </Link>
-                  </Grid>
-                ))}
-              </Grid>
-            </>
-          )}
-        </Grid>
+
         <Grid item xs={6}>
           {loggedIn && (
             <Card className={styles.itemActionPane} variant="outlined">

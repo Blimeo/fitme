@@ -15,6 +15,7 @@ import imghdr
 import random
 from OutfitMLModel import OutfitMLModel
 from PIL import Image
+from datetime import datetime
 
 load_dotenv(find_dotenv())
 app = Flask(__name__)
@@ -209,6 +210,7 @@ def submit_item():
         {"email": identity})['username']
     data["favorited"] = 0
     data["inFits"] = []
+    data["uploadDate"] = datetime.today().strftime('%Y-%m-%d')
     _id = items_collection.insert_one(data)
     _id = _id.inserted_id
     users_collection.update({"email": identity}, {"$push": {"uploaded_items": _id }})
@@ -253,7 +255,7 @@ def get_fit(fit_id):
     return jsonify(error="false", fit=fit)
 
 def is_gender(text):
-    return text == "MEN" or text == "WOMEN" or text == "UNISEX"
+    return text == "Men" or text == "Women" or text == "Unisex"
 
 @app.route("/get_fits", methods=["POST"])
 def get_fits():
@@ -278,6 +280,7 @@ def upload_fit():
     data = dict(request.form)
     fit = json.loads(data["data"])
     annotations = json.loads(data["annotations"])
+    print(fit, annotations)
     if (fit["name"] == "" or fit["img_url"] == "" or not is_gender(fit["gender"])):
         return jsonify(error="Bad fit metadata")
     for anno in annotations: 
@@ -292,10 +295,10 @@ def upload_fit():
     fit["uploader"] = users_collection.find_one(
         {"email": identity})['username']
     fit["favorited"] = 0
+    fit["uploadDate"] = datetime.today().strftime('%Y-%m-%d')
     fit_id = fits_collection.insert_one(fit)
-    users_collection.update({"email": identity}, {"$push": {"uploaded_fits": fit_id }})
-    #TODO: update item objects that are included in this fit
     fit_id = str(fit_id.inserted_id)
+    users_collection.update({"email": identity}, {"$push": {"uploaded_fits": fit_id }}) 
     for item in items:
         item_id = item['_id']
         items_collection.update_one({"_id": item_id}, {"$addToSet": {"inFits": fit_id}})
@@ -366,21 +369,28 @@ def comma_separated_params_to_list(param):
             result.append(val)
     return result
 
-def get_filter_from_request(request):
+def get_gender_from_request(request):
     request_data = {}
-    params = request.args.getlist("filter") or request.form.getlist("filter")
+    params = request.args.getlist("gender") or request.form.getlist("gender")
     if len(params) == 1 and ',' in params[0]:
-        request_data["filter"] = comma_separated_params_to_list(params[0])
+        request_data["gender"] = comma_separated_params_to_list(params[0])
     else:
-        request_data["filter"] = params
-    return request_data["filter"]
+        request_data["gender"] = params
+    return request_data["gender"]
 
 @app.route("/discover_items", methods=["GET"])
 def discover_items():
-    condition = []
-    for filter in get_filter_from_request(request):
-        condition.append({"gender": filter })
-    docs = list(items_collection.find({"$or": condition}))
+    gender_condition = []
+    # Gender filtering
+    for filter in get_gender_from_request(request):
+        gender_condition.append({"gender": filter })
+    conditions = [{"$or" : gender_condition}]
+    #Category filtering
+    category = request.args.get("category")
+    if category != "any":
+        conditions.append({"category" : category})
+    print(category)
+    docs = list(items_collection.find({"$and": conditions}))
     random.shuffle(docs)
     for item in docs:
         item['_id'] = str(item['_id'])
@@ -389,7 +399,7 @@ def discover_items():
 @app.route("/discover_fits", methods=["GET"])
 def discover_fits():
     condition = []
-    for filter in get_filter_from_request(request):
+    for filter in get_gender_from_request(request):
         condition.append({"gender": filter })
     docs = list(fits_collection.find({"$or": condition}))
     random.shuffle(docs)
@@ -406,10 +416,16 @@ def recommended_items():
     if identity:
         # TODO: custom recommendations
         pass
-    condition = []
-    for filter in get_filter_from_request(request):
-        condition.append({"gender": filter })
-    docs = list(items_collection.find({"$or": condition}))
+    gender_condition = []
+    # Gender filtering
+    for filter in get_gender_from_request(request):
+        gender_condition.append({"gender": filter })
+    conditions = [{"$or" : gender_condition}]
+    #Category filtering
+    category = request.args.get("category")
+    if category != "any":
+        conditions.append({"category" : category})
+    docs = list(items_collection.find({"$and": conditions}))
     random.shuffle(docs)
     for item in docs:
         item['_id'] = str(item['_id'])
@@ -423,7 +439,7 @@ def recommended_fits():
         # TODO: custom recommendations
         pass
     condition = []
-    for filter in get_filter_from_request(request):
+    for filter in get_gender_from_request(request):
         condition.append({"gender": filter})
     docs = list(fits_collection.find({"$or": condition}))
     random.shuffle(docs)

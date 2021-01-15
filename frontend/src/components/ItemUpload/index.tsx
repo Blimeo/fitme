@@ -13,8 +13,9 @@ import React, { useState } from "react";
 import ChipInput from "material-ui-chip-input";
 import { DropzoneArea } from "material-ui-dropzone";
 import styles from "./index.module.css";
-import { ItemUploadType } from "../../util/util-types";
+import { Gender, ItemUploadType } from "../../util/util-types";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
+import GenderToggleButtons from "../Util/GenderToggleButtons";
 
 type Props = {
   readonly setUploadHidden: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,9 +33,13 @@ export default function ItemUpload({ setUploadHidden }: Props) {
     tags: [],
     description: "",
     images: [],
+    gender: "UNISEX",
   });
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const handleGender = (_: React.MouseEvent<HTMLElement>, gender: Gender) => {
+    setValues({ ...values, gender });
+  };
   const handleChange = (prop: keyof ItemUploadType) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => setValues({ ...values, [prop]: event.target.value });
@@ -171,13 +176,25 @@ export default function ItemUpload({ setUploadHidden }: Props) {
                 maxFileSize={5000000}
               />
             </div>
-            {isSubmitting ? (
-              <CircularProgress />
-            ) : (
-              <Button style={{ marginTop: 8 }} variant="outlined" type="submit">
-                Submit
-              </Button>
-            )}
+            <Grid item xs={12} md={8}>
+              <GenderToggleButtons
+                value={values.gender}
+                onChange={handleGender}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              {isSubmitting ? (
+                <CircularProgress />
+              ) : (
+                <Button
+                  className={styles.SubmitButton}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Submit
+                </Button>
+              )}
+            </Grid>
           </form>
         </CardContent>
       </Card>

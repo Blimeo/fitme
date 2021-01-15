@@ -1,4 +1,8 @@
-.TagInput{
-    margin-top: 7px;
-    margin-bottom: 7px;
+.TagInput {
+  margin-top: 7px;
+  margin-bottom: 7px;
+}
+
+.SubmitButton {
+  margin-top: 8px !important;
 }

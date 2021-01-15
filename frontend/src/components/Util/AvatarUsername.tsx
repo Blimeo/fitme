@@ -3,6 +3,7 @@ import React, { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { User } from "../../util/util-types";
 import styles from "./AvatarUsername.module.css";
+import DefaultProfileImage from "../../assets/img/default_avatar.png";
 
 type Props = {
   readonly username: string;
@@ -32,7 +33,13 @@ const AvatarUsername = ({ username }: Props): ReactElement => {
   } else {
     return (
       <div className={styles.Container}>
-        <Avatar src={avatarUrl} />
+        <Avatar
+          src={
+            avatarUrl === "DEFAULT_PROFILE_IMAGE"
+              ? DefaultProfileImage
+              : avatarUrl
+          }
+        />
         <Link to={`/user/${username}`} className={styles.Link}>
           <Typography className={styles.Text}>{username}</Typography>
         </Link>
@@ -40,5 +47,4 @@ const AvatarUsername = ({ username }: Props): ReactElement => {
     );
   }
 };
-
 export default AvatarUsername;

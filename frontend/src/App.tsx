@@ -12,8 +12,10 @@ import Header from "./components/Header";
 import { createMuiTheme, CssBaseline, ThemeProvider } from "@material-ui/core";
 import NotFound from "./components/Error/NotFound";
 import Footer from "./components/Footer";
+import { useHistory } from "react-router-dom";
 
 export default function App() {
+  const history = useHistory();
   const theme = createMuiTheme({
     typography: {
       fontFamily: [
@@ -33,12 +35,14 @@ export default function App() {
         headers: {
           Authorization: `Bearer ${access_token}`,
         },
-      }).then((response) => setLoggedIn(response.ok));
+      })
+        .then((response) => setLoggedIn(response.ok))
+        .catch(() => history.push("/"));
     } else {
       setLoggedIn(false);
     }
     console.log("Logged in: " + loggedIn);
-  }, [loggedIn]);
+  }, [loggedIn, history]);
   return (
     <div>
       <BrowserRouter>

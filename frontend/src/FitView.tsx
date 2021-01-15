@@ -13,6 +13,7 @@ import { Fit } from "./util/util-types";
 import styles from "./css/FitView.module.css";
 import Annotation from "react-image-annotation";
 import AvatarUsername from "./components/Util/AvatarUsername";
+import { useTitle } from "./util/util-functions";
 type Props = {
   readonly loggedIn: boolean;
 };
@@ -31,8 +32,13 @@ export default function ItemView({ loggedIn }: Props) {
     items: [],
     uploader: "",
     annotations: [],
+    gender: "UNISEX",
     favorited: 0,
   });
+
+  useTitle(() =>
+    loading ? "fitme | Loading Fit" : `fitme | ${fit.name} by ${fit.uploader}`
+  );
 
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -78,7 +84,7 @@ export default function ItemView({ loggedIn }: Props) {
           Authorization: `Bearer ${access_token}`,
         },
       });
-      setFit({...fit, favorited: fit.favorited+1});
+      setFit({ ...fit, favorited: fit.favorited + 1 });
       setFavorited(true);
     }
   };
@@ -92,68 +98,99 @@ export default function ItemView({ loggedIn }: Props) {
           Authorization: `Bearer ${access_token}`,
         },
       });
-      setFit({...fit, favorited: fit.favorited-1});
+      setFit({ ...fit, favorited: fit.favorited - 1 });
       setFavorited(false);
     }
   };
+  if (loading) {
+    return <LinearProgress />;
+  }
+
   return (
     <Container className={styles.container} maxWidth="md">
-      {loading && <LinearProgress />}
-      {!loading && (
-        <Grid container spacing={1}>
-          <Grid item style={{ textAlign: "center" }} xs={12}>
-            <Typography variant="h4">{fit.name}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Annotation
-              src={fit.img_url}
-              annotations={fit.annotations}
-              value={dummyAnno}
-              activeAnnotations={activeAnnotations}
-              disableSelector
-              disableEditor
-              disableOverlay
-              allowTouch
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <Card className={styles.itemDesc} variant="outlined">
-              <CardContent>
-                <Typography>
-                  <b>Uploaded by:</b>
-                </Typography>
-                <AvatarUsername username={fit.uploader} />
-                <Typography>
-                  <b>Fit Description</b>
-                </Typography>
-                <Typography>{fit.description}</Typography>
-              </CardContent>
-            </Card>
-            <Card className={styles.itemDesc} variant="outlined">
-              <CardContent>
-                <Typography>
-                  <b>Tags</b>
-                </Typography>
-                <Typography>
-                  {fit.tags.map((tag) => (
-                    <Button
-                      className={styles.tagButton}
-                      style={{
-                        margin: "5px",
-                        backgroundColor: "#545454",
-                        color: "white",
-                      }}
-                      variant="contained"
+      <Grid container spacing={1}>
+        <Grid item style={{ textAlign: "center" }} xs={12}>
+          <Typography variant="h4">{fit.name}</Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <Annotation
+            src={fit.img_url}
+            annotations={fit.annotations}
+            value={dummyAnno}
+            activeAnnotations={activeAnnotations}
+            disableSelector
+            disableEditor
+            disableOverlay
+            allowTouch
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <Card className={styles.itemDesc} variant="outlined">
+            <CardContent>
+              <Typography>
+                <b>Uploaded by:</b>
+              </Typography>
+              <AvatarUsername username={fit.uploader} />
+              <Typography>
+                <b>Fit Description</b>
+              </Typography>
+              <Typography>{fit.description}</Typography>
+            </CardContent>
+          </Card>
+          <Card className={styles.itemDesc} variant="outlined">
+            <CardContent>
+              <Typography>
+                <b>Tags</b>
+              </Typography>
+              <Typography>
+                {fit.tags.map((tag) => (
+                  <Button
+                    className={styles.tagButton}
+                    style={{
+                      margin: "5px",
+                      backgroundColor: "#545454",
+                      color: "white",
+                    }}
+                    variant="contained"
+                  >
+                    {tag}
+                  </Button>
+                ))}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Grid container direction="column" spacing={1}>
+            {fit.annotations.map((anno: any, index: number) => {
+              return (
+                <Grid item xs={12}>
+                  <Link
+                    to={"/item/" + fit.items[index]._id}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Card
+                      style={{ padding: "6px" }}
+                      onMouseOver={() => setActiveAnnotations([anno])}
+                      onMouseOut={() => setActiveAnnotations([])}
+                      key={index}
                     >
-                      {tag}
-                    </Button>
-                  ))}
-                </Typography>
-              </CardContent>
-            </Card>
-            <Grid container direction="column" spacing={1}>
-              {fit.annotations.map((anno: any, index: number) => {
-                return (
+                      <div style={{ color: "gray" }}>
+                        <Typography>Item</Typography>
+                      </div>
+                      <Typography>
+                        <b>{anno.data.text}</b>
+                      </Typography>
+                    </Card>
+                  </Link>
+                </Grid>
+              );
+            })}
+          </Grid>
+        </Grid>
+        <Grid item xs={6}>
+          {loggedIn && (
+            <>
+              <Grid container direction="column" spacing={1}>
+                {fit.annotations.map((anno: any, index: number) => (
                   <Grid item xs={12}>
                     <Link
                       to={"/item/" + fit.items[index]._id}
@@ -174,35 +211,36 @@ export default function ItemView({ loggedIn }: Props) {
                       </Card>
                     </Link>
                   </Grid>
-                );
-              })}
-            </Grid>
-          </Grid>
-          <Grid item xs={6}>
-            {loggedIn && (
-              <Card className={styles.itemActionPane} variant="outlined">
-                <CardContent>
-                  <Typography>❤️ {fit.favorited}</Typography>
-                  {favorited ? (
-                    <Button variant="contained" onClick={handleUnfavorite}>
-                      Unfavorite
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={handleFavorite}
-                    >
-                      Favorite
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </Grid>
-          <Grid item xs={6}></Grid>
+                ))}
+              </Grid>
+            </>
+          )}
         </Grid>
-      )}
+        <Grid item xs={6}>
+          {loggedIn && (
+            <Card className={styles.itemActionPane} variant="outlined">
+              <CardContent>
+                <Typography>❤️ {fit.favorited}</Typography>
+                {favorited ? (
+                  <Button variant="contained" onClick={handleUnfavorite}>
+                    Unfavorite
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleFavorite}
+                  >
+                    Favorite
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </Grid>
+        <Grid item xs={6}></Grid>
+      </Grid>
+      <Grid item xs={6}></Grid>
     </Container>
   );
 }

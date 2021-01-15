@@ -31,6 +31,7 @@ export default function ItemView({ loggedIn }: Props) {
     description: "",
     imgs: [],
     uploader: "",
+    gender: "UNISEX",
     favorited: 0,
     inFits: [],
   });
@@ -125,7 +126,6 @@ export default function ItemView({ loggedIn }: Props) {
   };
   if (loading) {
     return <LinearProgress />;
-  } else {
   }
   return (
     <Container className={styles.container} maxWidth="md">

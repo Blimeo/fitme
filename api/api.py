@@ -120,7 +120,6 @@ def update_profile():
     del body["is_updating_avatar"]
     # Bulk update user's items and fits if they change their username
     if body["username"] is not user_data["username"]:
-        print("yes")
         # Bulk update items
         bulk = db["items"].initialize_unordered_bulk_op()
         counter = 0
@@ -208,7 +207,8 @@ def submit_item():
     data["imgs"] = item_imgs
     data["uploader"] = users_collection.find_one(
         {"email": identity})['username']
-    data["favorited"] = []
+    data["favorited"] = 0
+    data["inFits"] = []
     _id = items_collection.insert_one(data)
     _id = _id.inserted_id
     users_collection.update({"email": identity}, {"$push": {"uploaded_items": _id }})
@@ -252,7 +252,10 @@ def get_fit(fit_id):
         item['_id'] = str(item['_id'])
     return jsonify(error="false", fit=fit)
 
-@ app.route("/get_fits", methods=["POST"])
+def is_gender(text):
+    return text == "MEN" or text == "WOMEN" or text == "UNISEX"
+
+@app.route("/get_fits", methods=["POST"])
 def get_fits():
     fit_ids = request.get_json(force=True)
     fits = []
@@ -275,6 +278,12 @@ def upload_fit():
     data = dict(request.form)
     fit = json.loads(data["data"])
     annotations = json.loads(data["annotations"])
+    if (fit["name"] == "" or fit["img_url"] == "" or not is_gender(fit["gender"])):
+        return jsonify(error="Bad fit metadata")
+    for anno in annotations: 
+        _data = anno["data"]
+        if (_data["text"] == "Label this fit item!"):
+            return jsonify(error="Unannotated item")
     del fit['itemBoxes'], fit['width'], fit['height']
     item_names = [item['data']['text'] for item in annotations]
     items = [items_collection.find_one({"name" : name}) for name in item_names]
@@ -282,8 +291,9 @@ def upload_fit():
     fit["annotations"] = annotations
     fit["uploader"] = users_collection.find_one(
         {"email": identity})['username']
-    fit["favorited"] = []
+    fit["favorited"] = 0
     fit_id = fits_collection.insert_one(fit)
+    users_collection.update({"email": identity}, {"$push": {"uploaded_fits": fit_id }})
     #TODO: update item objects that are included in this fit
     fit_id = str(fit_id.inserted_id)
     for item in items:
@@ -349,9 +359,28 @@ def unfavorite_fit(fit_id):
     fits_collection.update({"_id": ObjectId(fit_id)}, {"$inc": {"favorited": -1 }})
     return jsonify(ok=True)
 
+def comma_separated_params_to_list(param):
+    result = []
+    for val in param.split(','):
+        if val:
+            result.append(val)
+    return result
+
+def get_filter_from_request(request):
+    request_data = {}
+    params = request.args.getlist("filter") or request.form.getlist("filter")
+    if len(params) == 1 and ',' in params[0]:
+        request_data["filter"] = comma_separated_params_to_list(params[0])
+    else:
+        request_data["filter"] = params
+    return request_data["filter"]
+
 @app.route("/discover_items", methods=["GET"])
 def discover_items():
-    docs = list(items_collection.find({}))
+    condition = []
+    for filter in get_filter_from_request(request):
+        condition.append({"gender": filter })
+    docs = list(items_collection.find({"$or": condition}))
     random.shuffle(docs)
     for item in docs:
         item['_id'] = str(item['_id'])
@@ -359,7 +388,10 @@ def discover_items():
 
 @app.route("/discover_fits", methods=["GET"])
 def discover_fits():
-    docs = list(fits_collection.find({}))
+    condition = []
+    for filter in get_filter_from_request(request):
+        condition.append({"gender": filter })
+    docs = list(fits_collection.find({"$or": condition}))
     random.shuffle(docs)
     for fit in docs:
         fit['_id'] = str(fit['_id'])
@@ -374,7 +406,10 @@ def recommended_items():
     if identity:
         # TODO: custom recommendations
         pass
-    docs = list(items_collection.find({}))
+    condition = []
+    for filter in get_filter_from_request(request):
+        condition.append({"gender": filter })
+    docs = list(items_collection.find({"$or": condition}))
     random.shuffle(docs)
     for item in docs:
         item['_id'] = str(item['_id'])
@@ -387,7 +422,10 @@ def recommended_fits():
     if identity:
         # TODO: custom recommendations
         pass
-    docs = list(fits_collection.find({}))
+    condition = []
+    for filter in get_filter_from_request(request):
+        condition.append({"gender": filter})
+    docs = list(fits_collection.find({"$or": condition}))
     random.shuffle(docs)
     for fit in docs:
         fit['_id'] = str(fit['_id'])

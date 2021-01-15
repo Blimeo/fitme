@@ -16,6 +16,8 @@ import styles from "./index.module.css";
 import { Gender, ItemUploadType } from "../../util/util-types";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import GenderToggleButtons from "../Util/GenderToggleButtons";
+import { Autocomplete } from "@material-ui/lab";
+import { clothingTypes } from "../../util/data";
 
 type Props = {
   readonly setUploadHidden: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,7 +35,8 @@ export default function ItemUpload({ setUploadHidden }: Props) {
     tags: [],
     description: "",
     images: [],
-    gender: "UNISEX",
+    gender: "Unisex",
+    category: "",
   });
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -91,7 +94,7 @@ export default function ItemUpload({ setUploadHidden }: Props) {
             <Typography gutterBottom variant="h5" component="h2">
               Showcase an item
             </Typography>
-            <Grid container spacing={3}>
+            <Grid container spacing={1}>
               <Grid item xs={12}>
                 <TextField
                   autoFocus
@@ -120,6 +123,7 @@ export default function ItemUpload({ setUploadHidden }: Props) {
                   required
                 />
               </Grid>
+
               <Grid item xs={12} sm={4}>
                 <TextField
                   margin="dense"
@@ -139,29 +143,49 @@ export default function ItemUpload({ setUploadHidden }: Props) {
                   required
                 />
               </Grid>
+              <Grid item xs={12} sm={4}>
+                <Autocomplete
+                  id="category-select"
+                  options={clothingTypes}
+                  onChange={(_, val) => {setValues({...values, category: val as string})}}
+                  getOptionLabel={(option: string) => option}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Category"
+                      variant="outlined"
+                      value={values.category}
+                      required
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <ChipInput
+                  className={styles.TagInput}
+                  label="Tags"
+                  onChange={(tags) => setValues({ ...values, tags })}
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="standard-multiline-flexible"
+                  label="Description (<500 characters)"
+                  multiline
+                  fullWidth
+                  style={{ marginTop: 8 }}
+                  rows={5}
+                  variant="outlined"
+                  inputProps={{ maxLength: 500 }}
+                  value={values.description}
+                  error={values.description.length >= 500}
+                  onChange={handleChange("description")}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <ChipInput
-                className={styles.TagInput}
-                label="Tags"
-                onChange={(tags) => setValues({ ...values, tags })}
-                variant="outlined"
-                fullWidth
-              />
-            </Grid>
-            <TextField
-              id="standard-multiline-flexible"
-              label="Description (<500 characters)"
-              multiline
-              fullWidth
-              style={{ marginTop: 8 }}
-              rows={5}
-              variant="outlined"
-              inputProps={{ maxLength: 500 }}
-              value={values.description}
-              error={values.description.length >= 500}
-              onChange={handleChange("description")}
-            />
+
             <Typography>
               Add up to 10 images below. JPEG and PNG files accepted, max 5MB
               per image.

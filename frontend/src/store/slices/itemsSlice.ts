@@ -6,6 +6,7 @@ export type ItemsSliceState = {
   recommendedData: Item[];
   lastUpdated: number; // unix timestamp
   currentGenderFilter: Gender[];
+  currentCategoryFilter: string;
 };
 
 const defaultItem: Item = {
@@ -17,9 +18,11 @@ const defaultItem: Item = {
   description: "",
   uploader: "",
   imgs: [],
-  gender: "UNISEX",
+  gender: "Unisex",
   favorited: 0,
   inFits: [],
+  category: "",
+  uploadDate: "",
 };
 
 export const itemsSlice = createSlice({
@@ -28,7 +31,8 @@ export const itemsSlice = createSlice({
     discoverData: [defaultItem],
     recommendedData: [defaultItem],
     lastUpdated: new Date().getTime(),
-    currentGenderFilter: ["MEN", "WOMEN", "UNISEX"],
+    currentGenderFilter: ["Men", "Women", "Unisex"],
+    currentCategoryFilter: "any",
   } as ItemsSliceState,
   reducers: {
     patchDiscover: (state, { payload }: PayloadAction<Item[]>) => {
@@ -43,6 +47,10 @@ export const itemsSlice = createSlice({
       state.currentGenderFilter = payload;
       state.lastUpdated = new Date().getTime();
     },
+    patchCategoryFilter: (state, { payload }: PayloadAction<string>) => {
+      state.currentCategoryFilter = payload;
+      state.lastUpdated = new Date().getTime();
+    },
   },
 });
 
@@ -50,6 +58,7 @@ export const {
   patchDiscover,
   patchRecommended,
   patchGenderFilter,
+  patchCategoryFilter
 } = itemsSlice.actions;
 
 export default itemsSlice.reducer;

@@ -17,8 +17,9 @@ const defaultFit: Fit = {
   items: [],
   uploader: "",
   annotations: [],
-  gender: "UNISEX",
+  gender: "Unisex",
   favorited: 0,
+  uploadDate: ""
 };
 
 export const fitsSlice = createSlice({
@@ -27,7 +28,7 @@ export const fitsSlice = createSlice({
     discoverData: [defaultFit],
     recommendedData: [defaultFit],
     lastUpdated: new Date().getTime(),
-    currentGenderFilter: ["MEN", "WOMEN", "UNISEX"],
+    currentGenderFilter: ["Men", "Women", "Unisex"],
   } as FitsSliceState,
   reducers: {
     patchDiscover: (state, action: PayloadAction<Fit[]>) => {

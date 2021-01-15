@@ -31,7 +31,7 @@ export default function FitUpload() {
     itemBoxes: [],
     width: 0,
     height: 0,
-    gender: "UNISEX",
+    gender: "Unisex",
   });
   const [img, setImg] = useState<File[]>([]); //it's only a single image but the dropzone library requires an array of files
   const [view, setView] = useState<View>("AWAITING_IMAGE");

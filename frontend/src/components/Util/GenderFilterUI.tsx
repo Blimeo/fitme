@@ -35,13 +35,13 @@ const GenderFilterUI = ({
       onChange={handleGenderFilter}
       aria-label="Filter by gender"
     >
-      <ToggleButton value="MEN">
+      <ToggleButton value="Men">
         <Typography>MEN</Typography>
       </ToggleButton>
-      <ToggleButton value="WOMEN">
+      <ToggleButton value="Women">
         <Typography>WOMEN</Typography>
       </ToggleButton>
-      <ToggleButton value="UNISEX">
+      <ToggleButton value="Unisex">
         <Typography>UNISEX</Typography>
       </ToggleButton>
     </StyledToggleButtonGroup>

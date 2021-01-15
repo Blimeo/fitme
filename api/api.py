@@ -207,6 +207,8 @@ def submit_item():
     data["imgs"] = item_imgs
     data["uploader"] = users_collection.find_one(
         {"email": identity})['username']
+    data["favorited"] = []
+    data["inFits"] = []
     _id = items_collection.insert_one(data)
     _id = _id.inserted_id
     users_collection.update({"email": identity}, {"$push": {"uploaded_items": _id }})
@@ -253,6 +255,22 @@ def get_fit(fit_id):
 def is_gender(text):
     return text == "MEN" or text == "WOMEN" or text == "UNISEX"
 
+@app.route("/get_fits", methods=["POST"])
+def get_fits():
+    fit_ids = request.get_json(force=True)
+    fits = []
+    for fit_id in fit_ids:
+        if not bson.objectid.ObjectId.is_valid(fit_id):
+            return jsonify(error="true")
+        fit = fits_collection.find_one({'_id': ObjectId(fit_id)})
+        if not fit:
+            return jsonify(error="true")
+        fit['_id'] = str(fit['_id'])
+        for item in fit['items']:
+            item['_id'] = str(item['_id'])
+        fits.append(fit)
+    return jsonify(error="false", fits=fits)
+
 @app.route("/upload_fit", methods=["POST"])
 @jwt_required
 def upload_fit():
@@ -273,9 +291,72 @@ def upload_fit():
     fit["annotations"] = annotations
     fit["uploader"] = users_collection.find_one(
         {"email": identity})['username']
-    _id = fits_collection.insert_one(fit)
-    users_collection.update({"email": identity}, {"$push": {"uploaded_fits": _id }})
+    fit["favorited"] = []
+    fit_id = fits_collection.insert_one(fit)
+    users_collection.update({"email": identity}, {"$push": {"uploaded_fits": fit_id }})
     #TODO: update item objects that are included in this fit
+    fit_id = str(fit_id.inserted_id)
+    for item in items:
+        item_id = item['_id']
+        items_collection.update_one({"_id": item_id}, {"$addToSet": {"inFits": fit_id}})
+    return jsonify(ok=True)
+
+@app.route("/favorite_item/<item_id>", methods=["PUT"])
+@jwt_required
+def favorite_item(item_id):
+    identity = get_jwt_identity()
+    username = users_collection.find_one(
+        {"email": identity})['username']
+    users_collection.update({"email": identity}, {"$push": {"favorite_items": item_id }})
+    items_collection.update({"_id": ObjectId(item_id)}, {"$inc": {"favorited": 1 }})
+    return jsonify(ok=True)
+
+@app.route("/item_favorite_status/<item_id>", methods=["GET"])
+@jwt_required
+def item_favorite_status(item_id):
+    identity = get_jwt_identity()
+    favorite_items = users_collection.find_one(
+        {"email": identity})['favorite_items']
+    found = item_id in favorite_items
+    return jsonify(found=found)
+
+@app.route("/unfavorite_item/<item_id>", methods=["PUT"])
+@jwt_required
+def unfavorite_item(item_id):
+    identity = get_jwt_identity()
+    username = users_collection.find_one(
+        {"email": identity})['username']
+    users_collection.update({"email": identity}, {"$pull": {"favorite_items": item_id }})
+    items_collection.update({"_id": ObjectId(item_id)}, {"$inc": {"favorited": -1 }})
+    return jsonify(ok=True)
+
+@app.route("/fit_favorite_status/<fit_id>", methods=["GET"])
+@jwt_required
+def fit_favorite_status(fit_id):
+    identity = get_jwt_identity()
+    favorite_fits = users_collection.find_one(
+        {"email": identity})['favorite_fits']
+    found = fit_id in favorite_fits
+    return jsonify(found=found)
+
+@app.route("/favorite_fit/<fit_id>", methods=["PUT"])
+@jwt_required
+def favorite_fit(fit_id):
+    identity = get_jwt_identity()
+    username = users_collection.find_one(
+        {"email": identity})['username']
+    users_collection.update({"email": identity}, {"$push": {"favorite_fits": fit_id }})
+    fits_collection.update({"_id": ObjectId(fit_id)}, {"$inc": {"favorited": 1 }})
+    return jsonify(ok=True)
+
+@app.route("/unfavorite_fit/<fit_id>", methods=["PUT"])
+@jwt_required
+def unfavorite_fit(fit_id):
+    identity = get_jwt_identity()
+    username = users_collection.find_one(
+        {"email": identity})['username']
+    users_collection.update({"email": identity}, {"$pull": {"favorite_fits": fit_id }})
+    fits_collection.update({"_id": ObjectId(fit_id)}, {"$inc": {"favorited": -1 }})
     return jsonify(ok=True)
 
 def comma_separated_params_to_list(param):
@@ -364,7 +445,6 @@ def item_names():
 def item_search(query):
     docs = list(items_collection.find({'name':
                                     {'$regex': query, '$options': 'i'}}, projection=['name']))
-    print(docs)
     for item in docs:
         item['_id'] = str(item['_id'])
     return jsonify(items=docs)

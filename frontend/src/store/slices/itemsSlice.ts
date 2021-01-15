@@ -18,6 +18,8 @@ const defaultItem: Item = {
   uploader: "",
   imgs: [],
   gender: "UNISEX",
+  favorited: 0,
+  inFits: [],
 };
 
 export const itemsSlice = createSlice({

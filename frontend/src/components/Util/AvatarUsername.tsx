@@ -21,7 +21,7 @@ const AvatarUsername = ({ username }: Props): ReactElement => {
           setAvatarUrl(user.avatar);
         }
       });
-  });
+  }, [username]);
   if (avatarUrl === "") {
     return (
       <>

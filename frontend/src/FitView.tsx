@@ -33,6 +33,7 @@ export default function ItemView({ loggedIn }: Props) {
     uploader: "",
     annotations: [],
     gender: "UNISEX",
+    favorited: 0,
   });
 
   useTitle(() =>
@@ -55,9 +56,56 @@ export default function ItemView({ loggedIn }: Props) {
       });
   }, [fit_id, history]);
 
+  const [favorited, setFavorited] = useState(false);
+  useEffect(() => {
+    if (loggedIn) {
+      const access_token = localStorage.getItem("access_token");
+      if (access_token !== null) {
+        fetch("/fit_favorite_status/" + fit_id, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        })
+          .then((r) => r.json())
+          .then((response) => {
+            setFavorited(response.found);
+          });
+      }
+    }
+  }, [loggedIn]);
+
+  const handleFavorite = () => {
+    const access_token = localStorage.getItem("access_token");
+    if (access_token !== null) {
+      fetch("/favorite_fit/" + fit_id, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+      setFit({ ...fit, favorited: fit.favorited + 1 });
+      setFavorited(true);
+    }
+  };
+
+  const handleUnfavorite = () => {
+    const access_token = localStorage.getItem("access_token");
+    if (access_token !== null) {
+      fetch("/unfavorite_fit/" + fit_id, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+      setFit({ ...fit, favorited: fit.favorited - 1 });
+      setFavorited(false);
+    }
+  };
   if (loading) {
     return <LinearProgress />;
   }
+
   return (
     <Container className={styles.container} maxWidth="md">
       <Grid container spacing={1}>
@@ -140,17 +188,59 @@ export default function ItemView({ loggedIn }: Props) {
         </Grid>
         <Grid item xs={6}>
           {loggedIn && (
+            <>
+              <Grid container direction="column" spacing={1}>
+                {fit.annotations.map((anno: any, index: number) => (
+                  <Grid item xs={12}>
+                    <Link
+                      to={"/item/" + fit.items[index]._id}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <Card
+                        style={{ padding: "6px" }}
+                        onMouseOver={() => setActiveAnnotations([anno])}
+                        onMouseOut={() => setActiveAnnotations([])}
+                        key={index}
+                      >
+                        <div style={{ color: "gray" }}>
+                          <Typography>Item</Typography>
+                        </div>
+                        <Typography>
+                          <b>{anno.data.text}</b>
+                        </Typography>
+                      </Card>
+                    </Link>
+                  </Grid>
+                ))}
+              </Grid>
+            </>
+          )}
+        </Grid>
+        <Grid item xs={6}>
+          {loggedIn && (
             <Card className={styles.itemActionPane} variant="outlined">
               <CardContent>
-                <Button variant="contained" color="secondary">
-                  Favorite
-                </Button>
+                <Typography>❤️ {fit.favorited}</Typography>
+                {favorited ? (
+                  <Button variant="contained" onClick={handleUnfavorite}>
+                    Unfavorite
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleFavorite}
+                  >
+                    Favorite
+                  </Button>
+                )}
               </CardContent>
             </Card>
           )}
         </Grid>
         <Grid item xs={6}></Grid>
       </Grid>
+      <Grid item xs={6}></Grid>
     </Container>
   );
 }

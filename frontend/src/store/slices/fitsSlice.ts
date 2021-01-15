@@ -18,6 +18,7 @@ const defaultFit: Fit = {
   uploader: "",
   annotations: [],
   gender: "UNISEX",
+  favorited: 0,
 };
 
 export const fitsSlice = createSlice({

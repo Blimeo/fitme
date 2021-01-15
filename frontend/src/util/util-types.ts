@@ -47,6 +47,8 @@ export type Item = {
   imgs: string[];
   uploader: string;
   gender: Gender;
+  favorited: number;
+  inFits: string[];
 };
 
 export type FitUploadType = {
@@ -70,4 +72,5 @@ export type Fit = {
   uploader: string;
   annotations: any;
   gender: Gender;
+  favorited: number;
 };

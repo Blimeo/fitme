@@ -79,7 +79,7 @@ def login():
 
     account_data = users_collection.find_one({"email": email})
     if (account_data is not None) and bcrypt.check_password_hash(account_data["password"], password):
-        access_token = create_access_token(identity=email)
+        access_token = create_access_token(identity=email, expires_delta=False)
         return jsonify(message="Login Succeeded!", access_token=access_token), 201
     else:
         return jsonify(message="Bad Email or Password"), 401

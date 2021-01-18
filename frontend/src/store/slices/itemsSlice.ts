@@ -23,6 +23,7 @@ const defaultItem: Item = {
   inFits: [],
   category: "",
   uploadDate: "",
+  color: "",
 };
 
 export const itemsSlice = createSlice({

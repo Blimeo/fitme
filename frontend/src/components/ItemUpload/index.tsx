@@ -17,7 +17,7 @@ import { Gender, ItemUploadType } from "../../util/util-types";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import GenderToggleButtons from "../Util/GenderToggleButtons";
 import { Autocomplete } from "@material-ui/lab";
-import { clothingTypes } from "../../util/data";
+import { clothingTypes, colorMap } from "../../util/data";
 
 type Props = {
   readonly setUploadHidden: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,6 +37,7 @@ export default function ItemUpload({ setUploadHidden }: Props) {
     images: [],
     gender: "Unisex",
     category: "",
+    color: "",
   });
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -109,7 +110,7 @@ export default function ItemUpload({ setUploadHidden }: Props) {
                   required
                 />
               </Grid>
-              <Grid item xs={12} sm={8}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   margin="dense"
                   id="brand"
@@ -123,8 +124,43 @@ export default function ItemUpload({ setUploadHidden }: Props) {
                   required
                 />
               </Grid>
-
               <Grid item xs={12} sm={4}>
+                <Autocomplete
+                  id="color-select"
+                  options={Object.keys(colorMap)}
+                  onChange={(_, val: any) => {
+                    setValues({ ...values, color: val });
+                  }}
+                  getOptionLabel={(color: string) => color}
+                  renderOption={(color: string) => (
+                    <React.Fragment>
+                      <div
+                        style={{
+                          width: "10px",
+                          height: "10px",
+                          marginRight: "5px",
+                          border: "1px solid black",
+                          display: "inline-block",
+                          //@ts-ignore
+                          backgroundColor: colorMap[color],
+                        }}
+                      />
+                      {color}
+                    </React.Fragment>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      margin="dense"
+                      label="Color"
+                      variant="outlined"
+                      value={values.color}
+                      required
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={2}>
                 <TextField
                   margin="dense"
                   id="price"
@@ -147,7 +183,9 @@ export default function ItemUpload({ setUploadHidden }: Props) {
                 <Autocomplete
                   id="category-select"
                   options={clothingTypes}
-                  onChange={(_, val) => {setValues({...values, category: val as string})}}
+                  onChange={(_, val) => {
+                    setValues({ ...values, category: val as string });
+                  }}
                   getOptionLabel={(option: string) => option}
                   renderInput={(params) => (
                     <TextField

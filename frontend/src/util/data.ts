@@ -23,3 +23,8 @@ export const clothingTypes = [
   "Scarves",
   "Gloves",
 ];
+
+export const colorMap = {
+  "Black" : "#000000",
+  "White": "#ffffff",
+};

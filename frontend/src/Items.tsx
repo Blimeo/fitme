@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Card,
   CardContent,
+  Button,
 } from "@material-ui/core";
 import React, { ReactElement, useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
@@ -24,6 +25,7 @@ import {
   patchRecommended,
   patchGenderFilter,
   patchCategoryFilter,
+  patchPage,
 } from "./store/slices/itemsSlice";
 import { Dispatch } from "@reduxjs/toolkit";
 import { arraysSetEquality, useTitle } from "./util/util-functions";
@@ -47,6 +49,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
     lastUpdated,
     currentGenderFilter,
     currentCategoryFilter,
+    currentPage,
   } = items;
   const [genderFilter, setGenderFilter] = useState<Gender[]>(() => [
     "Men",
@@ -56,7 +59,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
 
   const [categoryFilter, setCategoryFilter] = useState("any");
   const [loading, setLoading] = useState(false);
-
+  const [page, setPage] = useState(1);
   const handleGenderFilter = (
     _: React.MouseEvent<HTMLElement>,
     genders: Gender[]
@@ -70,6 +73,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
     if (
       !arraysSetEquality(genderFilter, currentGenderFilter) ||
       categoryFilter !== currentCategoryFilter ||
+      page !== currentPage ||
       Date.now() - lastUpdated > 180000 ||
       (discoverData.length === 1 && discoverData[0]._id === "LOADING") ||
       (recommendedData.length === 1 && recommendedData[0]._id === "LOADING")
@@ -78,7 +82,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
       const access_token = localStorage.getItem("access_token");
       const accessTokenString = `Bearer ${access_token}`;
       fetch(
-        `/discover_items?gender=${genderFilter.toString()}&category=${categoryFilter}`,
+        `/discover_items?gender=${genderFilter.toString()}&category=${categoryFilter}&page=${page.toString()}`,
         {
           method: "GET",
         }
@@ -104,9 +108,10 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
         });
       dispatch(patchGenderFilter(genderFilter));
       dispatch(patchCategoryFilter(categoryFilter));
+      dispatch(patchPage(page));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [genderFilter, categoryFilter]);
+  }, [genderFilter, categoryFilter, page]);
 
   if (
     discoverData.length === 1 &&
@@ -160,16 +165,16 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
                       </Typography>
                     </Grid>
                     {categoryFilter !== "any" && (
-                    <Grid item xs={12}>
-                      <b
-                        style={{ cursor: "pointer", color: "gray" }}
-                        onClick={(e) => {
-                          setCategoryFilter("any");
-                        }}
-                      >
-                        <u>Clear filter</u>
-                      </b>
-                    </Grid>
+                      <Grid item xs={12}>
+                        <b
+                          style={{ cursor: "pointer", color: "gray" }}
+                          onClick={(e) => {
+                            setCategoryFilter("any");
+                          }}
+                        >
+                          <u>Clear filter</u>
+                        </b>
+                      </Grid>
                     )}
                     {clothingTypes.map((category) => {
                       return (
@@ -180,7 +185,8 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
                               setCategoryFilter(category);
                             }}
                           >
-                            {category === categoryFilter && '> '}{category}
+                            {category === categoryFilter && "> "}
+                            {category}
                           </b>
                         </Grid>
                       );
@@ -253,6 +259,33 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
               </div>
             </Grid>
           </Grid>
+          <div className={styles.pageNav}>
+            {page > 1 && (
+              <Button
+                variant="contained"
+                onClick={() => setPage(page - 1)}
+                className={styles.pageNavButton}
+              >
+                {page - 1}
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              className={styles.pageNavButton}
+              disabled
+            >
+              {page}
+            </Button>
+            {discoverData.length === 15 && (
+              <Button
+                variant="contained"
+                onClick={() => setPage(page + 1)}
+                className={styles.pageNavButton}
+              >
+                {page + 1}
+              </Button>
+            )}
+          </div>
         </Container>
       </>
     );

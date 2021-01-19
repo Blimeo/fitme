@@ -6,6 +6,7 @@ import {
   Grid,
   LinearProgress,
   CircularProgress,
+  Button,
 } from "@material-ui/core";
 
 import React, { ReactElement, useEffect, useState } from "react";
@@ -20,6 +21,7 @@ import {
   patchDiscover,
   patchGenderFilter,
   patchRecommended,
+  patchPage,
 } from "./store/slices/fitsSlice";
 import { Dispatch } from "@reduxjs/toolkit";
 import { arraysSetEquality, useTitle } from "./util/util-functions";
@@ -41,6 +43,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
     recommendedData,
     lastUpdated,
     currentGenderFilter,
+    currentPage,
   } = fits;
 
   useTitle("fitme | Fits");
@@ -51,7 +54,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
     "Unisex",
   ]);
   const [loading, setLoading] = useState(false);
-
+  const [page, setPage] = useState(1);
   const handleGenderFilter = (
     _: React.MouseEvent<HTMLElement>,
     genders: Gender[]
@@ -63,13 +66,14 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
     if (
       !arraysSetEquality(genderFilter, currentGenderFilter) ||
       Date.now() - lastUpdated > 180000 ||
+      page !== currentPage ||
       (discoverData.length === 1 && discoverData[0]._id === "LOADING") ||
       (recommendedData.length === 1 && recommendedData[0]._id === "LOADING")
     ) {
       setLoading(true);
       const access_token = localStorage.getItem("access_token");
       const accessTokenString = `Bearer ${access_token}`;
-      fetch(`/discover_fits?gender=${genderFilter.toString()}`, {
+      fetch(`/discover_fits?gender=${genderFilter.toString()}&page=${page.toString()}`, {
         method: "GET",
       })
         .then((r) => r.json())
@@ -89,9 +93,10 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
           setLoading(false);
         });
       dispatch(patchGenderFilter(genderFilter));
+      dispatch(patchPage(page));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [genderFilter]);
+  }, [genderFilter, page]);
   if (
     discoverData.length === 1 &&
     recommendedData.length === 1 &&
@@ -179,6 +184,33 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
                 })
               )}
             </Grid>
+          </div>
+          <div className={styles.pageNav}>
+            {page > 1 && (
+              <Button
+                variant="contained"
+                onClick={() => setPage(page - 1)}
+                className={styles.pageNavButton}
+              >
+                {page - 1}
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              className={styles.pageNavButton}
+              disabled
+            >
+              {page}
+            </Button>
+            {discoverData.length === 15 && (
+              <Button
+                variant="contained"
+                onClick={() => setPage(page + 1)}
+                className={styles.pageNavButton}
+              >
+                {page + 1}
+              </Button>
+            )}
           </div>
         </Container>
       </>

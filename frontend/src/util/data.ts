@@ -25,6 +25,25 @@ export const clothingTypes = [
 ];
 
 export const colorMap = {
-  "Black" : "#000000",
-  "White": "#ffffff",
+  Black: "#000000",
+  White: "#ffffff",
+  Blue: "#24a0ed",
+  Brown: "#795548",
+  Grey: "#D5D8DC",
+  Red: "#C0392B",
+  Green: "#229954",
+  Pink: "#FF99FF",
+  "Navy Blue": "#000099",
+  Purple: "#673AB7",
+  Silver: "#D5DBDB",
+  Yellow: "#FFF176",
+  Beige: "#E1C699",
+  Gold: "#FFD700",
+  Maroon: "#800000",
+  Orange: "#FF5722",
+  Olive: "#9E9D24",
+  Cream: "#FFFDD0",
+  Charcoal: "#36454f",
+  Peach: "#FFE5B4",
+  "Multicolored": "wutface",
 };

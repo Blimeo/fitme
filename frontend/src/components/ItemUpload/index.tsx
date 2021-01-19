@@ -134,18 +134,27 @@ export default function ItemUpload({ setUploadHidden }: Props) {
                   getOptionLabel={(color: string) => color}
                   renderOption={(color: string) => (
                     <React.Fragment>
-                      <div
-                        style={{
-                          width: "10px",
-                          height: "10px",
-                          marginRight: "5px",
-                          border: "1px solid black",
-                          display: "inline-block",
-                          //@ts-ignore
-                          backgroundColor: colorMap[color],
-                        }}
-                      />
-                      {color}
+                      {color === "Multicolored" ? (
+                        <>
+                          <div className={styles.rainbow} />
+                          {color}
+                        </>
+                      ) : (
+                        <>
+                          <div
+                            style={{
+                              width: "10px",
+                              height: "10px",
+                              marginRight: "5px",
+                              border: "1px solid black",
+                              display: "inline-block",
+                              //@ts-ignore
+                              backgroundColor: colorMap[color],
+                            }}
+                          />
+                          {color}
+                        </>
+                      )}
                     </React.Fragment>
                   )}
                   renderInput={(params) => (

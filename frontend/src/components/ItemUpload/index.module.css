@@ -6,3 +6,12 @@
 .SubmitButton {
   margin-top: 8px !important;
 }
+
+.rainbow {
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border: 1px solid black;
+  display: inline-block;
+  background: linear-gradient(45deg, orange , yellow, green, cyan, blue, violet); /* Standard syntax (must be last) */
+}

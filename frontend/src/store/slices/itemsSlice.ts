@@ -7,6 +7,7 @@ export type ItemsSliceState = {
   lastUpdated: number; // unix timestamp
   currentGenderFilter: Gender[];
   currentCategoryFilter: string;
+  currentPage: number;
 };
 
 const defaultItem: Item = {
@@ -34,6 +35,7 @@ export const itemsSlice = createSlice({
     lastUpdated: new Date().getTime(),
     currentGenderFilter: ["Men", "Women", "Unisex"],
     currentCategoryFilter: "any",
+    currentPage: 1,
   } as ItemsSliceState,
   reducers: {
     patchDiscover: (state, { payload }: PayloadAction<Item[]>) => {
@@ -52,6 +54,10 @@ export const itemsSlice = createSlice({
       state.currentCategoryFilter = payload;
       state.lastUpdated = new Date().getTime();
     },
+    patchPage: (state, { payload }: PayloadAction<number>) => {
+      state.currentPage = payload;
+      state.lastUpdated = new Date().getTime();
+    },
   },
 });
 
@@ -59,7 +65,8 @@ export const {
   patchDiscover,
   patchRecommended,
   patchGenderFilter,
-  patchCategoryFilter
+  patchCategoryFilter,
+  patchPage,
 } = itemsSlice.actions;
 
 export default itemsSlice.reducer;

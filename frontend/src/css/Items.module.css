@@ -12,3 +12,13 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+.pageNav{
+    text-align:center;
+    margin-top: 10px;
+    border-top: 1px solid black;
+}
+
+.pageNavButton{
+    margin: 5px;
+}

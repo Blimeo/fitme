@@ -36,6 +36,7 @@ export type ItemUploadType = {
   images: File[];
   gender: Gender;
   category: string;
+  color: string;
 };
 
 export type Item = {
@@ -52,6 +53,7 @@ export type Item = {
   inFits: string[];
   category: string;
   uploadDate: string;
+  color: string;
 };
 
 export type FitUploadType = {

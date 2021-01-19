@@ -6,6 +6,7 @@ export type FitsSliceState = {
   recommendedData: Fit[];
   lastUpdated: number; // unix timestamp
   currentGenderFilter: Gender[];
+  currentPage: number;
 };
 
 const defaultFit: Fit = {
@@ -29,6 +30,7 @@ export const fitsSlice = createSlice({
     recommendedData: [defaultFit],
     lastUpdated: new Date().getTime(),
     currentGenderFilter: ["Men", "Women", "Unisex"],
+    currentPage: 1,
   } as FitsSliceState,
   reducers: {
     patchDiscover: (state, action: PayloadAction<Fit[]>) => {
@@ -43,6 +45,10 @@ export const fitsSlice = createSlice({
       state.currentGenderFilter = payload;
       state.lastUpdated = new Date().getTime();
     },
+    patchPage: (state, { payload }: PayloadAction<number>) => {
+      state.currentPage = payload;
+      state.lastUpdated = new Date().getTime();
+    },
   },
 });
 
@@ -50,6 +56,7 @@ export const {
   patchDiscover,
   patchRecommended,
   patchGenderFilter,
+  patchPage,
 } = fitsSlice.actions;
 
 export default fitsSlice.reducer;

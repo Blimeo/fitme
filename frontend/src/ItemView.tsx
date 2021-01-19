@@ -36,6 +36,7 @@ export default function ItemView({ loggedIn }: Props) {
     inFits: [],
     category: "",
     uploadDate: "",
+    color: "",
   });
   const [galleryImgs, setGalleryImgs] = useState<any>([]);
   const [loading, setLoading] = useState(true);

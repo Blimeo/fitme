@@ -79,7 +79,7 @@ def login():
 
     account_data = users_collection.find_one({"email": email})
     if (account_data is not None) and bcrypt.check_password_hash(account_data["password"], password):
-        access_token = create_access_token(identity=email)
+        access_token = create_access_token(identity=email, expires_delta=False)
         return jsonify(message="Login Succeeded!", access_token=access_token), 201
     else:
         return jsonify(message="Bad Email or Password"), 401
@@ -389,9 +389,14 @@ def discover_items():
     category = request.args.get("category")
     if category != "any":
         conditions.append({"category" : category})
-    print(category)
-    docs = list(items_collection.find({"$and": conditions}))
-    random.shuffle(docs)
+    docs = items_collection.find({"$and": conditions})
+
+    page = int(request.args.get("page"))
+    page_size = 15
+    skips = page_size * (page - 1)
+    cursor = docs.skip(skips).limit(page_size)
+    docs = [x for x in cursor]
+    
     for item in docs:
         item['_id'] = str(item['_id'])
     return jsonify(items=docs)
@@ -401,8 +406,14 @@ def discover_fits():
     condition = []
     for filter in get_gender_from_request(request):
         condition.append({"gender": filter })
-    docs = list(fits_collection.find({"$or": condition}))
-    random.shuffle(docs)
+    docs = fits_collection.find({"$or": condition})
+
+    page = int(request.args.get("page"))
+    page_size = 15
+    skips = page_size * (page - 1)
+    cursor = docs.skip(skips).limit(page_size)
+    docs = [x for x in cursor]
+
     for fit in docs:
         fit['_id'] = str(fit['_id'])
         for item in fit['items']:

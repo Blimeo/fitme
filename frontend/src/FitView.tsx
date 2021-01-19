@@ -21,7 +21,7 @@ type Props = {
 export default function ItemView({ loggedIn }: Props) {
   const { fit_id } = useParams<Record<string, string | undefined>>();
   const [activeAnnotations, setActiveAnnotations] = useState<any>([]);
-  const [dummyAnno, setDummyAnno] = useState<any>({});
+  const [dummyAnno] = useState<any>({});
   const history = useHistory();
   const [fit, setFit] = useState<Fit>({
     _id: "",
@@ -74,6 +74,7 @@ export default function ItemView({ loggedIn }: Props) {
           });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn]);
 
   const handleFavorite = () => {
@@ -161,6 +162,7 @@ export default function ItemView({ loggedIn }: Props) {
                       color: "white",
                     }}
                     variant="contained"
+                    key={tag}
                   >
                     {tag}
                   </Button>

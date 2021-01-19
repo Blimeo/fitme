@@ -132,7 +132,7 @@ export default function ItemView({ loggedIn }: Props) {
   return (
     <Container className={styles.container} maxWidth="md">
       <Grid container spacing={3}>
-        <Grid item xs>
+        <Grid item xs={12} md={6}>
           <ImageGallery showThumbnails={false} items={galleryImgs} />
           {loggedIn && (
             <Card className={styles.itemActionPane} variant="outlined">
@@ -155,21 +155,25 @@ export default function ItemView({ loggedIn }: Props) {
             </Card>
           )}
         </Grid>
-        <Grid item xs>
+        <Grid item xs={12} md={6}>
           <Grid container spacing={1}>
             <Grid item xs={12}>
               <Card variant="outlined">
                 <CardContent>
-                <Typography variant="body2">{item.gender} {'|'} {item.category}</Typography>
+                  <Typography variant="body2">
+                    {item.gender} {"|"} {item.category}
+                  </Typography>
                   <Typography>Brand: {item.brand}</Typography>
-                  
+
                   <Typography variant="h5">
                     <b>{item.name}</b>
                   </Typography>
                   <Typography variant="h3">${item.price}</Typography>
                   <Typography>Uploaded by:</Typography>
                   <AvatarUsername username={item.uploader} />
-                  <Typography style={{color: "gray"}}>{item.uploadDate}</Typography>
+                  <Typography style={{ color: "gray" }}>
+                    {item.uploadDate}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -198,6 +202,7 @@ export default function ItemView({ loggedIn }: Props) {
                           backgroundColor: "#545454",
                           color: "white",
                         }}
+                        key={tag}
                         variant="contained"
                       >
                         {tag}
@@ -216,7 +221,7 @@ export default function ItemView({ loggedIn }: Props) {
                   <Grid container spacing={1}>
                     {includedFits.map((fit) => {
                       return (
-                        <Grid item xs={6}>
+                        <Grid item xs={6} key={fit._id}>
                           <FitCard fit={fit} />
                         </Grid>
                       );

@@ -48,8 +48,12 @@ export default function FitCreator({
 }: Props) {
   const [baseAnnotation, setBaseAnnotation] = useState<any>({});
   const [activeAnnotations, setActiveAnnotations] = useState<any>([]);
+  const [annotationsBeingEdited, setAnnotationsBeingEdited] = useState<
+    boolean[]
+  >([]);
   useEffect(() => {
     setAnnotations(setMLAnnotations(boxes, width, height));
+    setAnnotationsBeingEdited(boxes.map((_) => true));
   }, [boxes, img, width, height, setAnnotations]);
 
   const onSubmit = (annotation: any) => {

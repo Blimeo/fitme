@@ -160,27 +160,28 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
                       </Typography>
                     </Grid>
                     {categoryFilter !== "any" && (
-                    <Grid item xs={12}>
-                      <b
-                        style={{ cursor: "pointer", color: "gray" }}
-                        onClick={(e) => {
-                          setCategoryFilter("any");
-                        }}
-                      >
-                        <u>Clear filter</u>
-                      </b>
-                    </Grid>
+                      <Grid item xs={12}>
+                        <b
+                          style={{ cursor: "pointer", color: "gray" }}
+                          onClick={(e) => {
+                            setCategoryFilter("any");
+                          }}
+                        >
+                          <u>Clear filter</u>
+                        </b>
+                      </Grid>
                     )}
                     {clothingTypes.map((category) => {
                       return (
-                        <Grid item xs={12}>
+                        <Grid item xs={12} key={category}>
                           <b
                             style={{ cursor: "pointer" }}
                             onClick={(e) => {
                               setCategoryFilter(category);
                             }}
                           >
-                            {category === categoryFilter && '> '}{category}
+                            {category === categoryFilter && "> "}
+                            {category}
                           </b>
                         </Grid>
                       );

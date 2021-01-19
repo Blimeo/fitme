@@ -19,10 +19,12 @@ import FitCreator from "./components/FitCreator";
 import { Alert } from "@material-ui/lab";
 import { useHistory } from "react-router-dom";
 import GenderToggleButtons from "./components/Util/GenderToggleButtons";
+import { useTitle } from "./util/util-functions";
 
 type View = "AWAITING_IMAGE" | "CROP_SCREEN" | "PROCESSING" | "IMAGE_RETURNED";
 
 export default function FitUpload() {
+  useTitle("fitme | Upload a Fit");
   const [fit, setFit] = useState<FitUploadType>({
     name: "",
     tags: [],

@@ -195,7 +195,7 @@ export default function ItemView({ loggedIn }: Props) {
                     <b>Tags</b>
                   </Typography>
                   <Typography>
-                    {item.tags.map((tag) => (
+                    {item.tags.map((tag, index) => (
                       <Button
                         className={styles.tagButton}
                         style={{
@@ -203,7 +203,7 @@ export default function ItemView({ loggedIn }: Props) {
                           backgroundColor: "#545454",
                           color: "white",
                         }}
-                        key={tag}
+                        key={index}
                         variant="contained"
                       >
                         {tag}
@@ -220,13 +220,11 @@ export default function ItemView({ loggedIn }: Props) {
                     <b>Fits featuring this item</b>
                   </Typography>
                   <Grid container spacing={1}>
-                    {includedFits.map((fit) => {
-                      return (
-                        <Grid item xs={6} key={fit._id}>
-                          <FitCard fit={fit} />
-                        </Grid>
-                      );
-                    })}
+                    {includedFits.map((fit, index) => (
+                      <Grid item xs={6} key={`${fit._id} ${index}`}>
+                        <FitCard fit={fit} />
+                      </Grid>
+                    ))}
                   </Grid>
                 </CardContent>
               </Card>

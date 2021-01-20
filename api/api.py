@@ -196,7 +196,12 @@ def submit_item():
     data = json.loads(data["postData"])
     if (not data["name"].strip()) or (not data["brand"].strip()) or len(data["images"]) == 0:
         return jsonify(error="Bad item data")
+    item_in_db = items_collection.find_one(
+        {"name": data["name"]})
+    if data["name"].startswith("Create new item (item not in list)") or item_in_db is not None:
+        return jsonify(error="Bad item title")
     print(data["images"])
+    data["price"] = float(data["price"])
     images = request.files.to_dict()
     content = []
     for f in list(images.values()):
@@ -233,7 +238,7 @@ def get_item_objs(ids):
     return items
 
 
-@ app.route("/get_item", methods=["POST"])
+@app.route("/get_item", methods=["POST"])
 def get_item():
     req = request.get_json(force=True)
     item_id = req.get('item_id', None)
@@ -242,7 +247,7 @@ def get_item():
         return jsonify(error="true")
     return jsonify(error="false", item=item[item_id])
 
-@ app.route("/get_fit/<fit_id>", methods=["GET"])
+@app.route("/get_fit/<fit_id>", methods=["GET"])
 def get_fit(fit_id):
     if not bson.objectid.ObjectId.is_valid(fit_id):
         return jsonify(error="true")
@@ -251,7 +256,8 @@ def get_fit(fit_id):
         return jsonify(error="true")
     fit['_id'] = str(fit['_id'])
     for item in fit['items']:
-        item['_id'] = str(item['_id'])
+        if item is not "":
+            item['_id'] = str(item['_id'])
     return jsonify(error="false", fit=fit)
 
 def is_gender(text):
@@ -280,16 +286,31 @@ def upload_fit():
     data = dict(request.form)
     fit = json.loads(data["data"])
     annotations = json.loads(data["annotations"])
-    print(fit, annotations)
     if (fit["name"] == "" or fit["img_url"] == "" or not is_gender(fit["gender"])):
         return jsonify(error="Bad fit metadata")
-    for anno in annotations: 
-        _data = anno["data"]
-        if (_data["text"] == "Label this fit item!"):
-            return jsonify(error="Unannotated item")
     del fit['itemBoxes'], fit['width'], fit['height']
     item_names = [item['data']['text'] for item in annotations]
-    items = [items_collection.find_one({"name" : name}) for name in item_names]
+    items = []
+    print(item_names)
+    print(items)
+    for name in item_names:
+        item_doc = items_collection.find_one({"name" : name})
+        if (name == "Label this fit item!"):
+            return jsonify(error="Unannotated item")
+        if item_doc is None:
+            items.append("")
+        else:
+            items.append(item_doc)
+    annotations = list(
+        map(
+            lambda anno: anno["data"]["text"][len("Create new item (item not in list): "):]
+            if anno["data"]["text"].startswith(
+                "Create new item (item not in list): "
+            )
+            else anno,
+            annotations,
+        )
+    )
     fit["items"] = items
     fit["annotations"] = annotations
     fit["uploader"] = users_collection.find_one(
@@ -300,16 +321,15 @@ def upload_fit():
     fit_id = str(fit_id.inserted_id)
     users_collection.update({"email": identity}, {"$push": {"uploaded_fits": fit_id }}) 
     for item in items:
-        item_id = item['_id']
-        items_collection.update_one({"_id": item_id}, {"$addToSet": {"inFits": fit_id}})
+        if item is not "":
+            item_id = item['_id']
+            items_collection.update_one({"_id": item_id}, {"$addToSet": {"inFits": fit_id}})
     return jsonify(ok=True)
 
 @app.route("/favorite_item/<item_id>", methods=["PUT"])
 @jwt_required
 def favorite_item(item_id):
     identity = get_jwt_identity()
-    username = users_collection.find_one(
-        {"email": identity})['username']
     users_collection.update({"email": identity}, {"$push": {"favorite_items": item_id }})
     items_collection.update({"_id": ObjectId(item_id)}, {"$inc": {"favorited": 1 }})
     return jsonify(ok=True)
@@ -417,7 +437,8 @@ def discover_fits():
     for fit in docs:
         fit['_id'] = str(fit['_id'])
         for item in fit['items']:
-            item['_id'] = str(item['_id'])
+            if item is not "":
+                item['_id'] = str(item['_id'])
     return jsonify(fits=docs)
 
 @app.route("/recommended_items", methods=["GET"])
@@ -457,7 +478,8 @@ def recommended_fits():
     for fit in docs:
         fit['_id'] = str(fit['_id'])
         for item in fit['items']:
-            item['_id'] = str(item['_id'])
+            if item is not "":
+                item['_id'] = str(item['_id'])
     return jsonify(fits=docs[:4])
 
 

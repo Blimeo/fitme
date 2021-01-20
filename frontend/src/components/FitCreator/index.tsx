@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Annotation from "react-image-annotation";
 import AnnotationEditor from "./AnnotationEditor";
 import TextEditor from "./TextEditor";
+import styles from "./index.module.css";
+import { getItemNameFromCustomString } from "../../util/util-functions";
 
 type Props = {
   readonly img: string;
@@ -25,6 +27,8 @@ const setMLAnnotations = (boxes: number[][], width: number, height: number) => {
       data: {
         id: index,
         text: "Label this fit item!",
+        isBeingEdited: true,
+        isMLAnnotation: true,
       },
       geometry: {
         height: computedHeight,
@@ -48,12 +52,8 @@ export default function FitCreator({
 }: Props) {
   const [baseAnnotation, setBaseAnnotation] = useState<any>({});
   const [activeAnnotations, setActiveAnnotations] = useState<any>([]);
-  const [annotationsBeingEdited, setAnnotationsBeingEdited] = useState<
-    boolean[]
-  >([]);
   useEffect(() => {
     setAnnotations(setMLAnnotations(boxes, width, height));
-    setAnnotationsBeingEdited(boxes.map((_) => true));
   }, [boxes, img, width, height, setAnnotations]);
 
   const onSubmit = (annotation: any) => {
@@ -66,6 +66,8 @@ export default function FitCreator({
         data: {
           ...data,
           id: annotations.length,
+          isBeingEdited: false,
+          isMLAnnotation: false,
         },
       },
     ]);
@@ -80,11 +82,14 @@ export default function FitCreator({
   );
   return (
     <Grid container spacing={1}>
-      <Grid item xs={6}>
+      <Grid item xs={12} md={6}>
         <Annotation
           src={img}
           alt="Your fit upload image"
-          annotations={annotations}
+          annotations={annotations.map((anno: any) => ({
+            ...anno,
+            data: { text: getItemNameFromCustomString(anno.data.text) },
+          }))}
           value={baseAnnotation}
           activeAnnotations={activeAnnotations}
           onChange={setBaseAnnotation}
@@ -93,27 +98,90 @@ export default function FitCreator({
           allowTouch
         />
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={12} md={6}>
         <Grid container direction="column" spacing={1}>
           {annotations.map((anno: any, index: number) => {
             return (
-              <Grid item xs={12}>
+              <Grid item xs={12} key={index}>
                 <Card
                   style={{ padding: "6px" }}
                   onMouseOver={() => setActiveAnnotations([anno])}
                   onMouseOut={() => setActiveAnnotations([])}
-                  key={index}
                 >
-                  <Typography>
-                    <b>{anno.data.text || "Label this fit item!"}</b>
+                  <Typography variant="h6">
+                    {getItemNameFromCustomString(anno.data.text)}
                   </Typography>
-                  <TextEditor
-                    value={anno.data.text}
-                    onChange={(value: string) => {
-                      anno.data.text = value;
-                    }}
-                  />
 
+                  {anno.data.isBeingEdited ? (
+                    <>
+                      <TextEditor
+                        value={anno.data.text}
+                        onChange={(text: string) => {
+                          setAnnotations(
+                            annotations.map((a: any) =>
+                              a === anno
+                                ? {
+                                    ...a,
+                                    data: {
+                                      ...a.data,
+                                      isBeingEdited: false,
+                                      text,
+                                    },
+                                  }
+                                : a
+                            )
+                          );
+                        }}
+                      />
+                      {!anno.data.isMLAnnotation && (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          className={styles.AnnotationButton}
+                          onClick={() =>
+                            setAnnotations(
+                              annotations.map((a: any) =>
+                                a === anno
+                                  ? {
+                                      ...a,
+                                      data: {
+                                        ...a.data,
+                                        isBeingEdited: false,
+                                      },
+                                    }
+                                  : a
+                              )
+                            )
+                          }
+                        >
+                          Cancel Edit
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      className={styles.AnnotationButton}
+                      onClick={() =>
+                        setAnnotations(
+                          annotations.map((a: any) =>
+                            a === anno
+                              ? {
+                                  ...a,
+                                  data: {
+                                    ...a.data,
+                                    isBeingEdited: true,
+                                  },
+                                }
+                              : a
+                          )
+                        )
+                      }
+                    >
+                      Edit
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     color="secondary"

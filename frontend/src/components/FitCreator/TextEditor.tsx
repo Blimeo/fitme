@@ -29,7 +29,7 @@ function TextEditor({ value, onChange }: Props) {
   const [searchResults, setSearchResults] = React.useState<SearchResult[]>([]);
   useEffect(() => {
     if (searchQuery) {
-      fetch("/item_search/" + searchQuery, {
+      fetch(`/item_search/${searchQuery}`, {
         method: "GET",
       })
         .then((r) => r.json())
@@ -44,8 +44,14 @@ function TextEditor({ value, onChange }: Props) {
     <>
       <Inner>
         <Autocomplete
-          id="combo-box-demo"
-          options={searchResults.map((result) => result.name)}
+          options={
+            searchQuery.length > 1
+              ? [
+                  `Create new item (item not in list): ${searchQuery}`,
+                  ...searchResults.map((result) => result.name),
+                ]
+              : searchResults.map((result) => result.name)
+          }
           style={{ width: 300 }}
           freeSolo
           onChange={(_, value: any) => {

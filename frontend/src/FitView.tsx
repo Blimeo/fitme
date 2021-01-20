@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
-import { Fit } from "./util/util-types";
+import { Fit, Item } from "./util/util-types";
 import styles from "./css/FitView.module.css";
 import Annotation from "react-image-annotation";
 import AvatarUsername from "./components/Util/AvatarUsername";
@@ -43,7 +43,7 @@ export default function ItemView({ loggedIn }: Props) {
 
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    fetch("/get_fit/" + fit_id, {
+    fetch(`/get_fit/${fit_id}`, {
       method: "GET",
     })
       .then((r) => r.json())
@@ -174,10 +174,7 @@ export default function ItemView({ loggedIn }: Props) {
             {fit.annotations.map((anno: any, index: number) => {
               return (
                 <Grid item xs={12}>
-                  <Link
-                    to={"/item/" + fit.items[index]._id}
-                    style={{ textDecoration: "none" }}
-                  >
+                  {fit.items[index] === "" ? (
                     <Card
                       style={{ padding: "6px" }}
                       onMouseOver={() => setActiveAnnotations([anno])}
@@ -191,7 +188,26 @@ export default function ItemView({ loggedIn }: Props) {
                         <b>{anno.data.text}</b>
                       </Typography>
                     </Card>
-                  </Link>
+                  ) : (
+                    <Link
+                      to={`/item/${(fit.items[index] as Item)._id}`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <Card
+                        style={{ padding: "6px" }}
+                        onMouseOver={() => setActiveAnnotations([anno])}
+                        onMouseOut={() => setActiveAnnotations([])}
+                        key={index}
+                      >
+                        <div style={{ color: "gray" }}>
+                          <Typography>Item</Typography>
+                        </div>
+                        <Typography>
+                          <b>{anno.data.text}</b>
+                        </Typography>
+                      </Card>
+                    </Link>
+                  )}
                 </Grid>
               );
             })}

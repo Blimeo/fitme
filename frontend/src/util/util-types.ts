@@ -73,7 +73,7 @@ export type Fit = {
   tags: string[];
   description: string;
   img_url: string;
-  items: Item[];
+  items: (Item | "")[];
   uploader: string;
   annotations: any;
   gender: Gender;

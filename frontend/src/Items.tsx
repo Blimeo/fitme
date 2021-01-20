@@ -178,7 +178,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
                     )}
                     {clothingTypes.map((category) => {
                       return (
-                        <Grid item xs={12}>
+                        <Grid item xs={12} key={category}>
                           <b
                             style={{ cursor: "pointer" }}
                             onClick={(e) => {

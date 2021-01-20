@@ -19,10 +19,12 @@ import FitCreator from "./components/FitCreator";
 import { Alert } from "@material-ui/lab";
 import { useHistory } from "react-router-dom";
 import GenderToggleButtons from "./components/Util/GenderToggleButtons";
+import { useTitle } from "./util/util-functions";
 
 type View = "AWAITING_IMAGE" | "CROP_SCREEN" | "PROCESSING" | "IMAGE_RETURNED";
 
 export default function FitUpload() {
+  useTitle("fitme | Upload a Fit");
   const [fit, setFit] = useState<FitUploadType>({
     name: "",
     tags: [],
@@ -126,7 +128,12 @@ export default function FitUpload() {
 
   return (
     <Container className={styles.container} maxWidth="md">
-      <Typography gutterBottom variant="h5" component="h2">
+      <Typography
+        gutterBottom
+        variant="h4"
+        component="h2"
+        className={styles.UploadHeader}
+      >
         Showcase a fit
       </Typography>
       {view === "AWAITING_IMAGE" && (
@@ -236,7 +243,8 @@ export default function FitUpload() {
             </Snackbar>
             <Snackbar open={uploadFailure} autoHideDuration={6000}>
               <Alert onClose={() => setUploadFailure(false)} severity="error">
-                Make sure to annotate each of this fit's items!
+                There was an error when uploading this fit. Make sure to
+                annotate each of this fit's items!
               </Alert>
             </Snackbar>
           </Grid>

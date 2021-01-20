@@ -1,13 +1,13 @@
 .container {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
-.pageNav{
-    text-align:center;
-    margin-top: 10px;
-    border-top: 1px solid black;
+.pageNav {
+  text-align: center;
+  margin-top: 10px;
+  border-top: 1px solid black;
 }
 
-.pageNavButton{
-    margin: 5px;
+.pageNavButton {
+  margin: 5px;
 }

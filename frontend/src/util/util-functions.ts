@@ -38,3 +38,9 @@ export function arraysSetEquality<T>(a: T[], b: T[]): boolean {
   }
   return true;
 }
+
+export function getItemNameFromCustomString(str: string): string {
+  return str.startsWith("Create new item (item not in list)")
+    ? str.substring(35, str.length)
+    : str;
+}

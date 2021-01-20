@@ -40,6 +40,7 @@ export default function ItemUpload({ setUploadHidden }: Props) {
     color: "",
   });
   const [open, setOpen] = useState(false);
+  const [uploadFailure, setUploadFailure] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const handleGender = (_: React.MouseEvent<HTMLElement>, gender: Gender) => {
     setValues({ ...values, gender });
@@ -76,6 +77,9 @@ export default function ItemUpload({ setUploadHidden }: Props) {
       .then((r) => {
         setUploadHidden(true);
         setIsSubmitting(false);
+      })
+      .catch((e) => {
+        setUploadFailure(true);
       });
   };
   return (
@@ -87,6 +91,12 @@ export default function ItemUpload({ setUploadHidden }: Props) {
       >
         <Alert onClose={() => setOpen(false)} severity="error">
           Please add at least one photo to show what this item looks like.
+        </Alert>
+      </Snackbar>
+      <Snackbar open={uploadFailure} autoHideDuration={6000}>
+        <Alert onClose={() => setUploadFailure(false)} severity="error">
+          There was an error when uploading this item. Make sure this item
+          doesn't already exist in our database!
         </Alert>
       </Snackbar>
       <Card>

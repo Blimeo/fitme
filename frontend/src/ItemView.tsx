@@ -15,6 +15,7 @@ import "react-image-gallery/styles/scss/image-gallery.scss";
 import styles from "./css/ItemView.module.css";
 import AvatarUsername from "./components/Util/AvatarUsername";
 import FitCard from "./components/FitCard";
+import { useTitle } from "./util/util-functions";
 
 type Props = {
   readonly loggedIn: boolean;
@@ -42,6 +43,11 @@ export default function ItemView({ loggedIn }: Props) {
   const [loading, setLoading] = useState(true);
   const [favorited, setFavorited] = useState(false);
   const [includedFits, setIncludedFits] = useState<Fit[]>([]);
+
+  useTitle(() => (loading ? "fitme | Loading Item" : `fitme | ${item.name}`), [
+    item,
+  ]);
+
   useEffect(() => {
     let opts = {
       item_id: item_id,

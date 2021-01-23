@@ -37,8 +37,12 @@ export default function ItemView({ loggedIn }: Props) {
     uploadDate: "",
   });
 
-  useTitle(() =>
-    loading ? "fitme | Loading Fit" : `fitme | ${fit.name} by ${fit.uploader}`
+  useTitle(
+    () =>
+      loading
+        ? "fitme | Loading Fit"
+        : `fitme | ${fit.name} by ${fit.uploader}`,
+    [fit]
   );
 
   const [loading, setLoading] = useState(true);

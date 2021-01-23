@@ -148,6 +148,94 @@ def update_profile():
     users_collection.update_one({"email": identity}, {"$set": body})
     return jsonify(message="Successfully updated"), 200
 
+@app.route("/get_user_items", methods=["GET"])
+def get_user_items():
+    username = request.args.get("username")
+    user_data = users_collection.find_one(
+        {"username": username})
+    if user_data["uploaded_items"] is None:
+        return jsonify(items=[])
+    item_object_ids = user_data["uploaded_items"]
+    docs = items_collection.find({"_id": {"$in": item_object_ids}})
+    if docs is None:
+        return jsonify(items=[])
+    page = int(request.args.get("page"))
+    page_size = 4
+    skips = page_size * (page - 1)
+    cursor = docs.skip(skips).limit(page_size)
+    docs = [x for x in cursor]
+    
+    for item in docs:
+        item['_id'] = str(item['_id'])
+    return jsonify(items=docs)
+
+@app.route("/get_user_fits", methods=["GET"])
+def get_user_fits():
+    username = request.args.get("username")
+    user_data = users_collection.find_one(
+        {"username": username})
+    if user_data["uploaded_fits"] is None:
+        return jsonify(fits=[])
+    fit_ids = [ObjectId(x) for x in user_data["uploaded_fits"]]
+    docs = fits_collection.find({"_id": {"$in": fit_ids}})
+    if docs is None:
+        return jsonify(fits=[])
+    page = int(request.args.get("page"))
+    page_size = 4
+    skips = page_size * (page - 1)  
+    cursor = docs.skip(skips).limit(page_size)
+    docs = [x for x in cursor]
+    for fit in docs:
+        fit['_id'] = str(fit['_id'])
+        for item in fit['items']:
+            if item != "":
+                item['_id'] = str(item['_id'])
+    return jsonify(fits=docs)
+
+@app.route("/get_user_fav_items", methods=["GET"])
+def get_user_fav_items():
+    username = request.args.get("username")
+    user_data = users_collection.find_one(
+        {"username": username})
+    if user_data["favorite_items"] is None:
+        return jsonify(items=[])
+    item_object_ids = [ObjectId(x) for x in user_data["favorite_items"]]
+    docs = items_collection.find({"_id": {"$in": item_object_ids}})
+    if docs is None:
+        return jsonify(items=[])
+    page = int(request.args.get("page"))
+    page_size = 4
+    skips = page_size * (page - 1)
+    cursor = docs.skip(skips).limit(page_size)
+    docs = [x for x in cursor]
+    
+    for item in docs:
+        item['_id'] = str(item['_id'])
+    return jsonify(items=docs)
+
+@app.route("/get_user_fav_fits", methods=["GET"])
+def get_user_fav_fits():
+    username = request.args.get("username")
+    user_data = users_collection.find_one(
+        {"username": username})
+    if user_data["favorite_fits"] is None:
+        return jsonify(fits=[])
+    fit_object_ids = [ObjectId(x) for x in user_data["favorite_fits"]]
+    docs = fits_collection.find({"_id": {"$in": fit_object_ids}})
+    if docs is None:
+        return jsonify(fits=[])
+    page = int(request.args.get("page"))
+    page_size = 4
+    skips = page_size * (page - 1)
+    cursor = docs.skip(skips).limit(page_size)
+    docs = [x for x in cursor]
+    
+    for fit in docs:
+        fit['_id'] = str(fit['_id'])
+        for item in fit['items']:
+            if item != "":
+                item['_id'] = str(item['_id'])
+    return jsonify(fits=docs)
 
 @app.route("/profile_data", methods=["GET"])
 def profile_data():
@@ -200,7 +288,6 @@ def submit_item():
         {"name": data["name"]})
     if data["name"].startswith("Create new item (item not in list)") or item_in_db is not None:
         return jsonify(error="Bad item title")
-    print(data["images"])
     data["price"] = float(data["price"])
     images = request.files.to_dict()
     content = []
@@ -256,7 +343,7 @@ def get_fit(fit_id):
         return jsonify(error="true")
     fit['_id'] = str(fit['_id'])
     for item in fit['items']:
-        if item is not "":
+        if item != "":
             item['_id'] = str(item['_id'])
     return jsonify(error="false", fit=fit)
 
@@ -291,8 +378,6 @@ def upload_fit():
     del fit['itemBoxes'], fit['width'], fit['height']
     item_names = [item['data']['text'] for item in annotations]
     items = []
-    print(item_names)
-    print(items)
     for name in item_names:
         item_doc = items_collection.find_one({"name" : name})
         if (name == "Label this fit item!"):
@@ -511,7 +596,6 @@ def submit_fit_image():
     data = dict(request.form)
     crop_params = json.loads(data["crop"])
     image = request.files["img"]
-    print(crop_params)
     if image:
         mngr = ImageManager()
         # url contains the s3 url for the image to be processed

@@ -6,14 +6,15 @@ import { User } from "./util/util-types";
 
 type Props = {
   readonly loggedIn: boolean;
+  readonly ownProfile: boolean;
 };
 
-const Profile = ({ loggedIn }: Props): ReactElement => {
+const Profile = ({ loggedIn, ownProfile }: Props): ReactElement => {
   const { username } = useParams<Record<string, string | undefined>>();
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   useTitle(
     () =>
-      username === undefined
+      username === undefined || ownProfile
         ? "fitme | My Profile"
         : `fitme | ${username}'s Profile`,
     [username]
@@ -46,7 +47,9 @@ const Profile = ({ loggedIn }: Props): ReactElement => {
   return (
     <ProfileContainer
       username={
-        username === undefined || isOwnProfile ? "OWN PROFILE" : username
+        username === undefined || isOwnProfile || ownProfile
+          ? "OWN PROFILE"
+          : username
       }
       loggedIn={loggedIn}
     />

@@ -241,19 +241,17 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
                   {loading ? (
                     <CircularProgress />
                   ) : (
-                    discoverData.map((it) => {
-                      return (
-                        <Grid
-                          item
-                          xs={12}
-                          md={4}
-                          key={it._id}
-                          style={{ display: "flex" }}
-                        >
-                          <ItemCard item={it} />
-                        </Grid>
-                      );
-                    })
+                    discoverData.map((it) => (
+                      <Grid
+                        item
+                        xs={12}
+                        md={4}
+                        key={it._id}
+                        style={{ display: "flex" }}
+                      >
+                        <ItemCard item={it} />
+                      </Grid>
+                    ))
                   )}
                 </Grid>
               </div>

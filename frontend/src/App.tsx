@@ -60,14 +60,22 @@ export default function App() {
                 <Fits loggedIn={loggedIn} />
               </Route>
               <Route path="/profile">
-                {loggedIn ? <Profile loggedIn /> : <Redirect to="/" />}
+                {loggedIn ? (
+                  <Profile ownProfile loggedIn key={"own_profile_route"} />
+                ) : (
+                  <Redirect to="/" />
+                )}
               </Route>
               <Route path="/fit-upload">
                 <FitUpload />
                 {/* {loggedIn ? <FitUpload /> : <Redirect to="/fits" />} */}
               </Route>
               <Route path="/user/:username">
-                <Profile loggedIn={loggedIn} />
+                <Profile
+                  ownProfile={false}
+                  loggedIn={loggedIn}
+                  key={"user_route"}
+                />
               </Route>
               <Route path="/item/:item_id">
                 <ItemView loggedIn={loggedIn} />

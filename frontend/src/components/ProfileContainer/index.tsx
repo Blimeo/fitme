@@ -5,12 +5,16 @@ import {
   Typography,
   createStyles,
   Theme,
+  Grid,
 } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
-import { ProfileUser, User } from "../../util/util-types";
+import { Fit, Item, ProfileUser, User } from "../../util/util-types";
 import DefaultProfileImage from "../../assets/img/default_avatar.png";
 import ProfileHeader from "./ProfileHeader";
 import NotFound from "../Error/NotFound";
+import ItemCard from "../ItemCard";
+import FitCard from "../FitCard";
+import styles from "./index.module.css";
 
 type Props = {
   readonly username: ProfileUser | undefined;
@@ -67,17 +71,43 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+type DisplayItem = {
+  items: Item[];
+  currentPage: number;
+};
+
+type DisplayFit = {
+  fits: Fit[];
+  currentPage: number;
+};
+
 function ProfileContainer({ username, loggedIn }: Props) {
   const [profileData, setProfileData] = useState<User>(null);
+  const [profileItems, setProfileItems] = useState<DisplayItem>({
+    items: [],
+    currentPage: 1,
+  });
+  const [profileFits, setProfileFits] = useState<DisplayFit>({
+    fits: [],
+    currentPage: 1,
+  });
+  const [profileFavItems, setProfileFavItems] = useState<DisplayItem>({
+    items: [],
+    currentPage: 1,
+  });
+  const [profileFavFits, setProfileFavFits] = useState<DisplayFit>({
+    fits: [],
+    currentPage: 1,
+  });
   const [doesUsernameExist, setDoesUsernameExist] = useState<boolean>(true);
   const [viewerIsFollowingThisUser, setViewerIsFollowingThisUser] = useState<
     boolean | undefined
   >(undefined);
   const classes = useStyles();
+  const access_token = localStorage.getItem("access_token");
+  const accessTokenString = `Bearer ${access_token}`;
 
   const fetchFollowersList = useCallback(async (): Promise<void> => {
-    const access_token = localStorage.getItem("access_token");
-    const accessTokenString = `Bearer ${access_token}`;
     const response = await fetch("/my_profile_data", {
       method: "GET",
       headers: {
@@ -92,9 +122,80 @@ function ProfileContainer({ username, loggedIn }: Props) {
     } else {
       setViewerIsFollowingThisUser(false);
     }
-  }, [username]);
+  }, [accessTokenString, username]);
 
   useEffect(() => {
+    const fetchUserDataType = async (
+      dataType: "ITEMS" | "FITS" | "FAV_ITEMS" | "FAV_FITS"
+    ): Promise<void> => {
+      let route;
+      let pageNumber;
+      switch (dataType) {
+        case "ITEMS":
+          route = "/get_user_items";
+          pageNumber = profileItems.currentPage;
+          break;
+        case "FITS":
+          route = "/get_user_fits";
+          pageNumber = profileFits.currentPage;
+          break;
+        case "FAV_ITEMS":
+          route = "/get_user_fav_items";
+          pageNumber = profileFavItems.currentPage;
+          break;
+        case "FAV_FITS":
+          route = "/get_user_fav_fits";
+          pageNumber = profileFavFits.currentPage;
+          break;
+        default:
+          throw new Error("Impossible");
+      }
+      if (profileData !== null) {
+        route += `?username=${profileData.username}&page=${pageNumber}`;
+        const response = await fetch(route, {
+          method: "GET",
+          headers: {
+            Authorization: accessTokenString,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          switch (dataType) {
+            case "ITEMS":
+              setProfileItems({
+                items: data.items as Item[],
+                currentPage: pageNumber,
+              });
+              break;
+            case "FITS":
+              setProfileFits({
+                fits: data.fits as Fit[],
+                currentPage: pageNumber,
+              });
+              break;
+            case "FAV_ITEMS":
+              setProfileFavItems({
+                items: data.items as Item[],
+                currentPage: pageNumber,
+              });
+              break;
+            case "FAV_FITS":
+              setProfileFavFits({
+                fits: data.fits as Fit[],
+                currentPage: pageNumber,
+              });
+              break;
+            default:
+              throw new Error("Impossible");
+          }
+        } else {
+          alert(
+            "There was a problem grabbing this user's data. Please try refreshing the page."
+          );
+        }
+      }
+    };
     const fetchProfileData = (accessTokenString?: string): void => {
       const profilePromise = accessTokenString
         ? fetch(
@@ -125,16 +226,34 @@ function ProfileContainer({ username, loggedIn }: Props) {
         .catch(() => setDoesUsernameExist(false));
     };
 
-    if (loggedIn) {
-      const access_token = localStorage.getItem("access_token");
-      const bearer = `Bearer ${access_token}`;
-      fetchProfileData(bearer);
-      fetchFollowersList();
+    if (profileData === null) {
+      if (loggedIn) {
+        const access_token = localStorage.getItem("access_token");
+        const bearer = `Bearer ${access_token}`;
+        fetchProfileData(bearer);
+        fetchFollowersList();
+      } else {
+        fetchProfileData();
+        setViewerIsFollowingThisUser(false);
+      }
     } else {
-      fetchProfileData();
-      setViewerIsFollowingThisUser(false);
+      fetchUserDataType("ITEMS");
+      fetchUserDataType("FITS");
+      fetchUserDataType("FAV_ITEMS");
+      fetchUserDataType("FAV_FITS");
     }
-  }, [doesUsernameExist, fetchFollowersList, loggedIn, username]);
+  }, [
+    accessTokenString,
+    doesUsernameExist,
+    fetchFollowersList,
+    loggedIn,
+    profileData,
+    profileFavFits.currentPage,
+    profileFavItems.currentPage,
+    profileFits.currentPage,
+    profileItems.currentPage,
+    username,
+  ]);
 
   if (!doesUsernameExist) {
     return <NotFound />;
@@ -160,31 +279,92 @@ function ProfileContainer({ username, loggedIn }: Props) {
         fetchFollowersList={fetchFollowersList}
       />
       <Container maxWidth="lg" className={classes.container}>
-        <Typography variant="h5">
+        <Typography variant="h4">
           🤵 {username === "OWN PROFILE" && "My"} Fits
         </Typography>
-        {profileData.uploaded_fits.length === 0 ? (
-          <Typography>Nothing here yet.</Typography>
+        {profileData.uploaded_fits.length !== 0 && profileFits !== null ? (
+          <Grid container alignItems="stretch" spacing={1}>
+            {profileFits.fits.map((fit, index) => (
+              <Grid
+                item
+                xs={12}
+                md={3}
+                key={`${fit._id} ${index}`}
+                style={{ display: "flex" }}
+              >
+                <FitCard fit={fit} />
+              </Grid>
+            ))}
+          </Grid>
         ) : (
-          <Typography>TODO</Typography>
+          <Typography>Nothing here yet.</Typography>
         )}
 
-        <Typography variant="h5">
+        <Typography variant="h4" className={styles.ProfileSectionHeader}>
           🧣 {username === "OWN PROFILE" && "My"} Items
         </Typography>
-        {profileData.uploaded_items.length === 0 ? (
-          <Typography>Nothing here yet.</Typography>
+        {profileData.uploaded_items.length !== 0 && profileItems !== null ? (
+          <Grid container spacing={1}>
+            {profileItems.items.map((item, index) => (
+              <Grid
+                item
+                xs={12}
+                md={3}
+                key={`${item._id} ${index}`}
+                style={{ display: "flex" }}
+              >
+                <ItemCard item={item} />
+              </Grid>
+            ))}
+          </Grid>
         ) : (
-          <Typography>TODO</Typography>
+          <Typography>Nothing here yet.</Typography>
         )}
 
-        <Typography variant="h5">
+        <Typography variant="h4" className={styles.ProfileSectionHeader}>
           🌟 {username === "OWN PROFILE" && "My"} Favorites
         </Typography>
-        {profileData.favorite_items.length === 0 ? (
-          <Typography>Nothing here yet.</Typography>
+        <Typography variant="h5" className={styles.ProfileSectionHeader}>
+          {username === "OWN PROFILE" && "My"} Favorite Fits
+        </Typography>
+        {profileData.favorite_fits.length !== 0 && profileFavFits !== null ? (
+          <Grid container alignItems="stretch" spacing={1}>
+            {profileFavFits.fits.map((fit, index) => (
+              <Grid
+                item
+                xs={12}
+                md={3}
+                key={`${fit._id} ${index}`}
+                style={{ display: "flex" }}
+              >
+                <FitCard fit={fit} />
+              </Grid>
+            ))}
+          </Grid>
         ) : (
-          <Typography>TODO</Typography>
+          <Typography>
+            No favorites yet. Look around for some inspiration!
+          </Typography>
+        )}
+        <Typography variant="h5" className={styles.ProfileSectionHeader}>
+          {username === "OWN PROFILE" && "My"} Favorite Items
+        </Typography>
+        {profileData.favorite_items.length !== 0 && profileFavItems !== null ? (
+          <Grid container spacing={1}>
+            {profileFavItems.items.map((item, index) => (
+              <Grid
+                item
+                xs={12}
+                md={3}
+                key={`${item._id} ${index}`}
+                style={{ display: "flex" }}
+              >
+                <ItemCard item={item} />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Typography>No favorites yet.</Typography>
         )}
       </Container>
     </>

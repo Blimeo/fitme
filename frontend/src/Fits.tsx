@@ -12,7 +12,7 @@ import {
 import React, { ReactElement, useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
 import styles from "./css/Fits.module.css";
-import { Fit, Gender } from "./util/util-types";
+import { Fit, FitResponse, Gender } from "./util/util-types";
 import { connect } from "react-redux";
 import { RootState } from "./store/rootReducer";
 import FitCard from "./components/FitCard";
@@ -53,6 +53,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
     "Women",
     "Unisex",
   ]);
+  const [numFitsTotalInQuery, setNumFitsTotalInQuery] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const handleGenderFilter = (
@@ -92,6 +93,10 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
       })
         .then((r) => r.json())
         .then((response) => {
+          const fitsResponse = response.fits as FitResponse[];
+          if (fitsResponse.length > 0) {
+            setNumFitsTotalInQuery(fitsResponse[0].num_docs);
+          }
           dispatch(patchRecommended(response.fits as Fit[]));
           setLoading(false);
         });
@@ -206,7 +211,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
               </Button>
             )}
 
-            {discoverData.length > 12 && (
+            {discoverData.length >= 12 && numFitsTotalInQuery > 12 && (
               <>
                 <Button
                   variant="contained"

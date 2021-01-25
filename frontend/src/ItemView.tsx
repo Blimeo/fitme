@@ -61,7 +61,6 @@ export default function ItemView({ loggedIn }: Props) {
         if (response.error === "true") {
           history.push("/items");
         } else {
-          console.log(response.item);
           setItem(response.item as Item);
           let d: { original: string }[] = [];
           response.item.imgs.forEach((url: string) => {
@@ -101,7 +100,6 @@ export default function ItemView({ loggedIn }: Props) {
       })
         .then((r) => r.json())
         .then((response) => {
-          console.log(response.fits);
           setIncludedFits(response.fits);
         });
     }

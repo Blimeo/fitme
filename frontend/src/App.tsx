@@ -41,7 +41,6 @@ export default function App() {
     } else {
       setLoggedIn(false);
     }
-    console.log("Logged in: " + loggedIn);
   }, [loggedIn, history]);
   return (
     <div>

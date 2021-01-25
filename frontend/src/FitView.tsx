@@ -177,7 +177,7 @@ export default function ItemView({ loggedIn }: Props) {
           <Grid container direction="column" spacing={1}>
             {fit.annotations.map((anno: any, index: number) => {
               return (
-                <Grid item xs={12}>
+                <Grid item xs={12} key={`${anno.data.id} ${index}`}>
                   {fit.items[index] === "" ? (
                     <Card
                       style={{ padding: "6px" }}

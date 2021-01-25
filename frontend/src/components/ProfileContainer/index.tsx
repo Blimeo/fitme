@@ -161,7 +161,6 @@ function ProfileContainer({ username, loggedIn }: Props) {
         });
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           switch (dataType) {
             case "ITEMS":
               setProfileItems({

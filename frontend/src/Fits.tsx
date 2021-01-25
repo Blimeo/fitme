@@ -137,15 +137,18 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
           )}
           <div className={styles.recommended}>
             <div style={{ marginTop: "5px", marginBottom: "5px" }}>
-              <Typography variant="h3">
-                <b>Recommended</b>
-              </Typography>
+              {recommendedData.length >= 3 && (
+                <Typography variant="h3">
+                  <b>Recommended</b>
+                </Typography>
+              )}
             </div>
 
             <Grid container alignItems="stretch" spacing={1}>
               {loading ? (
                 <CircularProgress />
               ) : (
+                recommendedData.length >= 3 &&
                 recommendedData.map((fit) => {
                   return (
                     <Grid
@@ -171,6 +174,10 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
             <Grid container alignItems="stretch" spacing={1}>
               {loading ? (
                 <CircularProgress />
+              ) : discoverData.length === 0 ? (
+                <Typography>
+                  We couldn't find any fits under that criteria.
+                </Typography>
               ) : (
                 discoverData.map((fit) => {
                   return (

@@ -226,22 +226,19 @@ export default function ItemView({ loggedIn }: Props) {
                   <Typography>
                     <b>Fits featuring this item</b>
                   </Typography>
-                  <Grid container spacing={1}>
-                    {includedFits.map((fit, index) => (
-                      <Grid item xs={6} key={`${fit._id} ${index}`}>
-                        <FitCard fit={fit} />
-                      </Grid>
-                    ))}
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography>
-                    <b>Links</b>
-                  </Typography>
+                  {includedFits.length > 0 ? (
+                    <Grid container spacing={1}>
+                      {includedFits.map((fit, index) => (
+                        <Grid item xs={6} key={`${fit._id} ${index}`}>
+                          <FitCard fit={fit} />
+                        </Grid>
+                      ))}
+                    </Grid>
+                  ) : (
+                    <Typography variant="subtitle2">
+                      Currently, there are no fits featuring this item.
+                    </Typography>
+                  )}
                 </CardContent>
               </Card>
             </Grid>

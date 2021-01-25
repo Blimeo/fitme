@@ -4,7 +4,6 @@ export const clothingTypes = [
   "Casual Shoes",
   "Watches",
   "Sports Shoes",
-  "Tops",
   "Handbags",
   "Heels",
   "Sunglasses",
@@ -24,9 +23,6 @@ export const clothingTypes = [
   "Sweatshirts and Hoodies",
   "Leggings",
   "Skirts",
-  "Dresses",
-  "Flats",
-  "Leggings",
   "Other",
 ];
 

@@ -274,7 +274,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
             >
               {page}
             </Button>
-            {discoverData.length >= 12 && (
+            {discoverData.length > 12 && (
               <Button
                 variant="contained"
                 onClick={() => setPage(page + 1)}

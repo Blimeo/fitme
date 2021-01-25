@@ -6,6 +6,7 @@ import {
   createStyles,
   Theme,
   Grid,
+  Button,
 } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
 import { Fit, Item, ProfileUser, User } from "../../util/util-types";
@@ -283,19 +284,61 @@ function ProfileContainer({ username, loggedIn }: Props) {
           🤵 {username === "OWN PROFILE" && "My"} Fits
         </Typography>
         {profileData.uploaded_fits.length !== 0 && profileFits !== null ? (
-          <Grid container alignItems="stretch" spacing={1}>
-            {profileFits.fits.map((fit, index) => (
-              <Grid
-                item
-                xs={12}
-                md={3}
-                key={`${fit._id} ${index}`}
-                style={{ display: "flex" }}
-              >
-                <FitCard fit={fit} />
-              </Grid>
-            ))}
-          </Grid>
+          <>
+            <Grid container alignItems="stretch" spacing={1}>
+              {profileFits.fits.map((fit, index) => (
+                <Grid
+                  item
+                  xs={12}
+                  md={3}
+                  key={`${fit._id} ${index}`}
+                  style={{ display: "flex" }}
+                >
+                  <FitCard fit={fit} />
+                </Grid>
+              ))}
+            </Grid>
+            <div>
+              {profileFits.currentPage > 1 && (
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    setProfileFits({
+                      ...profileFits,
+                      currentPage: profileFits.currentPage - 1,
+                    })
+                  }
+                  className={styles.pageNavButton}
+                >
+                  {profileFits.currentPage - 1}
+                </Button>
+              )}
+
+              {profileData.uploaded_fits.length > 4 && (
+                <>
+                  <Button
+                    variant="contained"
+                    className={styles.pageNavButton}
+                    disabled
+                  >
+                    {profileFits.currentPage}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      setProfileFits({
+                        ...profileFits,
+                        currentPage: profileFits.currentPage + 1,
+                      })
+                    }
+                    className={styles.pageNavButton}
+                  >
+                    {profileFits.currentPage + 1}
+                  </Button>
+                </>
+              )}
+            </div>
+          </>
         ) : (
           <Typography>Nothing here yet.</Typography>
         )}
@@ -304,19 +347,61 @@ function ProfileContainer({ username, loggedIn }: Props) {
           🧣 {username === "OWN PROFILE" && "My"} Items
         </Typography>
         {profileData.uploaded_items.length !== 0 && profileItems !== null ? (
-          <Grid container spacing={1}>
-            {profileItems.items.map((item, index) => (
-              <Grid
-                item
-                xs={12}
-                md={3}
-                key={`${item._id} ${index}`}
-                style={{ display: "flex" }}
-              >
-                <ItemCard item={item} />
-              </Grid>
-            ))}
-          </Grid>
+          <>
+            <Grid container spacing={1}>
+              {profileItems.items.map((item, index) => (
+                <Grid
+                  item
+                  xs={12}
+                  md={3}
+                  key={`${item._id} ${index}`}
+                  style={{ display: "flex" }}
+                >
+                  <ItemCard item={item} />
+                </Grid>
+              ))}
+            </Grid>
+            <div>
+              {profileItems.currentPage > 1 && (
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    setProfileItems({
+                      ...profileItems,
+                      currentPage: profileItems.currentPage - 1,
+                    })
+                  }
+                  className={styles.pageNavButton}
+                >
+                  {profileItems.currentPage - 1}
+                </Button>
+              )}
+
+              {profileData.uploaded_items.length > 4 && (
+                <>
+                  <Button
+                    variant="contained"
+                    className={styles.pageNavButton}
+                    disabled
+                  >
+                    {profileItems.currentPage}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      setProfileItems({
+                        ...profileItems,
+                        currentPage: profileItems.currentPage + 1,
+                      })
+                    }
+                    className={styles.pageNavButton}
+                  >
+                    {profileItems.currentPage + 1}
+                  </Button>
+                </>
+              )}
+            </div>
+          </>
         ) : (
           <Typography>Nothing here yet.</Typography>
         )}
@@ -328,19 +413,61 @@ function ProfileContainer({ username, loggedIn }: Props) {
           {username === "OWN PROFILE" && "My"} Favorite Fits
         </Typography>
         {profileData.favorite_fits.length !== 0 && profileFavFits !== null ? (
-          <Grid container alignItems="stretch" spacing={1}>
-            {profileFavFits.fits.map((fit, index) => (
-              <Grid
-                item
-                xs={12}
-                md={3}
-                key={`${fit._id} ${index}`}
-                style={{ display: "flex" }}
-              >
-                <FitCard fit={fit} />
-              </Grid>
-            ))}
-          </Grid>
+          <>
+            <Grid container alignItems="stretch" spacing={1}>
+              {profileFavFits.fits.map((fit, index) => (
+                <Grid
+                  item
+                  xs={12}
+                  md={3}
+                  key={`${fit._id} ${index}`}
+                  style={{ display: "flex" }}
+                >
+                  <FitCard fit={fit} />
+                </Grid>
+              ))}
+            </Grid>
+            <div>
+              {profileFavFits.currentPage > 1 && (
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    setProfileFavFits({
+                      ...profileFavFits,
+                      currentPage: profileFavFits.currentPage - 1,
+                    })
+                  }
+                  className={styles.pageNavButton}
+                >
+                  {profileFavFits.currentPage - 1}
+                </Button>
+              )}
+
+              {profileData.favorite_fits.length > 4 && (
+                <>
+                  <Button
+                    variant="contained"
+                    className={styles.pageNavButton}
+                    disabled
+                  >
+                    {profileFavFits.currentPage}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      setProfileFavFits({
+                        ...profileFavFits,
+                        currentPage: profileFavFits.currentPage + 1,
+                      })
+                    }
+                    className={styles.pageNavButton}
+                  >
+                    {profileFavFits.currentPage + 1}
+                  </Button>
+                </>
+              )}
+            </div>
+          </>
         ) : (
           <Typography>
             No favorites yet. Look around for some inspiration!
@@ -350,19 +477,60 @@ function ProfileContainer({ username, loggedIn }: Props) {
           {username === "OWN PROFILE" && "My"} Favorite Items
         </Typography>
         {profileData.favorite_items.length !== 0 && profileFavItems !== null ? (
-          <Grid container spacing={1}>
-            {profileFavItems.items.map((item, index) => (
-              <Grid
-                item
-                xs={12}
-                md={3}
-                key={`${item._id} ${index}`}
-                style={{ display: "flex" }}
-              >
-                <ItemCard item={item} />
-              </Grid>
-            ))}
-          </Grid>
+          <>
+            <Grid container spacing={1}>
+              {profileFavItems.items.map((item, index) => (
+                <Grid
+                  item
+                  xs={12}
+                  md={3}
+                  key={`${item._id} ${index}`}
+                  style={{ display: "flex" }}
+                >
+                  <ItemCard item={item} />
+                </Grid>
+              ))}
+            </Grid>
+            <div>
+              {profileFavItems.currentPage > 1 && (
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    setProfileFavItems({
+                      ...profileFavItems,
+                      currentPage: profileFavItems.currentPage - 1,
+                    })
+                  }
+                  className={styles.pageNavButton}
+                >
+                  {profileFavItems.currentPage - 1}
+                </Button>
+              )}
+              {profileData.favorite_items.length > 4 && (
+                <>
+                  <Button
+                    variant="contained"
+                    className={styles.pageNavButton}
+                    disabled
+                  >
+                    {profileFavItems.currentPage}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      setProfileFavItems({
+                        ...profileFavItems,
+                        currentPage: profileFavItems.currentPage + 1,
+                      })
+                    }
+                    className={styles.pageNavButton}
+                  >
+                    {profileFavItems.currentPage + 1}
+                  </Button>
+                </>
+              )}
+            </div>
+          </>
         ) : (
           <Typography>No favorites yet.</Typography>
         )}

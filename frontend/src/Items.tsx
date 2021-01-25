@@ -207,41 +207,23 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
               <div className={styles.recommended}>
                 <div style={{ marginTop: "5px", marginBottom: "5px" }}>
                   <Typography variant="h3">
-                    <b>Recommended</b>
+                    {discoverData.length >= 3 ? (
+                      <b>Recommended</b>
+                    ) : (
+                      <b>Discover</b>
+                    )}
                   </Typography>
                 </div>
 
                 <Grid container alignItems="stretch" spacing={1}>
                   {loading ? (
                     <CircularProgress />
+                  ) : recommendedData.length === 0 ? (
+                    <Typography>
+                      Could not find any items matching these criteria.
+                    </Typography>
                   ) : (
-                    recommendedData.map((it) => {
-                      return (
-                        <Grid
-                          item
-                          xs={12}
-                          md={4}
-                          key={it._id}
-                          style={{ display: "flex" }}
-                        >
-                          <ItemCard item={it} />
-                        </Grid>
-                      );
-                    })
-                  )}
-                </Grid>
-              </div>
-              <div className={styles.discover}>
-                <div style={{ marginTop: "5px", marginBottom: "5px" }}>
-                  <Typography variant="h3">
-                    <b>Discover</b>
-                  </Typography>
-                </div>
-                <Grid container alignItems="stretch" spacing={1}>
-                  {loading ? (
-                    <CircularProgress />
-                  ) : (
-                    discoverData.map((it) => (
+                    recommendedData.map((it) => (
                       <Grid
                         item
                         xs={12}
@@ -255,6 +237,32 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
                   )}
                 </Grid>
               </div>
+              {discoverData.length >= 3 && (
+                <div className={styles.discover}>
+                  <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+                    <Typography variant="h3">
+                      <b>Discover</b>
+                    </Typography>
+                  </div>
+                  <Grid container alignItems="stretch" spacing={1}>
+                    {loading ? (
+                      <CircularProgress />
+                    ) : (
+                      discoverData.map((it) => (
+                        <Grid
+                          item
+                          xs={12}
+                          md={4}
+                          key={it._id}
+                          style={{ display: "flex" }}
+                        >
+                          <ItemCard item={it} />
+                        </Grid>
+                      ))
+                    )}
+                  </Grid>
+                </div>
+              )}
             </Grid>
           </Grid>
           <div className={styles.pageNav}>

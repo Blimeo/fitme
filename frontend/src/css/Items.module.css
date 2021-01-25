@@ -1,24 +1,23 @@
 .container {
-    background-color: #f6f6f6;
+  background-color: #f6f6f6;
 }
 .topExplanation {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 .fab {
-    margin-left: auto;
-    margin-right: 10px;
+  margin-left: auto;
+  margin-right: 10px;
 }
-.topBox{
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.pageNav{
-    text-align:center;
-    margin-top: 10px;
-    border-top: 1px solid black;
+.topBox {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-.pageNavButton{
-    margin: 5px;
+.pageNav {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.pageNavButton {
+  margin: 5px;
 }

@@ -73,9 +73,12 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
       setLoading(true);
       const access_token = localStorage.getItem("access_token");
       const accessTokenString = `Bearer ${access_token}`;
-      fetch(`/discover_fits?gender=${genderFilter.toString()}&page=${page.toString()}`, {
-        method: "GET",
-      })
+      fetch(
+        `/discover_fits?gender=${genderFilter.toString()}&page=${page.toString()}`,
+        {
+          method: "GET",
+        }
+      )
         .then((r) => r.json())
         .then((response) => {
           dispatch(patchDiscover(response.fits as Fit[]));
@@ -195,21 +198,24 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
                 {page - 1}
               </Button>
             )}
-            <Button
-              variant="contained"
-              className={styles.pageNavButton}
-              disabled
-            >
-              {page}
-            </Button>
-            {discoverData.length === 15 && (
-              <Button
-                variant="contained"
-                onClick={() => setPage(page + 1)}
-                className={styles.pageNavButton}
-              >
-                {page + 1}
-              </Button>
+
+            {discoverData.length > 12 && (
+              <>
+                <Button
+                  variant="contained"
+                  className={styles.pageNavButton}
+                  disabled
+                >
+                  {page}
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => setPage(page + 1)}
+                  className={styles.pageNavButton}
+                >
+                  {page + 1}
+                </Button>
+              </>
             )}
           </div>
         </Container>

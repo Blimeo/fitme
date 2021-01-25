@@ -406,7 +406,7 @@ def upload_fit():
     fit_id = str(fit_id.inserted_id)
     users_collection.update({"email": identity}, {"$push": {"uploaded_fits": fit_id }}) 
     for item in items:
-        if item is not "":
+        if item != "":
             item_id = item['_id']
             items_collection.update_one({"_id": item_id}, {"$addToSet": {"inFits": fit_id}})
     return jsonify(ok=True)
@@ -497,7 +497,7 @@ def discover_items():
     docs = items_collection.find({"$and": conditions})
 
     page = int(request.args.get("page"))
-    page_size = 15
+    page_size = 12
     skips = page_size * (page - 1)
     cursor = docs.skip(skips).limit(page_size)
     docs = [x for x in cursor]
@@ -514,7 +514,7 @@ def discover_fits():
     docs = fits_collection.find({"$or": condition})
 
     page = int(request.args.get("page"))
-    page_size = 15
+    page_size = 12
     skips = page_size * (page - 1)
     cursor = docs.skip(skips).limit(page_size)
     docs = [x for x in cursor]
@@ -522,7 +522,7 @@ def discover_fits():
     for fit in docs:
         fit['_id'] = str(fit['_id'])
         for item in fit['items']:
-            if item is not "":
+            if item != "":
                 item['_id'] = str(item['_id'])
     return jsonify(fits=docs)
 
@@ -546,7 +546,7 @@ def recommended_items():
     random.shuffle(docs)
     for item in docs:
         item['_id'] = str(item['_id'])
-    return jsonify(items=docs[:4])
+    return jsonify(items=docs[:3])
 
 @app.route("/recommended_fits", methods=["GET"])
 @jwt_optional
@@ -563,7 +563,7 @@ def recommended_fits():
     for fit in docs:
         fit['_id'] = str(fit['_id'])
         for item in fit['items']:
-            if item is not "":
+            if item != "":
                 item['_id'] = str(item['_id'])
     return jsonify(fits=docs[:4])
 

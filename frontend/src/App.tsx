@@ -39,7 +39,6 @@ export default function App() {
         .then((response) => setLoggedIn(response.ok))
         .catch(() => history.push("/"));
     } else {
-      history.push("/");
       setLoggedIn(false);
     }
     console.log("Logged in: " + loggedIn);

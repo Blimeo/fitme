@@ -267,21 +267,24 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
                 {page - 1}
               </Button>
             )}
-            <Button
-              variant="contained"
-              className={styles.pageNavButton}
-              disabled
-            >
-              {page}
-            </Button>
+
             {discoverData.length > 12 && (
-              <Button
-                variant="contained"
-                onClick={() => setPage(page + 1)}
-                className={styles.pageNavButton}
-              >
-                {page + 1}
-              </Button>
+              <>
+                <Button
+                  variant="contained"
+                  className={styles.pageNavButton}
+                  disabled
+                >
+                  {page}
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => setPage(page + 1)}
+                  className={styles.pageNavButton}
+                >
+                  {page + 1}
+                </Button>
+              </>
             )}
           </div>
         </Container>

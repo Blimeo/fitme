@@ -12,7 +12,7 @@ import {
 import React, { ReactElement, useEffect, useState } from "react";
 import AddIcon from "@material-ui/icons/Add";
 import styles from "./css/Fits.module.css";
-import { Fit, Gender } from "./util/util-types";
+import { Fit, FitResponse, Gender } from "./util/util-types";
 import { connect } from "react-redux";
 import { RootState } from "./store/rootReducer";
 import FitCard from "./components/FitCard";
@@ -27,6 +27,7 @@ import { Dispatch } from "@reduxjs/toolkit";
 import { arraysSetEquality, useTitle } from "./util/util-functions";
 import { Link } from "react-router-dom";
 import GenderFilterUI from "./components/Util/GenderFilterUI";
+import { apiURL } from "./util/data";
 
 type OwnProps = {
   readonly loggedIn: boolean;
@@ -53,6 +54,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
     "Women",
     "Unisex",
   ]);
+  const [numFitsTotalInQuery, setNumFitsTotalInQuery] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const handleGenderFilter = (
@@ -74,7 +76,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
       const access_token = localStorage.getItem("access_token");
       const accessTokenString = `Bearer ${access_token}`;
       fetch(
-        `/discover_fits?gender=${genderFilter.toString()}&page=${page.toString()}`,
+        `${apiURL}/discover_fits?gender=${genderFilter.toString()}&page=${page.toString()}`,
         {
           method: "GET",
         }
@@ -84,7 +86,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
           dispatch(patchDiscover(response.fits as Fit[]));
         });
 
-      fetch(`/recommended_fits?gender=${genderFilter.toString()}`, {
+      fetch(`${apiURL}/recommended_fits?gender=${genderFilter.toString()}`, {
         method: "GET",
         headers: {
           Authorization: loggedIn ? accessTokenString : "",
@@ -92,6 +94,10 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
       })
         .then((r) => r.json())
         .then((response) => {
+          const fitsResponse = response.fits as FitResponse[];
+          if (fitsResponse.length > 0) {
+            setNumFitsTotalInQuery(fitsResponse[0].num_docs);
+          }
           dispatch(patchRecommended(response.fits as Fit[]));
           setLoading(false);
         });
@@ -137,15 +143,18 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
           )}
           <div className={styles.recommended}>
             <div style={{ marginTop: "5px", marginBottom: "5px" }}>
-              <Typography variant="h3">
-                <b>Recommended</b>
-              </Typography>
+              {recommendedData.length >= 3 && (
+                <Typography variant="h3">
+                  <b>Recommended</b>
+                </Typography>
+              )}
             </div>
 
             <Grid container alignItems="stretch" spacing={1}>
               {loading ? (
                 <CircularProgress />
               ) : (
+                recommendedData.length >= 3 &&
                 recommendedData.map((fit) => {
                   return (
                     <Grid
@@ -171,6 +180,10 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
             <Grid container alignItems="stretch" spacing={1}>
               {loading ? (
                 <CircularProgress />
+              ) : discoverData.length === 0 ? (
+                <Typography>
+                  We couldn't find any fits under that criteria.
+                </Typography>
               ) : (
                 discoverData.map((fit) => {
                   return (
@@ -199,7 +212,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
               </Button>
             )}
 
-            {discoverData.length > 12 && (
+            {discoverData.length >= 12 && numFitsTotalInQuery > 12 && (
               <>
                 <Button
                   variant="contained"

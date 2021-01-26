@@ -145,3 +145,6 @@ output/
 
 # Dummy dataset
 styles/
+
+# Pickled ML model
+model.pth

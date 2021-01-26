@@ -16,6 +16,7 @@ import styles from "./css/ItemView.module.css";
 import AvatarUsername from "./components/Util/AvatarUsername";
 import FitCard from "./components/FitCard";
 import { useTitle } from "./util/util-functions";
+import { apiURL } from "./util/data";
 
 type Props = {
   readonly loggedIn: boolean;
@@ -52,7 +53,7 @@ export default function ItemView({ loggedIn }: Props) {
     let opts = {
       item_id: item_id,
     };
-    fetch("/get_item", {
+    fetch(`${apiURL}/get_item`, {
       method: "POST",
       body: JSON.stringify(opts),
     })
@@ -61,7 +62,6 @@ export default function ItemView({ loggedIn }: Props) {
         if (response.error === "true") {
           history.push("/items");
         } else {
-          console.log(response.item);
           setItem(response.item as Item);
           let d: { original: string }[] = [];
           response.item.imgs.forEach((url: string) => {
@@ -77,7 +77,7 @@ export default function ItemView({ loggedIn }: Props) {
     if (loggedIn) {
       const access_token = localStorage.getItem("access_token");
       if (access_token !== null) {
-        fetch("/item_favorite_status/" + item_id, {
+        fetch(`${apiURL}/item_favorite_status/${item_id}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -93,7 +93,7 @@ export default function ItemView({ loggedIn }: Props) {
 
   useEffect(() => {
     if (item.inFits.length > 0) {
-      fetch("/get_fits", {
+      fetch(`${apiURL}/get_fits`, {
         method: "POST",
         body: JSON.stringify(
           item.inFits.slice(0, Math.min(4, item.inFits.length))
@@ -101,7 +101,6 @@ export default function ItemView({ loggedIn }: Props) {
       })
         .then((r) => r.json())
         .then((response) => {
-          console.log(response.fits);
           setIncludedFits(response.fits);
         });
     }
@@ -110,7 +109,7 @@ export default function ItemView({ loggedIn }: Props) {
   const handleFavorite = () => {
     const access_token = localStorage.getItem("access_token");
     if (access_token !== null) {
-      fetch("/favorite_item/" + item_id, {
+      fetch(`${apiURL}/favorite_item/${item_id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -124,7 +123,7 @@ export default function ItemView({ loggedIn }: Props) {
   const handleUnfavorite = () => {
     const access_token = localStorage.getItem("access_token");
     if (access_token !== null) {
-      fetch("/unfavorite_item/" + item_id, {
+      fetch(`${apiURL}/unfavorite_item/${item_id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -226,22 +225,19 @@ export default function ItemView({ loggedIn }: Props) {
                   <Typography>
                     <b>Fits featuring this item</b>
                   </Typography>
-                  <Grid container spacing={1}>
-                    {includedFits.map((fit, index) => (
-                      <Grid item xs={6} key={`${fit._id} ${index}`}>
-                        <FitCard fit={fit} />
-                      </Grid>
-                    ))}
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography>
-                    <b>Links</b>
-                  </Typography>
+                  {includedFits.length > 0 ? (
+                    <Grid container spacing={1}>
+                      {includedFits.map((fit, index) => (
+                        <Grid item xs={6} key={`${fit._id} ${index}`}>
+                          <FitCard fit={fit} />
+                        </Grid>
+                      ))}
+                    </Grid>
+                  ) : (
+                    <Typography variant="subtitle2">
+                      Currently, there are no fits featuring this item.
+                    </Typography>
+                  )}
                 </CardContent>
               </Card>
             </Grid>

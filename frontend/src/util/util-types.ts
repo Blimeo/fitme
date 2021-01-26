@@ -2,7 +2,6 @@ export type ProfileUser = string | "OWN PROFILE";
 
 export type SocialMediaAccount = string | "NONE_PROVIDED";
 
-
 export type User = {
   username: string;
   avatar: string; // link
@@ -40,6 +39,8 @@ export type ItemUploadType = {
   color: string;
 };
 
+export type ItemResponse = Item & { num_docs: number };
+
 export type Item = {
   _id: string;
   name: string;
@@ -67,6 +68,8 @@ export type FitUploadType = {
   itemBoxes: number[][]; // [[x1, y1, x2, y2], ...] where (x1, y1) is top-left and (x2, y2) is bottom-right
   gender: Gender;
 };
+
+export type FitResponse = Fit & { num_docs: number };
 
 export type Fit = {
   _id: string;

@@ -17,7 +17,7 @@ import { Gender, ItemUploadType } from "../../util/util-types";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import GenderToggleButtons from "../Util/GenderToggleButtons";
 import { Autocomplete } from "@material-ui/lab";
-import { clothingTypes, colorMap } from "../../util/data";
+import { apiURL, clothingTypes, colorMap } from "../../util/data";
 
 type Props = {
   readonly setUploadHidden: React.Dispatch<React.SetStateAction<boolean>>;
@@ -66,7 +66,7 @@ export default function ItemUpload({ setUploadHidden }: Props) {
       i++;
     }
     setIsSubmitting(true);
-    fetch("/submit_item", {
+    fetch(`${apiURL}/submit_item`, {
       method: "POST",
       headers: {
         Authorization: bearer,

@@ -14,6 +14,7 @@ import styles from "./css/FitView.module.css";
 import Annotation from "react-image-annotation";
 import AvatarUsername from "./components/Util/AvatarUsername";
 import { useTitle } from "./util/util-functions";
+import { apiURL } from "./util/data";
 type Props = {
   readonly loggedIn: boolean;
 };
@@ -47,7 +48,7 @@ export default function ItemView({ loggedIn }: Props) {
 
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    fetch(`/get_fit/${fit_id}`, {
+    fetch(`${apiURL}/get_fit/${fit_id}`, {
       method: "GET",
     })
       .then((r) => r.json())
@@ -66,7 +67,7 @@ export default function ItemView({ loggedIn }: Props) {
     if (loggedIn) {
       const access_token = localStorage.getItem("access_token");
       if (access_token !== null) {
-        fetch("/fit_favorite_status/" + fit_id, {
+        fetch(`${apiURL}/fit_favorite_status/${fit_id}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -84,7 +85,7 @@ export default function ItemView({ loggedIn }: Props) {
   const handleFavorite = () => {
     const access_token = localStorage.getItem("access_token");
     if (access_token !== null) {
-      fetch("/favorite_fit/" + fit_id, {
+      fetch(`${apiURL}/favorite_fit/${fit_id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -98,7 +99,7 @@ export default function ItemView({ loggedIn }: Props) {
   const handleUnfavorite = () => {
     const access_token = localStorage.getItem("access_token");
     if (access_token !== null) {
-      fetch("/unfavorite_fit/" + fit_id, {
+      fetch(`${apiURL}/unfavorite_fit/${fit_id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -177,7 +178,7 @@ export default function ItemView({ loggedIn }: Props) {
           <Grid container direction="column" spacing={1}>
             {fit.annotations.map((anno: any, index: number) => {
               return (
-                <Grid item xs={12}>
+                <Grid item xs={12} key={`${anno.data.id} ${index}`}>
                   {fit.items[index] === "" ? (
                     <Card
                       style={{ padding: "6px" }}

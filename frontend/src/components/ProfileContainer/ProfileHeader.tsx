@@ -20,6 +20,7 @@ import TwitterIcon from "@material-ui/icons/Twitter";
 import EditIcon from "@material-ui/icons/Edit";
 import DoneIcon from "@material-ui/icons/Done";
 import styles from "./ProfileHeader.module.css";
+import { apiURL } from "../../util/data";
 
 type Props = {
   readonly classes: Record<
@@ -70,16 +71,19 @@ function ProfileHeader({
   const handleFollowUser = async (): Promise<void> => {
     const access_token = localStorage.getItem("access_token");
     const bearer = "Bearer " + access_token;
-    const response = await fetch(`/follow_user?username=${username}`, {
+    const response = await fetch(`${apiURL}/follow_user?username=${username}`, {
       method: "PUT",
       headers: {
         Authorization: bearer,
       },
     });
     if (response.ok) {
-      const response = await fetch(`/profile_data?username=${username}`, {
-        method: "GET",
-      });
+      const response = await fetch(
+        `${apiURL}/profile_data?username=${username}`,
+        {
+          method: "GET",
+        }
+      );
       const data = await response.json();
       const userData = data as User;
       setProfileData(userData);
@@ -102,7 +106,7 @@ function ProfileHeader({
         profileImageFile.name
       );
     }
-    const response = await fetch("/update_profile", {
+    const response = await fetch(`${apiURL}/update_profile`, {
       method: "PUT",
       headers: {
         Authorization: bearer,
@@ -110,7 +114,7 @@ function ProfileHeader({
       body: requestBody,
     });
     if (response.ok) {
-      const response = await fetch("/my_profile_data", {
+      const response = await fetch(`${apiURL}/my_profile_data`, {
         method: "GET",
         headers: {
           Authorization: bearer,

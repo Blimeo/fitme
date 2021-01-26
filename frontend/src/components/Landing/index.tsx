@@ -70,12 +70,13 @@ function Landing() {
             <Grid item xs={12} md={4}>
               <Card>
                 <CardContent>
-                  <Typography variant="h4">Placeholder1</Typography>
-                  <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  <Typography variant="h5">
+                    Share Outfits With Less Hassle
+                  </Typography>
+                  <Typography className={styles.LandingCardDescriptionText}>
+                    We put each outfit ("fit") image into our machine learning
+                    model to automatically section off each part of your outfit
+                    so you can easily label them and show off your style!
                   </Typography>
                 </CardContent>
               </Card>
@@ -83,12 +84,12 @@ function Landing() {
             <Grid item xs={12} md={4}>
               <Card>
                 <CardContent>
-                  <Typography variant="h4">Placeholder2</Typography>
-                  <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  <Typography variant="h5">Save and Showcase</Typography>
+                  <Typography className={styles.LandingCardDescriptionText}>
+                    Our social network allows for you to showcase your favorite
+                    fashion items and fits while saving your favorites posted by
+                    others. Customize your profile to show off your social media
+                    accounts, or even change your profile picture!
                   </Typography>
                 </CardContent>
               </Card>

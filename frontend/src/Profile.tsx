@@ -1,6 +1,7 @@
 import { ReactElement, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProfileContainer from "./components/ProfileContainer";
+import { apiURL } from "./util/data";
 import { useTitle } from "./util/util-functions";
 import { User } from "./util/util-types";
 
@@ -26,7 +27,7 @@ const Profile = ({ loggedIn, ownProfile }: Props): ReactElement => {
       setIsOwnProfile(false);
     }
     if (loggedIn) {
-      fetch("/my_profile_data", {
+      fetch(`${apiURL}/my_profile_data`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${access_token}`,

@@ -21,3 +21,7 @@
 .UploadHeader {
   font-weight: 600;
 }
+
+.UploadDiv {
+  min-height: 364px;
+}

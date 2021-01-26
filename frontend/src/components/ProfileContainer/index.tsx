@@ -16,6 +16,7 @@ import NotFound from "../Error/NotFound";
 import ItemCard from "../ItemCard";
 import FitCard from "../FitCard";
 import styles from "./index.module.css";
+import { apiURL } from "../../util/data";
 
 type Props = {
   readonly username: ProfileUser | undefined;
@@ -109,7 +110,7 @@ function ProfileContainer({ username, loggedIn }: Props) {
   const accessTokenString = `Bearer ${access_token}`;
 
   const fetchFollowersList = useCallback(async (): Promise<void> => {
-    const response = await fetch("/my_profile_data", {
+    const response = await fetch(`${apiURL}/my_profile_data`, {
       method: "GET",
       headers: {
         Authorization: accessTokenString,
@@ -153,7 +154,7 @@ function ProfileContainer({ username, loggedIn }: Props) {
       }
       if (profileData !== null) {
         route += `?username=${profileData.username}&page=${pageNumber}`;
-        const response = await fetch(route, {
+        const response = await fetch(`${apiURL}${route}`, {
           method: "GET",
           headers: {
             Authorization: accessTokenString,
@@ -161,7 +162,6 @@ function ProfileContainer({ username, loggedIn }: Props) {
         });
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           switch (dataType) {
             case "ITEMS":
               setProfileItems({
@@ -201,8 +201,8 @@ function ProfileContainer({ username, loggedIn }: Props) {
       const profilePromise = accessTokenString
         ? fetch(
             username === "OWN PROFILE"
-              ? "/my_profile_data"
-              : `/profile_data?username=${username}`,
+              ? `${apiURL}/my_profile_data`
+              : `${apiURL}/profile_data?username=${username}`,
             {
               method: "GET",
               headers: {
@@ -210,7 +210,7 @@ function ProfileContainer({ username, loggedIn }: Props) {
               },
             }
           )
-        : fetch(`/profile_data?username=${username}`, {
+        : fetch(`${apiURL}/profile_data?username=${username}`, {
             method: "GET",
           });
       profilePromise

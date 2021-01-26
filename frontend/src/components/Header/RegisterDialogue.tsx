@@ -10,6 +10,7 @@ import styles from "./forms.module.css";
 import { Grid, Snackbar } from "@material-ui/core";
 import { emailIsValid } from "../../util/util-functions";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
+import { apiURL } from "../../util/data";
 
 type Props = {
   readonly buttonClassName: string;
@@ -58,7 +59,7 @@ export default function RegisterDialog({ buttonClassName }: Props) {
         username: username,
         password: password,
       };
-      const response = await fetch("/register", {
+      const response = await fetch(`${apiURL}/register`, {
         method: "POST",
         body: JSON.stringify(opts),
       });

@@ -15,7 +15,7 @@ import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
 import styles from "./css/Items.module.css";
 import ItemUpload from "./components/ItemUpload";
-import { Gender, Item } from "./util/util-types";
+import { Gender, Item, ItemResponse } from "./util/util-types";
 import ItemCard from "./components/ItemCard";
 import { connect } from "react-redux";
 import { RootState } from "./store/rootReducer";
@@ -29,7 +29,7 @@ import {
 } from "./store/slices/itemsSlice";
 import { Dispatch } from "@reduxjs/toolkit";
 import { arraysSetEquality, useTitle } from "./util/util-functions";
-import { clothingTypes } from "./util/data";
+import { apiURL, clothingTypes } from "./util/data";
 import GenderFilterUI from "./components/Util/GenderFilterUI";
 
 type OwnProps = {
@@ -56,7 +56,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
     "Women",
     "Unisex",
   ]);
-
+  const [numItemsTotalInQuery, setNumItemsTotalInQuery] = useState<number>(0);
   const [categoryFilter, setCategoryFilter] = useState("any");
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -78,22 +78,29 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
       (discoverData.length === 1 && discoverData[0]._id === "LOADING") ||
       (recommendedData.length === 1 && recommendedData[0]._id === "LOADING")
     ) {
+      if (categoryFilter !== currentCategoryFilter) {
+        setPage(1);
+      }
       setLoading(true);
       const access_token = localStorage.getItem("access_token");
       const accessTokenString = `Bearer ${access_token}`;
       fetch(
-        `/discover_items?gender=${genderFilter.toString()}&category=${categoryFilter}&page=${page.toString()}`,
+        `${apiURL}/discover_items?gender=${genderFilter.toString()}&category=${categoryFilter}&page=${page.toString()}`,
         {
           method: "GET",
         }
       )
         .then((r) => r.json())
         .then((response) => {
+          const itemsResponse = response.items as ItemResponse[];
+          if (itemsResponse.length > 0) {
+            setNumItemsTotalInQuery(itemsResponse[0].num_docs);
+          }
           dispatch(patchDiscover(response.items as Item[]));
         });
 
       fetch(
-        `/recommended_items?gender=${genderFilter.toString()}&category=${categoryFilter}`,
+        `${apiURL}/recommended_items?gender=${genderFilter.toString()}&category=${categoryFilter}`,
         {
           method: "GET",
           headers: {
@@ -276,7 +283,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
               </Button>
             )}
 
-            {discoverData.length > 12 && (
+            {discoverData.length >= 12 && numItemsTotalInQuery > 12 && (
               <>
                 <Button
                   variant="contained"

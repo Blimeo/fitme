@@ -16,6 +16,7 @@ distro==1.5.0
 dnspython==2.0.0
 Flask==1.1.2
 Flask-Bcrypt==0.7.1
+Flask-Cors==3.0.10
 Flask-JWT-Extended==3.25.0
 future==0.18.2
 fvcore==0.1.2.post20201218
@@ -63,8 +64,6 @@ tensorboard==2.4.0
 tensorboard-plugin-wit==1.7.0
 termcolor==1.1.0
 toml==0.10.2
-torch==1.7.1+cpu
-torchvision==0.8.2+cpu
 tqdm==4.55.1
 typing-extensions==3.7.4.3
 urllib3==1.26.2

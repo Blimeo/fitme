@@ -1,27 +1,35 @@
 # fitme
-A platform allowing users to share and discover fashion inspiration
+
+[Website Link](https://gofitme.herokuapp.com)
+
+A platform allowing users to share and discover fashion inspiration,
+eased through machine learning and a friendly social network.
 
 ## Architecture Overview
 
 ### Frontend
 
-- MVC: React
+- Framework: React
   - State Management: Redux
 - UI Library: MaterialUI
 - Build System: Yarn
 
 ### Backend
 
-- Middleware: Flask API
-  - Mongoose
+- Middleware: Flask HTTP API
 - MongoDB (Document-based NoSQL DB)
+- Amazon AWS S3 - Blob/Image Storage
 
 ### Machine Learning
 
 Libraries:
+
 - Pandas
+- NumPy
 - PyTorch
-- TBD
+  - Detectron2
+
+typeset on Jupyter Notebook
 
 ### Languages
 
@@ -31,4 +39,7 @@ Libraries:
 ### Workflow
 
 CI/CD Provider: GitHub Actions
-- Run linter and unit tests
+
+- Run linter
+
+See `frontend/package.json` for detailed frontend library dependencies.

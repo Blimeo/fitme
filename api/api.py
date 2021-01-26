@@ -24,6 +24,7 @@ app.config['SECRET_KEY'] = 'top secret'
 app.config['JWT_ACCESS_LIFESPAN'] = {'hours': 24}
 app.config['JWT_REFRESH_LIFESPAN'] = {'days': 30}
 jwt = JWTManager(app)
+port = int(os.environ.get("PORT", 5000))
 
 mongo_uri = os.getenv("MONGO_URI")
 connection_timeout = 2000  # ms
@@ -495,15 +496,17 @@ def discover_items():
     if category != "any":
         conditions.append({"category" : category})
     docs = items_collection.find({"$and": conditions})
-
+    num_docs = docs.count()
     page = int(request.args.get("page"))
     page_size = 12
     skips = page_size * (page - 1)
     cursor = docs.skip(skips).limit(page_size)
     docs = [x for x in cursor]
     
+    
     for item in docs:
         item['_id'] = str(item['_id'])
+        item['num_docs'] = num_docs
     return jsonify(items=docs)
 
 @app.route("/discover_fits", methods=["GET"])
@@ -512,7 +515,7 @@ def discover_fits():
     for filter in get_gender_from_request(request):
         condition.append({"gender": filter })
     docs = fits_collection.find({"$or": condition})
-
+    num_docs = docs.count()
     page = int(request.args.get("page"))
     page_size = 12
     skips = page_size * (page - 1)
@@ -521,6 +524,7 @@ def discover_fits():
 
     for fit in docs:
         fit['_id'] = str(fit['_id'])
+        fit['num_docs'] = num_docs
         for item in fit['items']:
             if item != "":
                 item['_id'] = str(item['_id'])
@@ -611,4 +615,4 @@ def submit_fit_image():
 
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    app.run(debug=True, host="0.0.0.0", port=port)

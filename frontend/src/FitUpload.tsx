@@ -20,6 +20,7 @@ import { Alert } from "@material-ui/lab";
 import { useHistory } from "react-router-dom";
 import GenderToggleButtons from "./components/Util/GenderToggleButtons";
 import { useTitle } from "./util/util-functions";
+import { apiURL } from "./util/data";
 
 type View = "AWAITING_IMAGE" | "CROP_SCREEN" | "PROCESSING" | "IMAGE_RETURNED";
 
@@ -39,6 +40,7 @@ export default function FitUpload() {
   const [view, setView] = useState<View>("AWAITING_IMAGE");
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadFailure, setUploadFailure] = useState(false);
+  const [uploadImageFailure, setUploadImageFailure] = useState(false);
   const [annotations, setAnnotations] = useState<any>([]);
   const handleChange = (prop: keyof FitUploadType) => (
     event: React.ChangeEvent<HTMLInputElement>
@@ -57,7 +59,6 @@ export default function FitUpload() {
     } else {
       setView("PROCESSING");
       setCropURL(URL.createObjectURL(img[0]));
-
       setView("CROP_SCREEN");
     }
   };
@@ -78,7 +79,7 @@ export default function FitUpload() {
       setUploadFailure(true);
       return;
     }
-    fetch("/upload_fit", {
+    fetch(`${apiURL}/upload_fit`, {
       method: "POST",
       headers: {
         Authorization: bearer,
@@ -104,13 +105,16 @@ export default function FitUpload() {
 
     form_data.append("img", img[0], img[0].name);
     form_data.append("crop", JSON.stringify(crop));
-    const response = await fetch(`/submit_fit_image`, {
+    const response = await fetch(`${apiURL}/submit_fit_image`, {
       method: "POST",
       headers: {
         Authorization: bearer,
       },
       body: form_data,
     });
+    if (response.status >= 500) {
+      setUploadImageFailure(true);
+    }
     if (response.ok) {
       const labelData = await response.json();
       setFit({
@@ -122,6 +126,7 @@ export default function FitUpload() {
       });
       setView("IMAGE_RETURNED");
     } else {
+      setUploadImageFailure(true);
       setView("AWAITING_IMAGE");
     }
   };
@@ -256,6 +261,15 @@ export default function FitUpload() {
                 <Alert onClose={() => setUploadFailure(false)} severity="error">
                   There was an error when uploading this fit. Make sure to
                   annotate each of this fit's items!
+                </Alert>
+              </Snackbar>
+              <Snackbar open={uploadImageFailure} autoHideDuration={6000}>
+                <Alert
+                  onClose={() => setUploadImageFailure(false)}
+                  severity="error"
+                >
+                  There was an error when uploading this image. Try again in a
+                  few minutes.
                 </Alert>
               </Snackbar>
             </Grid>

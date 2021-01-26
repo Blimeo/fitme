@@ -13,6 +13,7 @@ import { createMuiTheme, CssBaseline, ThemeProvider } from "@material-ui/core";
 import NotFound from "./components/Error/NotFound";
 import Footer from "./components/Footer";
 import { useHistory } from "react-router-dom";
+import { apiURL } from "./util/data";
 
 export default function App() {
   const history = useHistory();
@@ -30,7 +31,7 @@ export default function App() {
   useEffect(() => {
     const access_token = localStorage.getItem("access_token");
     if (access_token !== null) {
-      fetch("/verify_access_token", {
+      fetch(`${apiURL}/verify_access_token`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${access_token}`,

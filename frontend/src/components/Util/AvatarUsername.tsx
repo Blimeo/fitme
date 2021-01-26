@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { User } from "../../util/util-types";
 import styles from "./AvatarUsername.module.css";
 import DefaultProfileImage from "../../assets/img/default_avatar.png";
+import { apiURL } from "../../util/data";
 
 type Props = {
   readonly username: string;
@@ -13,7 +14,7 @@ const AvatarUsername = ({ username }: Props): ReactElement => {
   const [avatarUrl, setAvatarUrl] = useState<string>("");
 
   useEffect(() => {
-    fetch(`/profile_data?username=${username}`)
+    fetch(`${apiURL}/profile_data?username=${username}`)
       .then((response) => response.json())
       .then((data) => {
         const user = data as User;

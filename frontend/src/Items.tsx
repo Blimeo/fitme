@@ -29,7 +29,7 @@ import {
 } from "./store/slices/itemsSlice";
 import { Dispatch } from "@reduxjs/toolkit";
 import { arraysSetEquality, useTitle } from "./util/util-functions";
-import { clothingTypes } from "./util/data";
+import { apiURL, clothingTypes } from "./util/data";
 import GenderFilterUI from "./components/Util/GenderFilterUI";
 
 type OwnProps = {
@@ -85,7 +85,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
       const access_token = localStorage.getItem("access_token");
       const accessTokenString = `Bearer ${access_token}`;
       fetch(
-        `/discover_items?gender=${genderFilter.toString()}&category=${categoryFilter}&page=${page.toString()}`,
+        `${apiURL}/discover_items?gender=${genderFilter.toString()}&category=${categoryFilter}&page=${page.toString()}`,
         {
           method: "GET",
         }
@@ -100,7 +100,7 @@ const Items = ({ loggedIn, items, dispatch }: Props): ReactElement => {
         });
 
       fetch(
-        `/recommended_items?gender=${genderFilter.toString()}&category=${categoryFilter}`,
+        `${apiURL}/recommended_items?gender=${genderFilter.toString()}&category=${categoryFilter}`,
         {
           method: "GET",
           headers: {

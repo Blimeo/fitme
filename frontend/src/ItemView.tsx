@@ -16,6 +16,7 @@ import styles from "./css/ItemView.module.css";
 import AvatarUsername from "./components/Util/AvatarUsername";
 import FitCard from "./components/FitCard";
 import { useTitle } from "./util/util-functions";
+import { apiURL } from "./util/data";
 
 type Props = {
   readonly loggedIn: boolean;
@@ -52,7 +53,7 @@ export default function ItemView({ loggedIn }: Props) {
     let opts = {
       item_id: item_id,
     };
-    fetch("/get_item", {
+    fetch(`${apiURL}/get_item`, {
       method: "POST",
       body: JSON.stringify(opts),
     })
@@ -76,7 +77,7 @@ export default function ItemView({ loggedIn }: Props) {
     if (loggedIn) {
       const access_token = localStorage.getItem("access_token");
       if (access_token !== null) {
-        fetch("/item_favorite_status/" + item_id, {
+        fetch(`${apiURL}/item_favorite_status/${item_id}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -92,7 +93,7 @@ export default function ItemView({ loggedIn }: Props) {
 
   useEffect(() => {
     if (item.inFits.length > 0) {
-      fetch("/get_fits", {
+      fetch(`${apiURL}/get_fits`, {
         method: "POST",
         body: JSON.stringify(
           item.inFits.slice(0, Math.min(4, item.inFits.length))
@@ -108,7 +109,7 @@ export default function ItemView({ loggedIn }: Props) {
   const handleFavorite = () => {
     const access_token = localStorage.getItem("access_token");
     if (access_token !== null) {
-      fetch("/favorite_item/" + item_id, {
+      fetch(`${apiURL}/favorite_item/${item_id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -122,7 +123,7 @@ export default function ItemView({ loggedIn }: Props) {
   const handleUnfavorite = () => {
     const access_token = localStorage.getItem("access_token");
     if (access_token !== null) {
-      fetch("/unfavorite_item/" + item_id, {
+      fetch(`${apiURL}/unfavorite_item/${item_id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${access_token}`,

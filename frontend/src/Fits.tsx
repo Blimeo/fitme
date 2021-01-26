@@ -27,6 +27,7 @@ import { Dispatch } from "@reduxjs/toolkit";
 import { arraysSetEquality, useTitle } from "./util/util-functions";
 import { Link } from "react-router-dom";
 import GenderFilterUI from "./components/Util/GenderFilterUI";
+import { apiURL } from "./util/data";
 
 type OwnProps = {
   readonly loggedIn: boolean;
@@ -75,7 +76,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
       const access_token = localStorage.getItem("access_token");
       const accessTokenString = `Bearer ${access_token}`;
       fetch(
-        `/discover_fits?gender=${genderFilter.toString()}&page=${page.toString()}`,
+        `${apiURL}/discover_fits?gender=${genderFilter.toString()}&page=${page.toString()}`,
         {
           method: "GET",
         }
@@ -85,7 +86,7 @@ const Fits = ({ loggedIn, fits, dispatch }: Props): ReactElement => {
           dispatch(patchDiscover(response.fits as Fit[]));
         });
 
-      fetch(`/recommended_fits?gender=${genderFilter.toString()}`, {
+      fetch(`${apiURL}/recommended_fits?gender=${genderFilter.toString()}`, {
         method: "GET",
         headers: {
           Authorization: loggedIn ? accessTokenString : "",

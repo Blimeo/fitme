@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
+import { apiURL } from "../../util/data";
 
 const Inner = styled.div`
   padding: 8px 16px;
@@ -29,7 +30,7 @@ function TextEditor({ value, onChange }: Props) {
   const [searchResults, setSearchResults] = React.useState<SearchResult[]>([]);
   useEffect(() => {
     if (searchQuery) {
-      fetch(`/item_search/${searchQuery}`, {
+      fetch(`${apiURL}/item_search/${searchQuery}`, {
         method: "GET",
       })
         .then((r) => r.json())

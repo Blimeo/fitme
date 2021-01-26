@@ -8,6 +8,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { Grid, CircularProgress } from "@material-ui/core";
 import styles from "./forms.module.css";
+import { apiURL } from "../../util/data";
 
 type Props = {
   readonly logged: React.Dispatch<React.SetStateAction<boolean>>;
@@ -35,7 +36,7 @@ export default function LoginDialog({ logged, buttonClassName }: Props) {
       password: password,
     };
     setIsLoading(true);
-    fetch("/login", {
+    fetch(`${apiURL}/login`, {
       method: "POST",
       body: JSON.stringify(opts),
     })

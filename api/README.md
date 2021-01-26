@@ -13,4 +13,8 @@ You will need Heroku CLI installed.
 
 First, authenticate via `heroku login`.
 
-Next, `heroku container:login`.
+Next, `heroku container:login`. We push the built container to Heroku using
+`heroku container:push web --app gofitme-backend`, and then release it via
+`heroku container:release web --app gofitme-backend`.
+
+The API is currently deployed at `https://gofitme-backend.herokuapp.com/`.

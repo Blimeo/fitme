@@ -16,9 +16,11 @@ import random
 from OutfitMLModel import OutfitMLModel
 from PIL import Image
 from datetime import datetime
+from flask_cors import CORS
 
 load_dotenv(find_dotenv())
 app = Flask(__name__)
+CORS(app)
 bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = 'top secret'
 app.config['JWT_ACCESS_LIFESPAN'] = {'hours': 24}

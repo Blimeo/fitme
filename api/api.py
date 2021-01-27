@@ -186,12 +186,16 @@ def get_user_fits():
     page = int(request.args.get("page"))
     page_size = 4
     skips = page_size * (page - 1)  
-    print(page)
+    
     cursor = docs.skip(skips).limit(page_size)
     docs = [x for x in cursor]
     for fit in docs:
         fit['_id'] = str(fit['_id'])
-    return jsonify(fits=docs)
+        for item in fit['items']:
+            if type(item) is not str:
+                item['_id'] = str(item['_id'])
+    print(docs)
+    return jsonify(fits=docs) 
 
 @app.route("/get_user_fav_items", methods=["GET"])
 def get_user_fav_items():

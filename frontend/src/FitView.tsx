@@ -122,7 +122,9 @@ export default function ItemView({ loggedIn }: Props) {
         <Grid item xs={6}>
           <Annotation
             src={fit.img_url}
-            annotations={fit.annotations}
+            annotations={fit.annotations.filter(
+              (anno: any) => typeof anno !== "string"
+            )}
             value={dummyAnno}
             activeAnnotations={activeAnnotations}
             disableSelector
@@ -176,15 +178,30 @@ export default function ItemView({ loggedIn }: Props) {
             </CardContent>
           </Card>
           <Grid container direction="column" spacing={1}>
-            {fit.annotations.map((anno: any, index: number) => {
-              return (
-                <Grid item xs={12} key={`${anno.data.id} ${index}`}>
-                  {fit.items[index] === "" ? (
+            {fit.annotations.map((anno: any, index: number) => (
+              <Grid item xs={12} key={index}>
+                {typeof fit.items[index] === "string" ? (
+                  <Card
+                    style={{ padding: "6px" }}
+                    onMouseOver={() => setActiveAnnotations([anno])}
+                    onMouseOut={() => setActiveAnnotations([])}
+                  >
+                    <div style={{ color: "gray" }}>
+                      <Typography>Item</Typography>
+                    </div>
+                    <Typography>
+                      <b>{anno.data.text}</b>
+                    </Typography>
+                  </Card>
+                ) : (
+                  <Link
+                    to={`/item/${(fit.items[index] as Item)._id}`}
+                    style={{ textDecoration: "none" }}
+                  >
                     <Card
                       style={{ padding: "6px" }}
                       onMouseOver={() => setActiveAnnotations([anno])}
                       onMouseOut={() => setActiveAnnotations([])}
-                      key={index}
                     >
                       <div style={{ color: "gray" }}>
                         <Typography>Item</Typography>
@@ -193,29 +210,10 @@ export default function ItemView({ loggedIn }: Props) {
                         <b>{anno.data.text}</b>
                       </Typography>
                     </Card>
-                  ) : (
-                    <Link
-                      to={`/item/${(fit.items[index] as Item)._id}`}
-                      style={{ textDecoration: "none" }}
-                    >
-                      <Card
-                        style={{ padding: "6px" }}
-                        onMouseOver={() => setActiveAnnotations([anno])}
-                        onMouseOut={() => setActiveAnnotations([])}
-                        key={index}
-                      >
-                        <div style={{ color: "gray" }}>
-                          <Typography>Item</Typography>
-                        </div>
-                        <Typography>
-                          <b>{anno.data.text}</b>
-                        </Typography>
-                      </Card>
-                    </Link>
-                  )}
-                </Grid>
-              );
-            })}
+                  </Link>
+                )}
+              </Grid>
+            ))}
           </Grid>
         </Grid>
 

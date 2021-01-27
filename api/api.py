@@ -186,14 +186,16 @@ def get_user_fits():
     page = int(request.args.get("page"))
     page_size = 4
     skips = page_size * (page - 1)  
+    
     cursor = docs.skip(skips).limit(page_size)
     docs = [x for x in cursor]
     for fit in docs:
         fit['_id'] = str(fit['_id'])
         for item in fit['items']:
-            if item != "":
+            if type(item) is not str:
                 item['_id'] = str(item['_id'])
-    return jsonify(fits=docs)
+    print(docs)
+    return jsonify(fits=docs) 
 
 @app.route("/get_user_fav_items", methods=["GET"])
 def get_user_fav_items():
@@ -236,7 +238,7 @@ def get_user_fav_fits():
     for fit in docs:
         fit['_id'] = str(fit['_id'])
         for item in fit['items']:
-            if item != "":
+            if type(item) is not str:
                 item['_id'] = str(item['_id'])
     return jsonify(fits=docs)
 
@@ -346,7 +348,7 @@ def get_fit(fit_id):
         return jsonify(error="true")
     fit['_id'] = str(fit['_id'])
     for item in fit['items']:
-        if item != "":
+        if type(item) is not str:
             item['_id'] = str(item['_id'])
     return jsonify(error="false", fit=fit)
 
@@ -365,7 +367,8 @@ def get_fits():
             return jsonify(error="true")
         fit['_id'] = str(fit['_id'])
         for item in fit['items']:
-            item['_id'] = str(item['_id'])
+            if type(item) is not str:
+                item['_id'] = str(item['_id'])
         fits.append(fit)
     return jsonify(error="false", fits=fits)
 
@@ -386,21 +389,26 @@ def upload_fit():
         if (name == "Label this fit item!"):
             return jsonify(error="Unannotated item")
         if item_doc is None:
-            items.append("")
+            if name.startswith(
+                "Create new item (item not in list): "
+            ):
+                items.append(name[len("Create new item (item not in list): "):])
+            else:
+                items.append(name)
         else:
             items.append(item_doc)
-    annotations = list(
-        map(
-            lambda anno: anno["data"]["text"][len("Create new item (item not in list): "):]
-            if anno["data"]["text"].startswith(
-                "Create new item (item not in list): "
-            )
-            else anno,
-            annotations,
-        )
-    )
+    cleaned_annotations = []
+    for anno in annotations:
+        if anno["data"]["text"].startswith(
+            "Create new item (item not in list): "
+        ):
+            anno["data"]["text"] = anno["data"]["text"][len("Create new item (item not in list): "):]
+            cleaned_annotations.append(anno)
+        else:
+            cleaned_annotations.append(anno)
+    
     fit["items"] = items
-    fit["annotations"] = annotations
+    fit["annotations"] = cleaned_annotations
     fit["uploader"] = users_collection.find_one(
         {"email": identity})['username']
     fit["favorited"] = 0
@@ -409,7 +417,7 @@ def upload_fit():
     fit_id = str(fit_id.inserted_id)
     users_collection.update({"email": identity}, {"$push": {"uploaded_fits": fit_id }}) 
     for item in items:
-        if item != "":
+        if type(item) is not str:
             item_id = item['_id']
             items_collection.update_one({"_id": item_id}, {"$addToSet": {"inFits": fit_id}})
     return jsonify(ok=True)
@@ -528,7 +536,7 @@ def discover_fits():
         fit['_id'] = str(fit['_id'])
         fit['num_docs'] = num_docs
         for item in fit['items']:
-            if item != "":
+            if type(item) is not str:
                 item['_id'] = str(item['_id'])
     return jsonify(fits=docs)
 
@@ -569,7 +577,7 @@ def recommended_fits():
     for fit in docs:
         fit['_id'] = str(fit['_id'])
         for item in fit['items']:
-            if item != "":
+            if type(item) is not str:
                 item['_id'] = str(item['_id'])
     return jsonify(fits=docs[:4])
 

@@ -1,4 +1,4 @@
-export const apiURL = "";
+export const apiURL = "https://gofitme-backend.herokuapp.com";
 
 export const clothingTypes = [
   "Tops",

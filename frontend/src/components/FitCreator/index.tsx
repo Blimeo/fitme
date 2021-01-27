@@ -52,6 +52,15 @@ export default function FitCreator({
 }: Props) {
   const [baseAnnotation, setBaseAnnotation] = useState<any>({});
   const [activeAnnotations, setActiveAnnotations] = useState<any>([]);
+
+  const cleanAnnotations = annotations.map((anno: any) => ({
+    ...anno,
+    data: {
+      ...anno.data,
+      text: getItemNameFromCustomString(anno.data.text),
+    },
+  }));
+
   useEffect(() => {
     setAnnotations(setMLAnnotations(boxes, width, height));
   }, [boxes, img, width, height, setAnnotations]);
@@ -86,12 +95,17 @@ export default function FitCreator({
         <Annotation
           src={img}
           alt="Your fit upload image"
-          annotations={annotations.map((anno: any) => ({
-            ...anno,
-            data: { text: getItemNameFromCustomString(anno.data.text) },
-          }))}
+          annotations={cleanAnnotations}
           value={baseAnnotation}
-          activeAnnotations={activeAnnotations}
+          activeAnnotations={
+            activeAnnotations.length === 0
+              ? []
+              : [
+                  cleanAnnotations.find(
+                    (anno: any) => anno.data.id === activeAnnotations[0].data.id
+                  ),
+                ]
+          }
           onChange={setBaseAnnotation}
           onSubmit={onSubmit}
           renderEditor={renderEditor}

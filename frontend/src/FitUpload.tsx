@@ -92,7 +92,7 @@ export default function FitUpload() {
           setUploadSuccess(true);
           setTimeout(() => {
             history.push("/fits");
-          }, 2000);
+          }, 3000);
         }
       });
   };

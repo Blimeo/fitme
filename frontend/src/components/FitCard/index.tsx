@@ -14,7 +14,7 @@ type Props = {
 };
 export default function FitCard({ fit }: Props) {
   return (
-    <Link to={"/fit/" + fit._id} style={{ textDecoration: "none" }}>
+    <Link to={`/fit/${fit._id}`} style={{ textDecoration: "none" }}>
       <Card
         style={{
           display: "flex",
@@ -31,7 +31,9 @@ export default function FitCard({ fit }: Props) {
             title={fit.name}
           />
           <CardContent>
-            <Typography variant="body2" style={{color: "gray"}}>Uploaded by {fit.uploader}</Typography>
+            <Typography variant="body2" style={{ color: "gray" }}>
+              Uploaded by {fit.uploader}
+            </Typography>
             <Typography variant="body1">{fit.name}</Typography>
           </CardContent>
         </CardActionArea>

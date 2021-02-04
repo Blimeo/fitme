@@ -1,6 +1,8 @@
 # fitme
 
-[Website Link](https://gofitme.herokuapp.com)
+[Website Link](https://gofitme.herokuapp.com) [Demo Video](https://www.youtube.com/watch?v=icFoew4bchg)
+
+*(Note that the ML model runs on the free memory tier on Heroku as a Docker container and it may not work with a high resolution image.)*
 
 A platform allowing users to share and discover fashion inspiration,
 eased through machine learning and a friendly social network.
